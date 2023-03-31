@@ -1,5 +1,6 @@
 create table if not exists profiles(
-    email varchar(255) primary key,
+    profile_id serial primary key,
+    email varchar(255) unique,
     name varchar (255),
     surname varchar(255)
 );
