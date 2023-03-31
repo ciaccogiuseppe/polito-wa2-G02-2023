@@ -1,4 +1,4 @@
-create table if not exists customers(
+create table if not exists profiles(
     email varchar(255) primary key,
     name varchar (255),
     surname varchar(255)
