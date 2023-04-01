@@ -4,12 +4,12 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 
 data class ProfileDTO(
-    @NotNull
-    @Email
+    @field: NotNull
+    @field:Email
     val email: String,
-    @NotNull
+    @field:NotNull
     val name: String,
-    @NotNull
+    @field:NotNull
     val surname: String
 )
 

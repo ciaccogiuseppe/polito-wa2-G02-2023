@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
 data class ProductDTO(
-    @Size(min = 13, max = 13)
+    @field:Size(min = 13, max = 13)
     val productId: String,
-    @NotNull
+    @field:NotNull
     val name: String,
-    @NotNull
+    @field:NotNull
     val brand: String
 )
 
