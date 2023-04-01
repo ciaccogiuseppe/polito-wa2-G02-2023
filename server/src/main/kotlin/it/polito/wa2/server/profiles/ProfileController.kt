@@ -21,7 +21,6 @@ class ProfileController(private val profileService: ProfileService) {
     fun getProfile(@PathVariable email: String): ProfileDTO? {
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
-
         return profileService.getProfile(email)
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
@@ -44,9 +43,10 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong email format")
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong profile format")
+        if (profile == null)
+            throw BadRequestProfileException("Profile must not be NULL")
         if (profileService.getProfile(email) == null)
             throw ProfileNotFoundException("Profile with email '${email}' not found")
-
-        profileService.updateProfile(email, profile!!)
+        profileService.updateProfile(email, profile)
     }
 }
