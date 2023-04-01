@@ -1,5 +1,6 @@
 package it.polito.wa2.server.profiles
 
+import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.DuplicateProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import it.polito.wa2.server.UnprocessableProfileException
@@ -22,31 +23,29 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong email format")
 
         return profileService.getProfile(email)
-            ?: throw ProfileNotFoundException("Profile with email '${email} not found")
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
 
     @PostMapping("/API/profiles")
     @ResponseStatus(HttpStatus.CREATED)
     fun addProfile(@RequestBody @Valid profile: ProfileDTO?, br: BindingResult) {
-        if (br.hasFieldErrors("email"))
-            throw UnprocessableProfileException("Wrong email format")
-        if (profile != null && profileService.getProfile(profile.email) == null)
+        if (br.hasErrors())
+            throw UnprocessableProfileException("Wrong profile format")
+        if (profile == null)
+                throw BadRequestProfileException("Profile must not be NULL")
+        if (profileService.getProfile(profile.email) != null)
             throw DuplicateProfileException("Profile with email '${profile.email}' already exists")
-        profileService.addProfile(profile!!)
+        profileService.addProfile(profile)
     }
 
     @PutMapping("/API/profiles/{email}")
-    fun updateProfile(@PathVariable email: String, @RequestBody profile: ProfileDTO?, br: BindingResult) {
+    fun updateProfile(@PathVariable email: String, @RequestBody @Valid profile: ProfileDTO?, br: BindingResult) {
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
         if (br.hasErrors())
-            throw UnprocessableProfileException(br
-                .allErrors
-                .map { e -> e.objectName + ": " + e.defaultMessage + "\n" }
-                .reduce { s1, s2 -> s1 + s2 }
-            )
+            throw UnprocessableProfileException("Wrong profile format")
         if (profileService.getProfile(email) == null)
-            throw ProfileNotFoundException("Profile with email '${email} not found")
+            throw ProfileNotFoundException("Profile with email '${email}' not found")
 
         profileService.updateProfile(email, profile!!)
     }
