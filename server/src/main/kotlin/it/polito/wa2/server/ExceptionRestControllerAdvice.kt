@@ -18,7 +18,7 @@ class ExceptionRestControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(UnprocessableProductException::class)
-    fun handleProductNotFound(e: UnprocessableProductException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+    fun handleUnprocessableProduct(e: UnprocessableProductException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -29,12 +29,17 @@ class ExceptionRestControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ProfileNotFoundException::class)
-    fun handleProductNotFound(e: ProfileNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+    fun handleProfileNotFound(e: ProfileNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
 
     @ResponseBody
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(UnprocessableProfileException::class)
-    fun handleProductNotFound(e: UnprocessableProfileException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+    fun handleUnprocessableProfile(e: UnprocessableProfileException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DuplicateProfileException::class)
+    fun handleDuplicateProfile(e: DuplicateProfileException) = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.message!! )
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message) {}
@@ -42,3 +47,4 @@ class UnprocessableProductException(message: String): RuntimeException(message) 
 class DuplicateProductException(message: String): RuntimeException(message) {}
 class ProfileNotFoundException(message: String): RuntimeException(message) {}
 class UnprocessableProfileException(message: String): RuntimeException(message) {}
+class DuplicateProfileException(message: String): RuntimeException(message) {}

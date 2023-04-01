@@ -1,9 +1,16 @@
 package it.polito.wa2.server.profiles
 
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotNull
+
 data class ProfileDTO(
-        val email: String,
-        val name: String,
-        val surname: String
+    @NotNull
+    @Email
+    val email: String,
+    @NotNull
+    val name: String,
+    @NotNull
+    val surname: String
 )
 
 fun Profile.toDTO(): ProfileDTO {
