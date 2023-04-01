@@ -1,8 +1,10 @@
 import {Button} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import AppNavbar from "../AppNavbar/AppNavbar";
 
 function HomePage(props){
+    const navigate = useNavigate();
     return <>
         <div style={{
             position: 'absolute',
@@ -17,7 +19,7 @@ function HomePage(props){
                 <Button variant="info" style={{borderColor:"black", borderWidth:"2px"}} className="HomeButton">Get product by ID</Button>
             </div>
             <div className="CenteredButton">
-                <Button variant="info" style={{borderColor:"black", borderWidth:"2px"}} className="HomeButton">Get profiles by mail</Button>
+                <Button variant="info" style={{borderColor:"black", borderWidth:"2px"}} className="HomeButton"onClick={(e)=>{e.preventDefault(); navigate("/userinfo")}}>Get profile by mail</Button>
             </div>
             <div className="CenteredButton">
                 <Button variant="info" style={{borderColor:"black", borderWidth:"2px"}} className="HomeButton">Create new profile</Button>

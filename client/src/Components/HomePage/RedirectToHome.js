@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import {useEffect} from "react";
 import AppNavbar from "../AppNavbar/AppNavbar";
