@@ -12,10 +12,10 @@ function ProductsPage(props) {
                 setProductsList([]);
                 for (let product of res) {
                     setProductsList((oldList) => oldList.concat(
-                    <tr key={product.productId}>
-                        <td>{product.productId}</td>
-                        <td>{product.name}</td>
-                        <td>{product.brand}</td>
+                        <tr key={product.productId}>
+                            <td className="text-info">{product.productId}</td>
+                            <td className="text-info">{product.name}</td>
+                            <td className="text-info">{product.brand}</td>
                         </tr>));
                 }
             }
@@ -26,7 +26,6 @@ function ProductsPage(props) {
     }
 
     useEffect(() => getProducts(), []);
-    console.log(productsList)
     return <>
         <div style={{
             position: 'absolute',
@@ -37,15 +36,20 @@ function ProductsPage(props) {
             <AppNavbar />
 
             {productsList.length > 0 ?
-                <div className="text-info">
-                    <table style={{ alignContent: "center", width:"70%", margin: "auto", marginTop: 30}}>
-                        <tr>
-                            <th className="text-light"><h4>ProductID</h4></th>
-                            <th className="text-light"><h4>Name</h4></th>
-                            <th className="text-light"><h4>Brand</h4></th>
-                        </tr>
-                        {productsList}
+                <div>
+                    <table className="table table-striped table-dark" style={{ alignContent: "center", width: "70%", margin: "auto", marginTop: 30 }}>
+                        <thead>
+                            <tr className="text-light">
+                                <th><h4>ProductID</h4></th>
+                                <th><h4>Name</h4></th>
+                                <th><h4>Brand</h4></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {productsList}
+                        </tbody>
                     </table>
+                    <hr style={{ color: "white", width: "90%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginTop: "20px" }} />
                 </div>
                 : <></>}
 
