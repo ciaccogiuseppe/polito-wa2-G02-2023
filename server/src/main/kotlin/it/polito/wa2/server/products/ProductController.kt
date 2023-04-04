@@ -2,10 +2,12 @@ package it.polito.wa2.server.products
 
 import it.polito.wa2.server.ProductNotFoundException
 import it.polito.wa2.server.UnprocessableProductException
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
+@CrossOrigin(origins =["http://localhost:3000"])
 @RestController
 class ProductController(private val productService: ProductService) {
     @GetMapping("/API/products/")
