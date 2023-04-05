@@ -1,7 +1,7 @@
 package it.polito.wa2.server.profiles
 
 import it.polito.wa2.server.BadRequestProfileException
-import it.polito.wa2.server.DuplicateProfileException
+// import it.polito.wa2.server.DuplicateProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import it.polito.wa2.server.UnprocessableProfileException
 import jakarta.validation.Valid
@@ -27,8 +27,6 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong profile format")
         if (profile == null)
                 throw BadRequestProfileException("Profile must not be NULL")
-        if (profileService.getProfile(profile.email) != null)
-            throw DuplicateProfileException("Profile with email '${profile.email}' already exists")
         profileService.addProfile(profile)
     }
 
@@ -40,8 +38,6 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong profile format")
         if (profile == null)
             throw BadRequestProfileException("Profile must not be NULL")
-        if (profileService.getProfile(email) == null)
-            throw ProfileNotFoundException("Profile with email '${email}' not found")
         profileService.updateProfile(email, profile)
     }
 }

@@ -2,7 +2,8 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HomePage from "./Components/HomePage/HomePage";
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import ProductsPage from "./Components/Products/ProductsMainPage/ProductsPage";
+import ProductsPage from "./Components/Products/ProductsPage/ProductsPage";
+import ProductIdPage from "./Components/Products/ProductIdPage/ProductIdPage";
 import UserInfoPage from "./Components/Users/UserInfoPage/UserInfoPage";
 import RedirectToHome from "./Components/HomePage/RedirectToHome";
 import UserCreatePage from "./Components/Users/UserCreatePage/UserCreatePage";
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path='/' element= {<HomePage/>}/>
           <Route path='/products' element= {<ProductsPage/>}/>
+          <Route path='/productid' element= {<ProductIdPage/>}/>
           <Route path='/userinfo' element= {<UserInfoPage/>}/>
           <Route path='/usercreate' element= {<UserCreatePage/>}/>
           <Route path="*" element={<RedirectToHome/>} />

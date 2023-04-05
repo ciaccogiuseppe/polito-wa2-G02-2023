@@ -7,7 +7,7 @@ import jakarta.persistence.*
 class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var profile_id = 0
+    var profileId = 0
     var email: String = ""
     var name: String = ""
     var surname: String = ""

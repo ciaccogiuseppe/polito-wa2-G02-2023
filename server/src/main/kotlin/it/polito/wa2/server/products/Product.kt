@@ -8,7 +8,7 @@ import jakarta.persistence.Table
 @Table(name="products")
 class Product {
     @Id
-    var product_id: String = ""
+    var productId: String = ""
     var name: String = ""
     var brand: String = ""
 }
