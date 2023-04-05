@@ -21,7 +21,7 @@ class ProfileServiceImpl(
    }
 
     override fun updateProfile(email: String, newProfile: ProfileDTO) {
-        if(profileRepository.findByEmail(newProfile.email) != null)
+        if(email != newProfile.email && profileRepository.findByEmail(newProfile.email) != null)
             throw DuplicateProfileException("Profile with email '${newProfile.email}' already exists")
         val profile = profileRepository.findByEmail(email)
         if(profile != null) {

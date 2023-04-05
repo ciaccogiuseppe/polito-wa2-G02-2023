@@ -1,7 +1,6 @@
 package it.polito.wa2.server.profiles
 
 import it.polito.wa2.server.BadRequestProfileException
-// import it.polito.wa2.server.DuplicateProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import it.polito.wa2.server.UnprocessableProfileException
 import jakarta.validation.Valid

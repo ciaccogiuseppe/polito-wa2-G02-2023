@@ -1,15 +1,15 @@
 package it.polito.wa2.server.profiles
 
 import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.NotBlank
 
 data class ProfileDTO(
-    @field: NotNull
-    @field:Email
+    @field:NotBlank(message="email is mandatory")
+    @field:Email(message="email must be valid")
     val email: String,
-    @field:NotNull
+    @field:NotBlank(message="name is mandatory")
     val name: String,
-    @field:NotNull
+    @field:NotBlank(message="surname is mandatory")
     val surname: String
 )
 
