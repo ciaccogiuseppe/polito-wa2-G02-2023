@@ -15,12 +15,15 @@ async function getProfileDetails(email){
         case 404:
             err.message = "404 - Not Found";
             break;
+        case 422:
+            const detail = JSON.parse(await response.text()).detail;
+            err.message = "422 - " + detail;
+            break;
         default:
             err.message = "Generic Server Error";
             break;
     }
     throw(err);
-    //TODO: finish error handling
 }
 
 async function addNewProfile(profile){
@@ -37,19 +40,27 @@ async function addNewProfile(profile){
         const result = "success";
         return result;
     }
+    let detail = "";
     switch(response.status){
         case 500:
             err.message = "500 - Internal Server Error";
             break;
+        case 400:
+            detail = JSON.parse(await response.text()).detail;
+            err.message = "400 - " + detail;
+            break;
         case 409:
-            const detail = JSON.parse(await response.text()).detail;
+            detail = JSON.parse(await response.text()).detail;
             err.message = "409 - " + detail;
+            break;
+        case 422:
+            detail = JSON.parse(await response.text()).detail;
+            err.message = "422 - " + detail;
             break;
         default:
             err.message = "Generic Server Error";
             break;
     }
-    //TODO: finish error handling
     throw(err);
 }
 
