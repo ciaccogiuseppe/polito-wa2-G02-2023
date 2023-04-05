@@ -1,23 +1,24 @@
 import {Button, Form, Spinner} from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import {useEffect, useState} from "react";
-import {getProfileDetails} from "../../../API/Profiles";
+import {addNewProfile} from "../../../API/Profiles";
 
 
 
 
-function UserInfoPage(props){
+function UserCreatePage(props){
     const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
+    const [surname, setSurname] = useState("");
     const [errMessage, setErrMessage] = useState("");
     const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
-
-    function getProfile(){
+    function createProfile(){
         setLoading(true);
-        getProfileDetails(email).then(
+        addNewProfile({email:email, name:name, surname:surname}).then(
             res => {
                 setErrMessage("");
-                setResponse(res);
+                setResponse("User added succesfully");
                 setLoading(false);
                 //console.log(res);
             }
@@ -38,29 +39,27 @@ function UserInfoPage(props){
             <AppNavbar/>
 
             <div className="CenteredButton">
-                
+
                 <Form className="form">
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label>Email address</Form.Label>
                         <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} type="email" placeholder="Enter email" onChange={e => setEmail(e.target.value)}/>
+                        <Form.Label>Name</Form.Label>
+                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} type="text" placeholder="Name" onChange={e => setName(e.target.value)}/>
+                        <Form.Label>Surname</Form.Label>
+                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} type="text" placeholder="Surname" onChange={e => setSurname(e.target.value)}/>
                     </Form.Group>
-                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); getProfile();}}>Search user</Button>
+                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); createProfile();}}>Create user</Button>
                 </Form>
                 <hr style={{color:"white", width:"90%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}/>
                 {loading? <Spinner style={{alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}} animation="border" variant="info" /> :
                     <>
-                {response.name?<h4 className="text-light" style={{marginTop:"10px"}}>Name</h4>:<></>}
-                <div className="text-info">{response.name}</div>
-                {response.surname?<h4 className="text-light" style={{marginTop:"10px"}}>Surname</h4>:<></>}
-                <div className="text-info">{response.surname}</div>
-                {response.email?<h4 className="text-light" style={{marginTop:"10px"}}>E-Mail</h4>:<></>}
-                <div className="text-info">{response.email}</div>
-
-                {errMessage?<h5 className="text-danger" style={{marginTop:"10px"}}>{errMessage}</h5>:<></>}</>}
+                        {response?<h4 className="text-success" style={{marginTop:"10px"}}>{response}</h4>:<></>}
+                        {errMessage?<h5 className="text-danger" style={{marginTop:"10px"}}>{errMessage}</h5>:<></>}</>}
 
             </div>
         </div>
     </>
 }
 
-export default UserInfoPage;
+export default UserCreatePage;

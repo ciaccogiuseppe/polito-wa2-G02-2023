@@ -5,6 +5,7 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import ProductsPage from "./Components/Products/ProductsMainPage/ProductsPage";
 import UserInfoPage from "./Components/Users/UserInfoPage/UserInfoPage";
 import RedirectToHome from "./Components/HomePage/RedirectToHome";
+import UserCreatePage from "./Components/Users/UserCreatePage/UserCreatePage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path='/' element= {<HomePage/>}/>
           <Route path='/products' element= {<ProductsPage/>}/>
           <Route path='/userinfo' element= {<UserInfoPage/>}/>
+          <Route path='/usercreate' element= {<UserCreatePage/>}/>
           <Route path="*" element={<RedirectToHome/>} />
         </Routes>
       </Router>
