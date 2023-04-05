@@ -13,5 +13,5 @@ data class ProductDTO(
 )
 
 fun Product.toDTO(): ProductDTO {
-    return ProductDTO(product_id, name, brand)
+    return ProductDTO(productId, name, brand)
 }
