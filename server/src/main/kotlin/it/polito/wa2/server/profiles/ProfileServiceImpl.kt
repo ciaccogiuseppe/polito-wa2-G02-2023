@@ -8,9 +8,8 @@ class ProfileServiceImpl(
 ): ProfileService {
 
     override fun getProfile(email: String): ProfileDTO? {
-        val found = profileRepository.findByEmail(email)
-        return if (found.isEmpty()) null
-            else found[0].toDTO()
+        return profileRepository.findByEmail(email)
+            ?.toDTO()
     }
 
     override fun addProfile(profile: ProfileDTO) {
@@ -18,10 +17,12 @@ class ProfileServiceImpl(
    }
 
     override fun updateProfile(email: String, newProfile: ProfileDTO) {
-        val profile = profileRepository.findByEmail(email)[0]
-        profile.email = newProfile.email
-        profile.name = newProfile.name
-        profile.surname = newProfile.surname
-        profileRepository.save(profile)
+        val profile = profileRepository.findByEmail(email)
+        if(profile != null) {
+            profile.email = newProfile.email
+            profile.name = newProfile.name
+            profile.surname = newProfile.surname
+            profileRepository.save(profile)
+        }
     }
 }
