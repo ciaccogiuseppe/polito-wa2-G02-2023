@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*
 class ProfileController(private val profileService: ProfileService) {
     @GetMapping("/API/profiles/{email}")
     fun getProfile(@PathVariable email: String): ProfileDTO? {
-        if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
-            throw UnprocessableProfileException("Wrong email format")
+        checkEmail(email)
         return profileService.getProfile(email)
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
@@ -22,21 +21,29 @@ class ProfileController(private val profileService: ProfileService) {
     @PostMapping("/API/profiles")
     @ResponseStatus(HttpStatus.CREATED)
     fun addProfile(@RequestBody @Valid profile: ProfileDTO?, br: BindingResult) {
-        if (br.hasErrors())
-            throw UnprocessableProfileException("Wrong profile format")
-        if (profile == null)
-                throw BadRequestProfileException("Profile must not be NULL")
-        profileService.addProfile(profile)
+        checkInputProfile(profile, br)
+        profileService.addProfile(profile!!)
     }
 
     @PutMapping("/API/profiles/{email}")
     fun updateProfile(@PathVariable email: String, @RequestBody @Valid profile: ProfileDTO?, br: BindingResult) {
-        if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
-            throw UnprocessableProfileException("Wrong email format")
+        checkEmail(email)
+        checkInputProfile(profile, br)
+        profileService.updateProfile(email, profile!!)
+    }
+
+    fun checkInputProfile(profile: ProfileDTO?, br: BindingResult){
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong profile format")
         if (profile == null)
             throw BadRequestProfileException("Profile must not be NULL")
-        profileService.updateProfile(email, profile)
+        if(!profile.name.matches(Regex("([a-zA-Z]+'?\\s?)+")) ||
+            !profile.surname.matches(Regex("([a-zA-Z]+'?\\s?)+")))
+            throw UnprocessableProfileException("Wrong profile format")
+    }
+
+    fun checkEmail(email: String){
+        if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
+            throw UnprocessableProfileException("Wrong email format")
     }
 }
