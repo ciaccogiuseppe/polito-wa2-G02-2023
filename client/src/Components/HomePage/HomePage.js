@@ -32,7 +32,7 @@ function HomePage(props) {
                 <Button variant="info" style={{ borderColor: "black", borderWidth: "2px" }} className="HomeButton" onClick={(e) => { e.preventDefault(); navigate("/usercreate") }}>Create new profile</Button>
             </div>
             <div className="CenteredButton">
-                <Button variant="info" style={{ borderColor: "black", borderWidth: "2px" }} className="HomeButton">Edit profile</Button>
+                <Button variant="info" style={{ borderColor: "black", borderWidth: "2px" }} className="HomeButton" onClick={(e) => { e.preventDefault(); navigate("/userupdate") }}>Edit profile</Button>
             </div>
         </div>
     </>

@@ -1,28 +1,28 @@
 import {Button, Form, Spinner} from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import {useEffect, useState} from "react";
-import {addNewProfile} from "../../../API/Profiles";
+import {addNewProfile, editProfile} from "../../../API/Profiles";
 
 
 
 
-function UserCreatePage(props){
+function UserUpdatePage(props){
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
     const [errMessage, setErrMessage] = useState("");
     const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
-    function createProfile(){
+    function updateProfile(){
         setLoading(true);
-        addNewProfile({email:email, name:name, surname:surname}).then(
+        editProfile({email:email, name:name, surname:surname}).then(
             res => {
                 setErrMessage("");
-                setResponse("User added succesfully");
-                setLoading(false);
+                setResponse("User updated succesfully");
                 setEmail("");
                 setName("");
                 setSurname("");
+                setLoading(false);
                 //console.log(res);
             }
         ).catch(err => {
@@ -52,7 +52,7 @@ function UserCreatePage(props){
                         <Form.Label>Surname</Form.Label>
                         <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={surname} type="text" placeholder="Surname" onChange={e => setSurname(e.target.value)}/>
                     </Form.Group>
-                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); createProfile();}}>Create user</Button>
+                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); updateProfile();}}>Update user</Button>
                 </Form>
                 <hr style={{color:"white", width:"90%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}/>
                 {loading? <Spinner style={{alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}} animation="border" variant="info" /> :
@@ -65,4 +65,4 @@ function UserCreatePage(props){
     </>
 }
 
-export default UserCreatePage;
+export default UserUpdatePage;

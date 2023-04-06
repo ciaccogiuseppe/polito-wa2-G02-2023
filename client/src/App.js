@@ -7,6 +7,7 @@ import ProductIdPage from "./Components/Products/ProductIdPage/ProductIdPage";
 import UserInfoPage from "./Components/Users/UserInfoPage/UserInfoPage";
 import RedirectToHome from "./Components/HomePage/RedirectToHome";
 import UserCreatePage from "./Components/Users/UserCreatePage/UserCreatePage";
+import UserUpdatePage from "./Components/Users/UserUpdatePage/UserUpdatePage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path='/productid' element= {<ProductIdPage/>}/>
           <Route path='/userinfo' element= {<UserInfoPage/>}/>
           <Route path='/usercreate' element= {<UserCreatePage/>}/>
+          <Route path='/userupdate' element= {<UserUpdatePage/>}/>
           <Route path="*" element={<RedirectToHome/>} />
         </Routes>
       </Router>

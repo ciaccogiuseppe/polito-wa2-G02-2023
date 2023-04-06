@@ -18,9 +18,8 @@ function AppNavbar(){
                         </NavDropdown>
                         <NavDropdown title="User" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/userinfo" onClick={(e)=>{e.preventDefault(); navigate("/userinfo");}}>Get User info</NavDropdown.Item>
-                            <NavDropdown.Item href="/usercreate" onClick={(e)=>{e.preventDefault(); navigate("/usercreate");}}>
-                                Create User
-                            </NavDropdown.Item>
+                            <NavDropdown.Item href="/usercreate" onClick={(e)=>{e.preventDefault(); navigate("/usercreate");}}>Create User</NavDropdown.Item>
+                            <NavDropdown.Item href="/usercreate" onClick={(e)=>{e.preventDefault(); navigate("/userupdate");}}>Update User</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
