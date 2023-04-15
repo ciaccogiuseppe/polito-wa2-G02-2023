@@ -4,10 +4,10 @@ import HomePage from "./Components/HomePage/HomePage";
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import ProductsPage from "./Components/Products/ProductsPage/ProductsPage";
 import ProductIdPage from "./Components/Products/ProductIdPage/ProductIdPage";
-import UserInfoPage from "./Components/Users/UserInfoPage/UserInfoPage";
+import ProfileInfoPage from "./Components/Users/ProfileInfoPage/ProfileInfoPage";
 import RedirectToHome from "./Components/HomePage/RedirectToHome";
-import UserCreatePage from "./Components/Users/UserCreatePage/UserCreatePage";
-import UserUpdatePage from "./Components/Users/UserUpdatePage/UserUpdatePage";
+import ProfileCreatePage from "./Components/Users/ProfileCreatePage/ProfileCreatePage";
+import ProfileUpdatePage from "./Components/Users/ProfileUpdatePage/ProfileUpdatePage";
 
 function App() {
   return (
@@ -17,9 +17,9 @@ function App() {
           <Route path='/' element= {<HomePage/>}/>
           <Route path='/products' element= {<ProductsPage/>}/>
           <Route path='/productid' element= {<ProductIdPage/>}/>
-          <Route path='/userinfo' element= {<UserInfoPage/>}/>
-          <Route path='/usercreate' element= {<UserCreatePage/>}/>
-          <Route path='/userupdate' element= {<UserUpdatePage/>}/>
+          <Route path='/userinfo' element= {<ProfileInfoPage/>}/>
+          <Route path='/usercreate' element= {<ProfileCreatePage/>}/>
+          <Route path='/userupdate' element= {<ProfileUpdatePage/>}/>
           <Route path="*" element={<RedirectToHome/>} />
         </Routes>
       </Router>

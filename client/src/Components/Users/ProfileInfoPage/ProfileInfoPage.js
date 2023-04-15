@@ -6,7 +6,7 @@ import {getProfileDetails} from "../../../API/Profiles";
 
 
 
-function UserInfoPage(props){
+function ProfileInfoPage(props){
     const [email, setEmail] = useState("");
     const [errMessage, setErrMessage] = useState("");
     const [response, setResponse] = useState("");
@@ -63,4 +63,4 @@ function UserInfoPage(props){
     </>
 }
 
-export default UserInfoPage;
+export default ProfileInfoPage;
