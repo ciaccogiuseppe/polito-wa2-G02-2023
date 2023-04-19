@@ -9,9 +9,9 @@ class ProfileServiceImpl(
         private val profileRepository: ProfileRepository
 ): ProfileService {
 
-    override fun getProfile(email: String): ProfileDTO? {
-        return profileRepository.findByEmail(email)
-            ?.toDTO()
+    override fun getProfile(email: String): ProfileDTO {
+        return profileRepository.findByEmail(email)?.toDTO()
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
 
     override fun addProfile(profile: ProfileDTO) {
@@ -21,16 +21,13 @@ class ProfileServiceImpl(
    }
 
     override fun updateProfile(email: String, newProfile: ProfileDTO) {
+        val profile = profileRepository.findByEmail(email)
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
         if(email != newProfile.email && profileRepository.findByEmail(newProfile.email) != null)
             throw DuplicateProfileException("Profile with email '${newProfile.email}' already exists")
-        val profile = profileRepository.findByEmail(email)
-        if(profile != null) {
-            profile.email = newProfile.email
-            profile.name = newProfile.name
-            profile.surname = newProfile.surname
-            profileRepository.save(profile)
-        } else {
-            throw ProfileNotFoundException("Profile with email '${email}' not found")
-        }
+        profile.email = newProfile.email
+        profile.name = newProfile.name
+        profile.surname = newProfile.surname
+        profileRepository.save(profile)
     }
 }

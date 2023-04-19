@@ -1,7 +1,6 @@
 package it.polito.wa2.server.profiles
 
 import it.polito.wa2.server.BadRequestProfileException
-import it.polito.wa2.server.ProfileNotFoundException
 import it.polito.wa2.server.UnprocessableProfileException
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -12,10 +11,9 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class ProfileController(private val profileService: ProfileService) {
     @GetMapping("/API/profiles/{email}")
-    fun getProfile(@PathVariable email: String): ProfileDTO? {
+    fun getProfile(@PathVariable email: String): ProfileDTO {
         checkEmail(email)
         return profileService.getProfile(email)
-            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
 
     @PostMapping("/API/profiles")

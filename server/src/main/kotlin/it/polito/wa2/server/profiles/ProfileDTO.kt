@@ -1,11 +1,12 @@
 package it.polito.wa2.server.profiles
 
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 
 data class ProfileDTO(
     @field:NotBlank(message="email is mandatory")
-    @field:Email(message="email must be valid")
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
     val email: String,
     @field:NotBlank(message="name is mandatory")
     val name: String,
