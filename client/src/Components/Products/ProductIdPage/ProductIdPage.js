@@ -34,7 +34,7 @@ function ProductIdPage(props){
                 
                 <Form className="form">
                     <Form.Group className="mb-3">
-                        <Form.Label>Product ID</Form.Label>
+                        <Form.Label className="text-info">Product ID</Form.Label>
                         <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} type="input" placeholder="Enter product ID" onChange={e => setProductID(e.target.value)}/>
                     </Form.Group>
                     <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); getProduct();}}>Search product</Button>

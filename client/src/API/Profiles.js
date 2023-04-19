@@ -65,7 +65,7 @@ async function addNewProfile(profile){
 }
 
 async function editProfile(profile){
-    const url = APIURL + "/API/profiles/" + profile.email;
+    const url = APIURL + "/API/profiles/" + profile.oldemail;
     const response = await fetch(url, {
         method:"PUT",
         headers: {

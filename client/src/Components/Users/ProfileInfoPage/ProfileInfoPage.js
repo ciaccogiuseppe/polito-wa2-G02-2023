@@ -41,8 +41,8 @@ function ProfileInfoPage(props){
                 
                 <Form className="form">
                     <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label>Email address</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} type="email" placeholder="Enter email" onChange={e => setEmail(e.target.value)}/>
+                        <Form.Label className="text-info">Email address</Form.Label>
+                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
                     </Form.Group>
                     <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); getProfile();}}>Search user</Button>
                 </Form>
