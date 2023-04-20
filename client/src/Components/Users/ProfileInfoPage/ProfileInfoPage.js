@@ -13,6 +13,14 @@ function ProfileInfoPage(props){
     const [loading, setLoading] = useState(false);
 
     function getProfile(){
+        if(email==""){
+            setErrMessage("Email must not be empty");
+            return;
+        }
+        else if ( email.includes("/")){
+            setErrMessage("Wrong email format");
+            return;
+        }
         setLoading(true);
         getProfileDetails(email).then(
             res => {

@@ -17,6 +17,14 @@ function ProfileUpdatePage(props){
     const [loading, setLoading] = useState(false);
 
     function getProfile(){
+        if(oldEmail==""){
+            setErrMessage("Email must not be empty");
+            return;
+        }
+        else if ( oldEmail.includes("/")){
+            setErrMessage("Wrong email format");
+            return;
+        }
         setLoading(true);
         setResponse("");
         getProfileDetails(oldEmail).then(

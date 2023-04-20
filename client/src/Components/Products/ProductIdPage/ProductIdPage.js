@@ -11,6 +11,14 @@ function ProductIdPage(props){
     const [errMessage, setErrMessage] = useState("");
     const [response, setResponse] = useState("");
     function getProduct(){
+        if(productID==""){
+            setErrMessage("Product ID must not be empty");
+            return;
+        }
+        else if ( productID.includes("/")){
+            setErrMessage("Wrong ID format");
+            return;
+        }
         getProductDetails(productID).then(
             res => {
                 setErrMessage("");
