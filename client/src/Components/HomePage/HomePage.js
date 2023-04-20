@@ -34,6 +34,11 @@ function HomePage(props) {
             <div className="CenteredButton">
                 <Button variant="info" style={{ borderColor: "black", borderWidth: "2px" }} className="HomeButton" onClick={(e) => { e.preventDefault(); navigate("/userupdate") }}>Edit profile</Button>
             </div>
+            <hr style={{color:"white", width:"90%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}/>
+
+            <div className="CenteredButton">
+            <div className="text-white">This client is intended to test server APIs, therefore only few client-side validation checks are implemented</div>
+            </div>
         </div>
     </>
 }
