@@ -3,12 +3,14 @@ package it.polito.wa2.server.profiles
 import it.polito.wa2.server.DuplicateProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-@Service
+@Service @Transactional
 class ProfileServiceImpl(
         private val profileRepository: ProfileRepository
 ): ProfileService {
 
+    @Transactional(readOnly = true)
     override fun getProfile(email: String): ProfileDTO {
         return profileRepository.findByEmail(email)?.toDTO()
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
