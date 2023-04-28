@@ -9,8 +9,8 @@
 ## Database
 
 - Install Docker and deploy Postgres
-- Run ```docker run --name postgres -v postgres-vol:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=password postgres```
-- Connect to PostgreSQL in IDEA Database section with username ```postgres``` and password ```password```
+- Run ```docker run --name postgres -v postgres-vol:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=<password> postgres```
+- Connect to PostgreSQL in IDEA Database section with username ```postgres``` and password ```<password>```
 - Open a Query Console for the selected Database
 - Run ```create database ticketing``` command
 - Select ```ticketing``` Database as main Database
@@ -36,20 +36,33 @@ To package the React application:
 
 ## API Reference
 
-- METHOD `/API/`
+- METHOD `GET` URL: `/API/tickets/{ticket_id}`
 
-    - Headers:
-    - Description:
-    - Permissions allowed:
-    - Request body:
-
-      ```
-      {}
-      ```
-
-    - Response:
-    - Error responses:
-    - Response body: 
-
+  - Description: Get ticket, if existing, with id corresponding to parameter `ticket_id`
+  - Permissions allowed:
+  - Request query parameter: `ticket_id` to retrieve the corresponding ticket
+  - Request body: _None_
+  - Response: `200 OK` (success)
+  - Error responses: `404 ...` (...), `422 ...` (...), `400 ...` (...), `500 ...` (...)
+  - Response body: ticket corresponding to ticket it
   ```
+  {(Insert JSON)}
+  ```
+
+- METHOD `GET` URL: `/API/tickets/{ticket_id}`
+
+  - Description: Get ticket, if existing, with id corresponding to parameter `ticket_id`
+  - Permissions allowed:
+  - Request query parameter: `ticket_id` to retrieve the corresponding ticket
+  - Request body: _None_
+
+    ```
+    {}
+    ```
+
+  - Response: `200 OK` (success)
+  - Error responses: `404 ...` (...), `422 ...` (...), `400 ...` (...), `500 ...` (...)
+  - Response body: ticket corresponding to ticket it
+  ```
+  {(Insert JSON)}
   ```
