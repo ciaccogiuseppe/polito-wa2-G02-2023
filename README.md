@@ -34,3 +34,22 @@ To package the React application:
 - copy the content of the generated `client/build` folder in `server/src/main/resources/static`
 - the client app can now be loaded opening `localhost:8080` and it can properly interact with the API server
 
+## API Reference
+
+- METHOD `/API/`
+
+    - Headers:
+    - Description:
+    - Permissions allowed:
+    - Request body:
+
+      ```
+      {}
+      ```
+
+    - Response:
+    - Error responses:
+    - Response body: 
+
+  ```
+  ```
