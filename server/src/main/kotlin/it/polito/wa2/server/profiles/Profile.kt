@@ -1,8 +1,8 @@
 package it.polito.wa2.server.profiles
 
-import it.polito.wa2.server.ticketing.Message.Message
-import it.polito.wa2.server.ticketing.Ticket.Ticket
-import it.polito.wa2.server.ticketing.TicketHistory.TicketHistory
+import it.polito.wa2.server.ticketing.message.Message
+import it.polito.wa2.server.ticketing.ticket.Ticket
+import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import jakarta.persistence.*
 
 @Entity

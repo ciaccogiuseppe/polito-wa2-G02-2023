@@ -1,4 +1,4 @@
-package it.polito.wa2.server.ticketing.TicketHistory
+package it.polito.wa2.server.ticketing.tickethistory
 
 
 import org.springframework.stereotype.Service

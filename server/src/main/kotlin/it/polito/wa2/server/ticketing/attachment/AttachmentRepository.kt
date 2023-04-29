@@ -1,9 +1,8 @@
-package it.polito.wa2.server.ticketing.Ticket
-
+package it.polito.wa2.server.ticketing.attachment
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TicketRepository: JpaRepository<Ticket, String> {
+interface AttachmentRepository: JpaRepository<Attachment, String> {
 }

@@ -1,8 +1,8 @@
-package it.polito.wa2.server.ticketing.Message
+package it.polito.wa2.server.ticketing.message
 
 import it.polito.wa2.server.profiles.Profile
-import it.polito.wa2.server.ticketing.Attachment.Attachment
-import it.polito.wa2.server.ticketing.Ticket.Ticket
+import it.polito.wa2.server.ticketing.attachment.Attachment
+import it.polito.wa2.server.ticketing.ticket.Ticket
 import jakarta.persistence.*
 import java.sql.Timestamp
 

@@ -1,4 +1,4 @@
-package it.polito.wa2.server.ticketing.Attachment
+package it.polito.wa2.server.ticketing.attachment
 
 
 import org.springframework.stereotype.Service

@@ -1,9 +1,9 @@
-package it.polito.wa2.server.ticketing.Ticket
+package it.polito.wa2.server.ticketing.ticket
 
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.profiles.Profile
-import it.polito.wa2.server.ticketing.Message.Message
-import it.polito.wa2.server.ticketing.TicketHistory.TicketHistory
+import it.polito.wa2.server.ticketing.message.Message
+import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import jakarta.persistence.*
 import java.sql.Timestamp
 

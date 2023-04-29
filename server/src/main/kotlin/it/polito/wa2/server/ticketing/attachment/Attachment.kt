@@ -1,8 +1,7 @@
-package it.polito.wa2.server.ticketing.Attachment
+package it.polito.wa2.server.ticketing.attachment
 
-import it.polito.wa2.server.ticketing.Message.Message
+import it.polito.wa2.server.ticketing.message.Message
 import jakarta.persistence.*
-import org.hibernate.annotations.Type
 
 
 @Entity
