@@ -1,7 +1,9 @@
 package it.polito.wa2.server.products
 
+import it.polito.wa2.server.ticketing.Ticket.Ticket
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
 @Entity
@@ -11,4 +13,7 @@ class Product {
     var productId: String = ""
     var name: String = ""
     var brand: String = ""
+
+    @OneToMany(mappedBy = "product_id")
+    val tickets = mutableSetOf<Ticket>()
 }
