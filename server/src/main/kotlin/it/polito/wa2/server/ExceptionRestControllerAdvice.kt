@@ -30,6 +30,12 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(BadRequestProfileException::class)
     fun handleProfileBadRequest(e: BadRequestProfileException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
+
+    /************** Attachment exception handlers **************/
+    @ExceptionHandler(AttachmentNotFoundException::class)
+    fun handleAttachmentNotFound(e: AttachmentNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+
+
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message)
@@ -39,3 +45,4 @@ class ProfileNotFoundException(message: String): RuntimeException(message)
 class UnprocessableProfileException(message: String): RuntimeException(message)
 class DuplicateProfileException(message: String): RuntimeException(message)
 class BadRequestProfileException(message: String): RuntimeException(message)
+class AttachmentNotFoundException(message: String): RuntimeException(message)
