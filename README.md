@@ -434,14 +434,14 @@ To package the React application:
     ]
   }
   ```
-| Field         | Content                           |
-|---------------|-----------------------------------|
-| `message_id`  | id of the chat message            |
-| `ticket_id`   | id of the ticket                  |
-| `sender_id`   | id of the sender user             |
-| `text`        | textual content of the message    |
-| `timestamp`   | timestamp of the message          |
-| `attachments` | attachments linked to the message |
+| Field         | Content                                  |
+|---------------|------------------------------------------|
+| `message_id`  | id of the chat message                   |
+| `ticket_id`   | id of the ticket                         |
+| `sender_id`   | id of the sender user                    |
+| `text`        | textual content of the message           |
+| `timestamp`   | timestamp of the message                 |
+| `attachments` | IDs of attachments linked to the message |
 
 
 - **METHOD** `POST` **URL**: `/API/chat/{ticket_id}`
@@ -476,3 +476,30 @@ To package the React application:
 | `text`        | textual content of the message    |
 | `timestamp`   | timestamp of the message          |
 | `attachments` | attachments linked to the message |
+
+### Attachment
+- **METHOD** `GET` **URL**: `/API/attachment/{attachment_id}`
+
+  - **Description**: Get attachment linked to `attachment_id`
+  - **Permissions allowed**:
+  - **Request query parameter**: `attachment_id` to retrieve the corresponding attachment
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `404 Not Found` (attachment with id `attachment_id` not existing)
+    - `422 Unprocessable Entity` (wrong format for `attachment_id`)
+    - `500 Internal Server Error`
+  - **Response body**: attachment corresponding to attachment_id / Error message in case of error
+  ```
+  {
+    "attachment_id" : <attachment_id>
+    "name" : <name>,
+    "attachment": <attachment>
+  }
+  ```
+| Field           | Content                        |
+|-----------------|--------------------------------|
+| `attachment_id` | id of the chat attachment      |
+| `name`          | name of the attachment         |
+| `attachment`    | attachment data (binary array) |
