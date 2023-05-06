@@ -35,6 +35,16 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     @ExceptionHandler(AttachmentNotFoundException::class)
     fun handleAttachmentNotFound(e: AttachmentNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
 
+    /************** Ticket exception handlers **************/
+    @ExceptionHandler(TicketNotFoundException::class)
+    fun handleTicketNotFound(e: TicketNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+
+    /************** Message exception handlers **************/
+    @ExceptionHandler(UnprocessableMessageException::class)
+    fun handleUnprocessableMessage(e: UnprocessableMessageException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+
+    @ExceptionHandler(BadRequestMessageException::class)
+    fun handleMessageBadRequest(e: BadRequestMessageException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
 
 }
 
@@ -46,3 +56,6 @@ class UnprocessableProfileException(message: String): RuntimeException(message)
 class DuplicateProfileException(message: String): RuntimeException(message)
 class BadRequestProfileException(message: String): RuntimeException(message)
 class AttachmentNotFoundException(message: String): RuntimeException(message)
+class TicketNotFoundException(message: String): RuntimeException(message)
+class UnprocessableMessageException(message: String): RuntimeException(message)
+class BadRequestMessageException(message: String): RuntimeException(message)

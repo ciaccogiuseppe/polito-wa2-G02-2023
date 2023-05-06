@@ -9,13 +9,14 @@ import java.sql.Timestamp
 @Entity
 @Table(name="message")
 class Message {
-    @ManyToOne
-    var ticket_id : Ticket? = null
 
     @ManyToOne
-    var sender_id: Profile? = null
+    var ticketId : Ticket? = null
 
-    @OneToMany(mappedBy = "message_id")
+    @ManyToOne
+    var senderId : Profile? = null
+
+    @OneToMany(mappedBy = "messageId")
     var attachments = mutableSetOf<Attachment>()
 
     var text : String = ""

@@ -28,7 +28,7 @@ class Ticket {
     @ManyToOne
     var expert_id : Profile? = null
 
-    @OneToMany(mappedBy = "ticket_id")
+    @OneToMany(mappedBy = "ticketId")
     var messages = mutableListOf<Message>()
 
     @OneToMany(mappedBy = "ticket_id")
