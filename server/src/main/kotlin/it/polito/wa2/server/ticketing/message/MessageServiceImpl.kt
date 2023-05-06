@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service
 @Service
 class MessageServiceImpl(private val messageRepository: MessageRepository, private val ticketRepository: TicketRepository): MessageService {
     override fun getChat(ticketId: String): List<MessageDTO> {
-        val ticket = ticketRepository.findByIdOrNull(ticketId)
-            ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found");
+        val ticket = ticketRepository.findByIdOrNull(ticketId.toLong())
+            ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
         return messageRepository.findAllByTicketId(ticket)
     }
 
     override fun addMessage(ticketId: String, message: MessageDTO) {
-        val ticket = ticketRepository.findByIdOrNull(ticketId)
-            ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found");
-        ticket.messages.add(message.toMessage());
-        ticketRepository.save(ticket);
+        val ticket = ticketRepository.findByIdOrNull(ticketId.toLong())
+            ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
+        ticket.messages.add(message.toMessage())
+        ticketRepository.save(ticket)
     }
 
 }
