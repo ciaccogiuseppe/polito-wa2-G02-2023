@@ -10,11 +10,11 @@ import java.sql.Timestamp
 data class MessageDTO(
     val messageId : Long?,
     @field:NotNull
-    val ticketId: Ticket?,
-    val senderId: Profile?,
+    val ticket: Ticket?,
+    val sender: Profile?,
     @field:NotBlank(message="a message text is mandatory")
     val text: String,
-    val timestamp: Timestamp?,
+    val sentTimestamp: Timestamp?,
     val attachments: MutableSet<Attachment>,
 ) {
     override fun equals(other: Any?): Boolean {
@@ -42,7 +42,7 @@ data class MessageDTO(
 }
 
 fun Message.toDTO(): MessageDTO {
-    return MessageDTO(messageId, ticketId, senderId, text, timestamp, attachments)
+    return MessageDTO(messageId, ticket, sender, text, sentTimestamp, attachments)
 }
 
 fun MessageDTO.toMessage(): Message {
@@ -50,8 +50,8 @@ fun MessageDTO.toMessage(): Message {
     message.attachments = attachments
     message.messageId = messageId
     message.text = text
-    message.senderId = senderId
-    message.ticketId = ticketId
-    message.timestamp = timestamp
+    message.sender = sender
+    message.ticket = ticket
+    message.sentTimestamp = sentTimestamp
     return message
 }

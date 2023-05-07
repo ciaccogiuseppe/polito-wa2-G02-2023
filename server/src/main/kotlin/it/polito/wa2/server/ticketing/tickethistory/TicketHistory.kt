@@ -6,22 +6,23 @@ import jakarta.persistence.*
 import java.sql.Timestamp
 
 @Entity
-@Table(name="ticket_history")
+@Table(name="tickets_history")
 class TicketHistory {
     @ManyToOne
-    var ticket_id : Ticket? = null
+    @JoinColumn(name="ticket_id")
+    var ticket : Ticket? = null
 
     @ManyToOne
-    var user_id : Profile? = null
+    var user : Profile? = null
 
     @ManyToOne
-    var current_expert_id : Profile? = null
+    var currentExpert : Profile? = null
 
     @Temporal(TemporalType.TIMESTAMP)
-    var timestamp : Timestamp? = null
+    var updatedTimestamp : Timestamp? = null
 
-    var old_state : String = ""
-    var new_state : String = ""
+    var oldState : String = ""
+    var newState : String = ""
 
 
 
@@ -32,5 +33,5 @@ class TicketHistory {
         initialValue = 1,
         allocationSize = 1
     )
-    var history_id : Long? = null
+    var historyId : Long? = null
 }

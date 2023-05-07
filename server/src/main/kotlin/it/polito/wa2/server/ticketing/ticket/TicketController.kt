@@ -11,29 +11,29 @@ import java.sql.Timestamp
 @RestController
 class TicketController(private val ticketService: TicketService) {
     private val validStates = arrayListOf("OPEN", "RESOLVED", "CLOSED", "IN PROGRESS", "REOPENED")
-    @GetMapping("/API/ticketing/{ticket_id}")
-    fun getTicket(@PathVariable ticket_id: Long): TicketDTO {
-        return ticketService.getTicket(ticket_id)
+    @GetMapping("/API/ticketing/{ticketId}")
+    fun getTicket(@PathVariable ticketId: Long): TicketDTO {
+        return ticketService.getTicket(ticketId)
     }
 
     @GetMapping("/API/ticketing/filter")
     fun getTicketsFiltered(
-        customer_id: Long?,
-        min_priority: Int?,
-        max_priority: Int?,
-        product_id: String?,
-        created_after: Timestamp?,
-        created_before: Timestamp?,
-        expert_id: Long?,
+        customerId: Long?,
+        minPriority: Int?,
+        maxPriority: Int?,
+        productId: String?,
+        createdAfter: Timestamp?,
+        createdBefore: Timestamp?,
+        expertId: Long?,
         status: List<String>?
     ): List<TicketDTO> {
         checkFilterParameters(
-            customer_id, min_priority, max_priority, product_id,
-            created_after, created_before, expert_id, status
+            customerId, minPriority, maxPriority, productId,
+            createdAfter, createdBefore, expertId, status
         )
         return ticketService.getTicketsFiltered(
-            customer_id, min_priority, max_priority, product_id,
-            created_after, created_before, expert_id, status
+            customerId, minPriority, maxPriority, productId,
+            createdAfter, createdBefore, expertId, status
         )
     }
 
@@ -44,20 +44,20 @@ class TicketController(private val ticketService: TicketService) {
     }
 
     fun checkFilterParameters(
-        customer_id: Long?,
-        min_priority: Int?,
-        max_priority: Int?,
-        product_id: String?,
-        created_after: Timestamp?,
-        created_before: Timestamp?,
-        expert_id: Long?,
+        customerId: Long?,
+        minPriority: Int?,
+        maxPriority: Int?,
+        productId: String?,
+        createdAfter: Timestamp?,
+        createdBefore: Timestamp?,
+        expertId: Long?,
         status: List<String>?
     ) {
-        if ((min_priority != null) && (min_priority < 0))
+        if ((minPriority != null) && (minPriority < 0))
             throw UnprocessableTicketException("Invalid min priority")
-        if ((max_priority != null) && (max_priority < 0))
+        if ((maxPriority != null) && (maxPriority < 0))
             throw UnprocessableTicketException("Invalid max priority")
-        if (created_after != null && created_before != null && created_after.after(created_before))
+        if (createdAfter != null && createdBefore != null && createdAfter.after(createdBefore))
             throw UnprocessableTicketException("<created_after> is after <created_before>")
         if (status != null && validStates.containsAll(status))
             throw UnprocessableTicketException("Some states are invalid")
@@ -68,7 +68,7 @@ class TicketController(private val ticketService: TicketService) {
             throw UnprocessableProfileException("Wrong ticket format")
         if (ticket == null)
             throw BadRequestProfileException("Ticket must not be NULL")
-        if (ticket.productId == null)
+        if (ticket.product == null)
             throw UnprocessableTicketException("Wrong ticket format")
     }
 }

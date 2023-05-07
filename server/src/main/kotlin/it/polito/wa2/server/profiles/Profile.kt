@@ -20,18 +20,18 @@ class Profile {
     var name: String = ""
     var surname: String = ""
 
-    @OneToMany(mappedBy = "customer_id")
-    val tickets_customer = mutableSetOf<Ticket>()
+    @OneToMany(mappedBy = "customer")
+    val ticketsCustomer = mutableSetOf<Ticket>()
 
-    @OneToMany(mappedBy = "expert_id")
-    val tickets_expert = mutableSetOf<Ticket>()
+    @OneToMany(mappedBy = "expert")
+    val ticketsExpert = mutableSetOf<Ticket>()
 
-    @OneToMany(mappedBy = "senderId")
-    val message_sender = mutableSetOf<Message>()
+    @OneToMany(mappedBy = "sender")
+    val messageSender = mutableSetOf<Message>()
 
-    @OneToMany(mappedBy = "user_id")
-    val history_editor = mutableSetOf<TicketHistory>()
+    @OneToMany(mappedBy = "user")
+    val historyEditor = mutableSetOf<TicketHistory>()
 
-    @OneToMany(mappedBy = "current_expert_id")
-    val history_expert = mutableSetOf<TicketHistory>()
+    @OneToMany(mappedBy = "currentExpert")
+    val historyExpert = mutableSetOf<TicketHistory>()
 }

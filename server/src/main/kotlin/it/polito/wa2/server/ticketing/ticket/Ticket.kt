@@ -17,21 +17,22 @@ class Ticket {
 
 
     @Temporal(TemporalType.TIMESTAMP)
-    var timestamp : Timestamp? = null
+    var createdTimestamp : Timestamp? = null
 
     @ManyToOne
-    var product_id : Product? = null
+    @JoinColumn(name="product_id")
+    var product : Product? = null
 
     @ManyToOne
-    var customer_id : Profile? = null
+    var customer : Profile? = null
 
     @ManyToOne
-    var expert_id : Profile? = null
+    var expert : Profile? = null
 
-    @OneToMany(mappedBy = "ticketId")
+    @OneToMany(mappedBy = "ticket")
     var messages = mutableListOf<Message>()
 
-    @OneToMany(mappedBy = "ticket_id")
+    @OneToMany(mappedBy = "ticket")
     var history = mutableListOf<TicketHistory>()
 
 

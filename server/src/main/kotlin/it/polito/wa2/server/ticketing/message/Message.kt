@@ -7,22 +7,23 @@ import jakarta.persistence.*
 import java.sql.Timestamp
 
 @Entity
-@Table(name="message")
+@Table(name="messages")
 class Message {
 
     @ManyToOne
-    var ticketId : Ticket? = null
+    @JoinColumn(name="ticket_id")
+    var ticket : Ticket? = null
 
     @ManyToOne
-    var senderId : Profile? = null
+    var sender : Profile? = null
 
-    @OneToMany(mappedBy = "messageId")
+    @OneToMany(mappedBy = "message")
     var attachments = mutableSetOf<Attachment>()
 
     var text : String = ""
 
     @Temporal(TemporalType.TIMESTAMP)
-    var timestamp : Timestamp? = null
+    var sentTimestamp : Timestamp? = null
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_generator")

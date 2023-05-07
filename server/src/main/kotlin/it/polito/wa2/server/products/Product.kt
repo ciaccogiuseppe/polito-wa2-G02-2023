@@ -14,6 +14,6 @@ class Product {
     var name: String = ""
     var brand: String = ""
 
-    @OneToMany(mappedBy = "product_id")
+    @OneToMany(mappedBy = "product")
     val tickets = mutableSetOf<Ticket>()
 }

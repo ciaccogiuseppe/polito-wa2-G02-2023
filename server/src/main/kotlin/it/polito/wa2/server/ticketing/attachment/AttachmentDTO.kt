@@ -35,5 +35,5 @@ data class AttachmentDTO(
 }
 
 fun Attachment.toDTO() : AttachmentDTO{
-    return AttachmentDTO(attachment_id, attachment, name)
+    return AttachmentDTO(attachmentId, attachment, name)
 }

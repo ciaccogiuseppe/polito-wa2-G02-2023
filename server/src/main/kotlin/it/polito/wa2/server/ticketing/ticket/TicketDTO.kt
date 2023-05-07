@@ -15,11 +15,11 @@ data class TicketDTO(
     @field:NotBlank
     val priority: Int,
     @field:Size(min = 13, max = 13)
-    val productId: Product?,
-    val customerId: Profile?,
-    val expertId: Profile?,
+    val product: Product?,
+    val customer: Profile?,
+    val expert: Profile?,
     val status: String,
-    val createdDate: Timestamp?
+    val createdTimestamp: Timestamp?
 )
 
 fun Ticket.toDTO(): TicketDTO {
@@ -28,11 +28,11 @@ fun Ticket.toDTO(): TicketDTO {
         title,
         description,
         priority,
-        product_id,
-        customer_id,
-        expert_id,
+        product,
+        customer,
+        expert,
         status,
-        timestamp
+        createdTimestamp
     )
 }
 
@@ -42,10 +42,10 @@ fun TicketDTO.toTicket(): Ticket {
     ticket.title = title
     ticket.description = description
     ticket.priority = priority
-    ticket.product_id = productId
-    ticket.customer_id = customerId
-    ticket.expert_id = expertId
+    ticket.product = product
+    ticket.customer = customer
+    ticket.expert = expert
     ticket.status = status
-    ticket.timestamp = createdDate
+    ticket.createdTimestamp = createdTimestamp
     return ticket
 }

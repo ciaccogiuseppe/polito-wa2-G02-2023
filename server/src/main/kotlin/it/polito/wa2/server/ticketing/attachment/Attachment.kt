@@ -5,7 +5,7 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name="attachment")
+@Table(name="attachments")
 class Attachment {
 
     var name : String = ""
@@ -15,7 +15,8 @@ class Attachment {
     var attachment: ByteArray? = null
 
     @ManyToOne
-    var message_id : Message? = null
+    @JoinColumn(name="message_id")
+    var message : Message? = null
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attachment_generator")
@@ -24,5 +25,5 @@ class Attachment {
         initialValue = 1,
         allocationSize = 1
     )
-    var attachment_id : Long? = null
+    var attachmentId : Long? = null
 }
