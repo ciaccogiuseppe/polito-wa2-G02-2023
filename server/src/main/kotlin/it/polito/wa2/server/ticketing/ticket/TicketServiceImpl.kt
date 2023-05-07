@@ -2,6 +2,7 @@ package it.polito.wa2.server.ticketing.ticket
 
 import it.polito.wa2.server.*
 import it.polito.wa2.server.products.Product
+import it.polito.wa2.server.products.ProductDTO
 import it.polito.wa2.server.products.ProductService
 import it.polito.wa2.server.products.toProduct
 import it.polito.wa2.server.profiles.Profile
@@ -66,7 +67,7 @@ class TicketServiceImpl(
         return ticketRepository.save(ticket.toTicket()).ticketId!!
     }
 
-    private fun checkIfProductAndCustomerExists(prod: Product, customerId: Long) {
+    private fun checkIfProductAndCustomerExists(prod: ProductDTO, customerId: Long) {
         productService.getProduct(prod.productId)
         profileService.getProfileById(customerId)
     }

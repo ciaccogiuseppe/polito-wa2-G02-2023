@@ -11,7 +11,7 @@ class MessageServiceImpl(private val messageRepository: MessageRepository, priva
     override fun getChat(ticketId: String): List<MessageDTO> {
         val ticket = ticketRepository.findByIdOrNull(ticketId.toLong())
             ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
-        return messageRepository.findAllByTicket(ticket)
+        return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
     override fun addMessage(ticketId: String, message: MessageDTO) {

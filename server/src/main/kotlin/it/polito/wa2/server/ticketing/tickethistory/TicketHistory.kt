@@ -29,7 +29,7 @@ class TicketHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_history_generator")
     @SequenceGenerator(name = "ticket_history_generator",
-        sequenceName = "ticket_history_id_seq",
+        sequenceName = "tickets_history_id_seq",
         initialValue = 1,
         allocationSize = 1
     )

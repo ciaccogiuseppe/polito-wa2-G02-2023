@@ -16,7 +16,7 @@ class TicketHistoryServiceImpl(
 
     override fun getTicketHistory(ticketId: Long): List<TicketHistoryDTO> {
         val ticket = ticketService.getTicket(ticketId).toTicket()
-        return ticketHistoryRepository.findByTicket(ticket).map {it.toDTO()}
+        return ticketHistoryRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
 }

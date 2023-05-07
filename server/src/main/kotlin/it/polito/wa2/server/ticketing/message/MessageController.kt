@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class MessageController(private val messageService: MessageService) {
     @GetMapping("/API/chat/{ticketId}")
-    fun getMessage(@PathVariable ticketId: String) : List<MessageDTO>? {
+    fun getMessage(@PathVariable ticketId: String) : List<MessageDTO> {
         return messageService.getChat(ticketId)
     }
 

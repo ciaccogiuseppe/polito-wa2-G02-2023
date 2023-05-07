@@ -37,3 +37,11 @@ data class AttachmentDTO(
 fun Attachment.toDTO() : AttachmentDTO{
     return AttachmentDTO(attachmentId, attachment, name)
 }
+
+fun AttachmentDTO.toAttachment(): Attachment{
+    val attachmentObj = Attachment()
+    attachmentObj.attachmentId = attachmentId
+    attachmentObj.name = name
+    attachmentObj.attachment = attachment
+    return attachmentObj
+}

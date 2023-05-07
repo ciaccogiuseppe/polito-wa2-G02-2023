@@ -1,7 +1,11 @@
 package it.polito.wa2.server.ticketing.ticket
 
-import it.polito.wa2.server.products.Product
-import it.polito.wa2.server.profiles.Profile
+import it.polito.wa2.server.products.ProductDTO
+import it.polito.wa2.server.products.toDTO
+import it.polito.wa2.server.products.toProduct
+import it.polito.wa2.server.profiles.ProfileDTO
+import it.polito.wa2.server.profiles.toDTO
+import it.polito.wa2.server.profiles.toProfile
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.sql.Timestamp
@@ -15,9 +19,9 @@ data class TicketDTO(
     @field:NotBlank
     val priority: Int,
     @field:Size(min = 13, max = 13)
-    val product: Product?,
-    val customer: Profile?,
-    val expert: Profile?,
+    val product: ProductDTO?,
+    val customer: ProfileDTO?,
+    val expert: ProfileDTO?,
     val status: String,
     val createdTimestamp: Timestamp?
 )
@@ -28,9 +32,9 @@ fun Ticket.toDTO(): TicketDTO {
         title,
         description,
         priority,
-        product,
-        customer,
-        expert,
+        product?.toDTO(),
+        customer?.toDTO(),
+        expert?.toDTO(),
         status,
         createdTimestamp
     )
@@ -42,9 +46,9 @@ fun TicketDTO.toTicket(): Ticket {
     ticket.title = title
     ticket.description = description
     ticket.priority = priority
-    ticket.product = product
-    ticket.customer = customer
-    ticket.expert = expert
+    ticket.product = product?.toProduct()
+    ticket.customer = customer?.toProfile()
+    ticket.expert = expert?.toProfile()
     ticket.status = status
     ticket.createdTimestamp = createdTimestamp
     return ticket

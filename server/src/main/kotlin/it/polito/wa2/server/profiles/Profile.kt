@@ -11,7 +11,7 @@ class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_generator")
     @SequenceGenerator(name = "profile_generator",
-        sequenceName = "profiles_profile_id_seq",
+        sequenceName = "profiles_id_seq",
         initialValue = 1,
         allocationSize = 1
     )

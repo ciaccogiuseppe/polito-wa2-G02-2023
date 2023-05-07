@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TicketHistoryRepository: JpaRepository<TicketHistory, String> {
-    fun findByTicket(ticket: Ticket): List<TicketHistory>
+    fun findAllByTicket(ticket: Ticket): List<TicketHistory>
 }

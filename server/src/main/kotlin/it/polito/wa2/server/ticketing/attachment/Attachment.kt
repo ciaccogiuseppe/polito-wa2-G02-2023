@@ -21,7 +21,7 @@ class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attachment_generator")
     @SequenceGenerator(name = "attachment_generator",
-        sequenceName = "attachment_id_seq",
+        sequenceName = "attachments_id_seq",
         initialValue = 1,
         allocationSize = 1
     )

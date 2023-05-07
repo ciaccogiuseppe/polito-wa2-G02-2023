@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface MessageRepository: JpaRepository<Message, String> {
-    fun findAllByTicket(ticket: Ticket): List<MessageDTO>
+    fun findAllByTicket(ticket: Ticket): List<Message>
 }
