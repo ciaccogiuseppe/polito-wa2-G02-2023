@@ -43,6 +43,16 @@ class TicketController(private val ticketService: TicketService) {
         return ticketService.addTicket(ticket!!)
     }
 
+    @PutMapping("/API/ticketing/assign")
+    fun assignTicket(){
+        TODO("Not yet implemented")
+    }
+
+    @PutMapping("/API/ticketing/update")
+    fun updateTicket(){
+        TODO("Not yet implemented")
+    }
+
     fun checkFilterParameters(
         customerId: Long?,
         minPriority: Int?,
