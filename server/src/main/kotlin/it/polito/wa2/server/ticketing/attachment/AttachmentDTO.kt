@@ -2,6 +2,7 @@ package it.polito.wa2.server.ticketing.attachment
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
+import org.springframework.data.repository.findByIdOrNull
 
 data class AttachmentDTO(
     val attachmentId: Long?,
@@ -38,8 +39,11 @@ fun Attachment.toDTO() : AttachmentDTO{
     return AttachmentDTO(attachmentId, attachment, name)
 }
 
-fun AttachmentDTO.toAttachment(): Attachment{
-    val attachmentObj = Attachment()
+fun AttachmentDTO.toAttachment(attachmentRepository: AttachmentRepository): Attachment{
+    var attachmentObj = attachmentRepository.findByIdOrNull(attachmentId.toString())
+    if(attachmentObj != null)
+        return attachmentObj
+    attachmentObj = Attachment()
     attachmentObj.attachmentId = attachmentId
     attachmentObj.name = name
     attachmentObj.attachment = attachment

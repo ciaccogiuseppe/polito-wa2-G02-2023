@@ -1,11 +1,9 @@
 package it.polito.wa2.server.ticketing.ticket
 
 import it.polito.wa2.server.*
-import it.polito.wa2.server.products.Product
-import it.polito.wa2.server.products.ProductDTO
-import it.polito.wa2.server.products.ProductService
-import it.polito.wa2.server.products.toProduct
+import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
+import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.profiles.toProfile
 import org.springframework.data.repository.findByIdOrNull
@@ -16,7 +14,9 @@ import java.sql.Timestamp
 class TicketServiceImpl(
     private val ticketRepository: TicketRepository,
     private val productService: ProductService,
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
+    private val profileRepository: ProfileRepository,
+    private val productRepository: ProductRepository
 ): TicketService {
     override fun getTicket(ticketId: Long): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
@@ -39,11 +39,11 @@ class TicketServiceImpl(
         var product: Product? = null
 
         if (customerId != null)
-            customer = profileService.getProfileById(customerId).toProfile()
+            customer = profileService.getProfileById(customerId).toProfile(profileRepository)
         if (expertId != null)
-            expert = profileService.getProfileById(expertId).toProfile()
+            expert = profileService.getProfileById(expertId).toProfile(profileRepository)
         if (productId != null)
-            product = productService.getProduct(productId).toProduct()
+            product = productService.getProduct(productId).toProduct(productRepository)
 
         return ticketRepository
             .findAll()
@@ -64,7 +64,7 @@ class TicketServiceImpl(
         val id: Long = 1
         // productId is not null, already checked in the controller
         checkIfProductAndCustomerExists(ticket.product!!, id)
-        return ticketRepository.save(ticket.toTicket()).ticketId!!
+        return ticketRepository.save(ticket.toTicket(ticketRepository, productRepository, profileRepository)).ticketId!!
     }
 
     private fun checkIfProductAndCustomerExists(prod: ProductDTO, customerId: Long) {

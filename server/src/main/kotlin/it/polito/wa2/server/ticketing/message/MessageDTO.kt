@@ -1,16 +1,21 @@
 package it.polito.wa2.server.ticketing.message
 
+import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.ProfileDTO
+import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.toDTO
 import it.polito.wa2.server.profiles.toProfile
 import it.polito.wa2.server.ticketing.attachment.AttachmentDTO
+import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
 import it.polito.wa2.server.ticketing.attachment.toAttachment
 import it.polito.wa2.server.ticketing.attachment.toDTO
 import it.polito.wa2.server.ticketing.ticket.TicketDTO
+import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.toDTO
 import it.polito.wa2.server.ticketing.ticket.toTicket
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import org.springframework.data.repository.findByIdOrNull
 import java.sql.Timestamp
 
 data class MessageDTO(
@@ -52,13 +57,22 @@ fun Message.toDTO(): MessageDTO {
         text, sentTimestamp, attachments.map{it.toDTO()}.toMutableSet())
 }
 
-fun MessageDTO.toMessage(): Message {
-    val message = Message()
-    message.attachments = attachments.map{it.toAttachment()}.toMutableSet()
+fun MessageDTO.toMessage(
+    messageRepository: MessageRepository,
+    profileRepository: ProfileRepository,
+    attachmentRepository: AttachmentRepository,
+    ticketRepository: TicketRepository,
+    productRepository: ProductRepository,
+    ): Message {
+    var message = messageRepository.findByIdOrNull(messageId.toString())
+    if(message!=null)
+        return message
+    message = Message()
+    message.attachments = attachments.map{it.toAttachment(attachmentRepository)}.toMutableSet()
     message.messageId = messageId
     message.text = text
-    message.sender = sender?.toProfile()
-    message.ticket = ticket?.toTicket()
+    message.sender = sender?.toProfile(profileRepository)
+    message.ticket = ticket?.toTicket(ticketRepository, productRepository, profileRepository)
     message.sentTimestamp = sentTimestamp
     return message
 }

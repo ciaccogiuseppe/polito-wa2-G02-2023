@@ -2,6 +2,7 @@ package it.polito.wa2.server.products
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.springframework.data.repository.findByIdOrNull
 
 data class ProductDTO(
     @field:Size(min = 13, max = 13)
@@ -12,8 +13,11 @@ data class ProductDTO(
     val brand: String
 )
 
-fun ProductDTO.toProduct(): Product {
-    val product = Product()
+fun ProductDTO.toProduct(productRepository: ProductRepository): Product {
+    var product = productRepository.findByIdOrNull(productId)
+    if(product!=null)
+        return product
+    product = Product()
     product.productId = productId
     product.name = name
     product.brand = brand
