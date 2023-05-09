@@ -15,9 +15,13 @@ class Profile {
         initialValue = 1,
         allocationSize = 1
     )
+    @Column(updatable = false, nullable = false)
     var profileId : Long? = null
+    @Column(nullable=false, unique = true)
     var email: String = ""
+    @Column(nullable = false)
     var name: String = ""
+    @Column(nullable = false)
     var surname: String = ""
 
     @OneToMany(mappedBy = "customer")

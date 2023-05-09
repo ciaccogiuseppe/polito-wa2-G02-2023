@@ -10,20 +10,27 @@ import java.sql.Timestamp
 @Entity
 @Table(name="tickets")
 class Ticket {
+    @Column(nullable = false)
     var title : String = ""
+    @Column(nullable = false)
     var description : String = ""
+    @Column(nullable = false)
     var priority : Int = 0
-    var status : String = ""
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    var status : TicketStatus = TicketStatus.OPEN
 
-
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     var createdTimestamp : Timestamp? = null
 
     @ManyToOne
     @JoinColumn(name="product_id")
+    @Column(nullable = false)
     var product : Product? = null
 
     @ManyToOne
+    @Column(nullable = false)
     var customer : Profile? = null
 
     @ManyToOne
@@ -43,7 +50,12 @@ class Ticket {
         initialValue = 1,
         allocationSize = 1
     )
+    @Column(updatable = false, nullable = false)
     var ticketId : Long? = null
 
 
+}
+
+enum class TicketStatus{
+    OPEN, RESOLVED, CLOSED, IN_PROGRESS, REOPENED
 }

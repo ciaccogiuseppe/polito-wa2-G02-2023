@@ -8,14 +8,16 @@ import jakarta.persistence.*
 @Table(name="attachments")
 class Attachment {
 
+    @Column(nullable = false)
     var name : String = ""
 
     @Lob
-    @Column(columnDefinition="bytea")
+    @Column(columnDefinition="bytea", nullable = false)
     var attachment: ByteArray? = null
 
     @ManyToOne
     @JoinColumn(name="message_id")
+    @Column(nullable = false)
     var message : Message? = null
 
     @Id
@@ -25,5 +27,6 @@ class Attachment {
         initialValue = 1,
         allocationSize = 1
     )
+    @Column(updatable = false, nullable = false)
     var attachmentId : Long? = null
 }

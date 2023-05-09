@@ -12,17 +12,21 @@ class Message {
 
     @ManyToOne
     @JoinColumn(name="ticket_id")
+    @Column(nullable = false)
     var ticket : Ticket? = null
 
     @ManyToOne
+    @Column(nullable = false)
     var sender : Profile? = null
 
     @OneToMany(mappedBy = "message")
     var attachments = mutableSetOf<Attachment>()
 
+    @Column(nullable = false)
     var text : String = ""
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
     var sentTimestamp : Timestamp? = null
 
     @Id
@@ -32,5 +36,6 @@ class Message {
         initialValue = 1,
         allocationSize = 1
     )
+    @Column(updatable = false, nullable = false)
     var messageId : Long? = null
 }
