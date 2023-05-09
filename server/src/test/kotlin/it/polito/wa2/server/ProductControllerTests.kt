@@ -73,6 +73,8 @@ class ProductControllerTests {
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(body.size, 3)
+
         Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
         Assertions.assertEquals(true, body.any{a -> a["productId"] == product2.productId})
         Assertions.assertEquals(true, body.any{a -> a["productId"] == product3.productId})
