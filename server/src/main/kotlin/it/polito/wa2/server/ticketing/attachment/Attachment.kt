@@ -2,6 +2,7 @@ package it.polito.wa2.server.ticketing.attachment
 
 import it.polito.wa2.server.ticketing.message.Message
 import jakarta.persistence.*
+import org.hibernate.annotations.Type
 
 
 @Entity
@@ -11,7 +12,7 @@ class Attachment {
     @Column(nullable = false)
     var name : String = ""
 
-    @Lob
+    //@Lob
     @Column(columnDefinition="bytea", nullable = false)
     var attachment: ByteArray = byteArrayOf()
 
