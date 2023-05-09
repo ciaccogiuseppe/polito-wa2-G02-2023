@@ -5,7 +5,6 @@ import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
-//import it.polito.wa2.server.profiles.toProfile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.sql.Timestamp

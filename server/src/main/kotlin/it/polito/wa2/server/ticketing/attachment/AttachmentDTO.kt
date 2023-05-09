@@ -3,7 +3,6 @@ package it.polito.wa2.server.ticketing.attachment
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Positive
-import org.springframework.data.repository.findByIdOrNull
 
 data class AttachmentDTO(
     @field:Positive

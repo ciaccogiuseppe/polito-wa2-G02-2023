@@ -1,17 +1,8 @@
 package it.polito.wa2.server.ticketing.ticket
 
 import it.polito.wa2.server.products.Product
-import it.polito.wa2.server.products.ProductDTO
-import it.polito.wa2.server.products.ProductRepository
-import it.polito.wa2.server.products.toDTO
 import it.polito.wa2.server.profiles.Profile
-//import it.polito.wa2.server.products.toProduct
-import it.polito.wa2.server.profiles.ProfileDTO
-import it.polito.wa2.server.profiles.ProfileRepository
-import it.polito.wa2.server.profiles.toDTO
 import jakarta.validation.constraints.*
-// import it.polito.wa2.server.profiles.toProfile
-import org.springframework.data.repository.findByIdOrNull
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
