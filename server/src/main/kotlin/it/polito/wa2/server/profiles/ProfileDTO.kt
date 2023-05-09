@@ -9,8 +9,12 @@ data class ProfileDTO(
         message="email must be valid")
     val email: String,
     @field:NotBlank(message="name is mandatory")
+    @field:Pattern(regexp = "([a-zA-Z]+'?\\s?)+",
+        message="name must be valid")
     val name: String,
     @field:NotBlank(message="surname is mandatory")
+    @field:Pattern(regexp = "([a-zA-Z]+'?\\s?)+",
+        message="surname must be valid")
     val surname: String
 )
 

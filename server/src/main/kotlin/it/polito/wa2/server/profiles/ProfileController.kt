@@ -35,9 +35,6 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong profile format")
         if (profile == null)
             throw BadRequestProfileException("Profile must not be NULL")
-        if(!profile.name.matches(Regex("([a-zA-Z]+'?\\s?)+")) ||
-            !profile.surname.matches(Regex("([a-zA-Z]+'?\\s?)+")))
-            throw UnprocessableProfileException("Wrong profile format")
     }
 
     fun checkEmail(email: String){

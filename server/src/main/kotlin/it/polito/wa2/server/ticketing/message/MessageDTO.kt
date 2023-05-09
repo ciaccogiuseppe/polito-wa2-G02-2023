@@ -22,6 +22,7 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
 import org.springframework.data.repository.findByIdOrNull
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 data class MessageDTO(
     @field:Positive
@@ -74,10 +75,9 @@ fun MessageDTO.toNewMessage(
     ticket: Ticket): Message {
     val message = Message()
     message.attachments = attachments
-    message.messageId = messageId
     message.text = text
     message.sender = sender
     message.ticket = ticket
-    message.sentTimestamp = sentTimestamp
+    message.sentTimestamp = Timestamp.valueOf(LocalDateTime.now())
     return message
 }
