@@ -1,21 +1,15 @@
 package it.polito.wa2.server
 
 import it.polito.wa2.server.products.Product
-import it.polito.wa2.server.products.ProductDTO
 import it.polito.wa2.server.products.ProductRepository
-import it.polito.wa2.server.profiles.toNewProfile
-import jakarta.validation.constraints.NotBlank
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
-import org.springframework.boot.json.GsonJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -23,7 +17,6 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.shaded.com.google.common.reflect.TypeToken
 import java.net.URI
 
 
@@ -129,9 +122,9 @@ class ProductControllerTests {
         val body = json.parseMap(result.body)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        Assertions.assertEquals(body["productId"], product1.productId)
-        Assertions.assertEquals(body["name"], product1.name)
-        Assertions.assertEquals(body["brand"], product1.brand)
+        Assertions.assertEquals(product1.productId, body["productId"])
+        Assertions.assertEquals(product1.name, body["name"])
+        Assertions.assertEquals(product1.brand, body["brand"])
 
         productRepository.delete(product1)
         productRepository.delete(product2)

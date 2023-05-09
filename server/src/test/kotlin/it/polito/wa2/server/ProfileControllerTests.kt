@@ -145,9 +145,9 @@ class ProfileControllerTests {
         val createdProfile = profileRepository.findByEmail(profile.email)
 
         Assertions.assertNotNull(createdProfile)
-        Assertions.assertEquals(createdProfile?.email, profile.email)
-        Assertions.assertEquals(createdProfile?.name, profile.name)
-        Assertions.assertEquals(createdProfile?.surname, profile.surname)
+        Assertions.assertEquals(profile.email, createdProfile?.email)
+        Assertions.assertEquals(profile.name, createdProfile?.name)
+        Assertions.assertEquals(profile.surname, createdProfile?.surname)
 
         profileRepository.delete(createdProfile!!)
     }
@@ -312,9 +312,9 @@ class ProfileControllerTests {
         val updatedProfile = profileRepository.findByEmail(newProfile.email)
 
         Assertions.assertNotNull(updatedProfile)
-        Assertions.assertEquals(updatedProfile?.email, newProfile.email)
-        Assertions.assertEquals(updatedProfile?.name, newProfile.name)
-        Assertions.assertEquals(updatedProfile?.surname, newProfile.surname)
+        Assertions.assertEquals(newProfile.email, updatedProfile?.email)
+        Assertions.assertEquals(newProfile.name, updatedProfile?.name)
+        Assertions.assertEquals(newProfile.surname, updatedProfile?.surname)
 
         profileRepository.delete(updatedProfile!!)
     }
