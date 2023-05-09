@@ -1,14 +1,11 @@
 package it.polito.wa2.server.ticketing.tickethistory
 
-
-import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketService
-//import it.polito.wa2.server.ticketing.ticket.toTicket
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +15,6 @@ class TicketHistoryServiceImpl(
     private val ticketHistoryRepository: TicketHistoryRepository,
     private val ticketService: TicketService,
     private val ticketRepository: TicketRepository,
-    private val productRepository: ProductRepository,
     private val profileRepository: ProfileRepository,
     private val profileService: ProfileService
 ): TicketHistoryService {

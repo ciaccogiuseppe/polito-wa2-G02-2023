@@ -1,12 +1,8 @@
 package it.polito.wa2.server.ticketing.tickethistory
 
 import it.polito.wa2.server.profiles.Profile
-import it.polito.wa2.server.profiles.ProfileDTO
-import it.polito.wa2.server.profiles.toDTO
 import it.polito.wa2.server.ticketing.ticket.Ticket
-import it.polito.wa2.server.ticketing.ticket.TicketDTO
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
-import it.polito.wa2.server.ticketing.ticket.toDTO
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive

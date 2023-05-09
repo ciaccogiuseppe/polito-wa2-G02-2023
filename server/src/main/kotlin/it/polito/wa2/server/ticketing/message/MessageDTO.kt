@@ -1,26 +1,13 @@
 package it.polito.wa2.server.ticketing.message
 
-import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
-import it.polito.wa2.server.profiles.ProfileDTO
-import it.polito.wa2.server.profiles.ProfileRepository
-import it.polito.wa2.server.profiles.toDTO
 import it.polito.wa2.server.ticketing.attachment.Attachment
-//import it.polito.wa2.server.profiles.toProfile
 import it.polito.wa2.server.ticketing.attachment.AttachmentDTO
-import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
-// import it.polito.wa2.server.ticketing.attachment.toAttachment
 import it.polito.wa2.server.ticketing.attachment.toDTO
 import it.polito.wa2.server.ticketing.ticket.Ticket
-import it.polito.wa2.server.ticketing.ticket.TicketDTO
-import it.polito.wa2.server.ticketing.ticket.TicketRepository
-import it.polito.wa2.server.ticketing.ticket.toDTO
-//import it.polito.wa2.server.ticketing.ticket.toTicket
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
-import org.springframework.data.repository.findByIdOrNull
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
