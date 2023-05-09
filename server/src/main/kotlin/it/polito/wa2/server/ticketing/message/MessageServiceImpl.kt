@@ -1,9 +1,5 @@
 package it.polito.wa2.server.ticketing.message
 
-
-import it.polito.wa2.server.TicketNotFoundException
-import it.polito.wa2.server.UnprocessableAttachmentException
-import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
@@ -24,7 +20,6 @@ class MessageServiceImpl(
     private val ticketRepository: TicketRepository,
     private val profileRepository: ProfileRepository,
     private val attachmentRepository: AttachmentRepository,
-    private val productRepository: ProductRepository,
     private val profileService: ProfileService,
     private val ticketService: TicketService,
     private val attachmentService: AttachmentService): MessageService {
