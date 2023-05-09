@@ -18,17 +18,16 @@ class TicketController(private val ticketService: TicketService) {
         return ticketService.getTicket(ticketId)
     }
 
-    /*
     @GetMapping("/API/ticketing/filter")
     fun getTicketsFiltered(
-        customerId: Long?,
-        minPriority: Int?,
-        maxPriority: Int?,
-        productId: String?,
-        createdAfter: Timestamp?,
-        createdBefore: Timestamp?,
-        expertId: Long?,
-        status: List<String>?
+        @RequestParam(name="customerId", required=false) customerId: Long?,
+        @RequestParam(name="minPriority", required=false) minPriority: Int?,
+        @RequestParam(name="maxPriority", required=false) maxPriority: Int?,
+        @RequestParam(name="productId", required=false) productId: String?,
+        @RequestParam(name="createdAfter", required=false) createdAfter: Timestamp?,
+        @RequestParam(name="createdBefore", required=false) createdBefore: Timestamp?,
+        @RequestParam(name="expertId", required=false) expertId: Long?,
+        @RequestParam(name="status", required=false) status: List<TicketStatus>?
     ): List<TicketDTO> {
         checkFilterParameters(
             customerId, minPriority, maxPriority, productId,
@@ -39,7 +38,6 @@ class TicketController(private val ticketService: TicketService) {
             createdAfter, createdBefore, expertId, status
         )
     }
-     */
 
     @PostMapping("/API/ticketing/")
     fun addTicket(@RequestBody @Valid ticket: TicketDTO?, br: BindingResult): TicketIdDTO {
@@ -57,7 +55,6 @@ class TicketController(private val ticketService: TicketService) {
         TODO("Not yet implemented")
     }
 
-    /*
     fun checkFilterParameters(
         customerId: Long?,
         minPriority: Int?,
@@ -66,7 +63,7 @@ class TicketController(private val ticketService: TicketService) {
         createdAfter: Timestamp?,
         createdBefore: Timestamp?,
         expertId: Long?,
-        status: List<String>?
+        status: List<TicketStatus>?
     ) {
         if ((minPriority != null) && (minPriority < 0))
             throw UnprocessableTicketException("Invalid min priority")
@@ -74,10 +71,8 @@ class TicketController(private val ticketService: TicketService) {
             throw UnprocessableTicketException("Invalid max priority")
         if (createdAfter != null && createdBefore != null && createdAfter.after(createdBefore))
             throw UnprocessableTicketException("<created_after> is after <created_before>")
-        if (status != null && validStates.containsAll(status))
-            throw UnprocessableTicketException("Some states are invalid")
     }
-     */
+
     fun checkAddParameters(ticket: TicketDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")

@@ -24,7 +24,6 @@ class TicketServiceImpl(
         return ticket.toDTO()
     }
 
-    /*
     override fun getTicketsFiltered(
         customerId: Long?,
         minPriority: Int?,
@@ -33,18 +32,18 @@ class TicketServiceImpl(
         createdAfter: Timestamp?,
         createdBefore: Timestamp?,
         expertId: Long?,
-        status: List<String>?
+        status: List<TicketStatus>?
     ): List<TicketDTO> {
         var customer: Profile? = null
         var expert: Profile? = null
         var product: Product? = null
 
         if (customerId != null)
-            customer = profileService.getProfileById(customerId).toProfile(profileRepository)
+            customer = getProfile(customerId)
         if (expertId != null)
-            expert = profileService.getProfileById(expertId).toProfile(profileRepository)
+            expert = getProfile(expertId)
         if (productId != null)
-            product = productService.getProduct(productId).toProduct(productRepository)
+            product = getProduct(productId)
 
         return ticketRepository
             .findAll()
@@ -59,24 +58,24 @@ class TicketServiceImpl(
                 (status != null && status.contains(it.status))
             }.map { it.toDTO() }
     }
-     */
 
     override fun addTicket(ticket: TicketDTO): TicketIdDTO {
         // TODO: get user_id from session
-        val userId: Long = 1
         // productId is not null, already checked in the controller
-        val returnedEntities = checkIfProductAndCustomerExists(ticket.productId, userId)
-        val ticketId =  ticketRepository.save(ticket.toNewTicket(returnedEntities.product, returnedEntities.customer)).ticketId!!
+        val product = getProduct(ticket.productId)
+        val customer = getProfile(1)
+        val ticketId =  ticketRepository.save(ticket.toNewTicket(product, customer)).ticketId!!
         return TicketIdDTO(ticketId)
     }
 
-    private fun checkIfProductAndCustomerExists(productId: String, customerId: Long): RepositoryObjectsTicketServ {
-        val repProductId = productService.getProduct(productId).productId
-        val repProfileId = profileService.getProfileById(customerId).email
-        val product = productRepository.findByIdOrNull(repProductId)!!
-        val customer = profileRepository.findByEmail(repProfileId)!!
-        return RepositoryObjectsTicketServ(product, customer)
+    private fun getProfile(profileId: Long): Profile {
+        val profileDTO = profileService.getProfileById(profileId)
+        return profileRepository.findByEmail(profileDTO.email)!!
     }
 
-    data class RepositoryObjectsTicketServ(val product: Product, val customer:Profile)
+    private fun getProduct(productId: String): Product {
+        val productDTO = productService.getProduct(productId)
+        return productRepository.findByIdOrNull(productDTO.productId)!!
+    }
+
 }

@@ -6,7 +6,6 @@ import java.sql.Timestamp
 interface TicketService {
     fun getTicket(ticketId: Long): TicketDTO
 
-    /*
     fun getTicketsFiltered(
         customerId: Long?,
         minPriority: Int?,
@@ -15,9 +14,8 @@ interface TicketService {
         createdAfter: Timestamp?,
         createdBefore: Timestamp?,
         expertId: Long?,
-        status: List<String>?
+        status: List<TicketStatus>?
     ): List<TicketDTO>
-     */
 
     fun addTicket(ticket: TicketDTO): TicketIdDTO
 
