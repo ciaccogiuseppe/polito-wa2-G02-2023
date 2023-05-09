@@ -73,9 +73,9 @@ class AttachmentControllerTests {
         customer.surname = "Rossi"
 
         val expert = Profile()
-        customer.email = "mario.bianchi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Bianchi"
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
 
         profileRepository.save(customer)
         profileRepository.save(expert)
