@@ -11,12 +11,11 @@ import java.sql.Timestamp
 class Message {
 
     @ManyToOne
-    @JoinColumn(name="ticket_id")
-    @Column(nullable = false)
+    @JoinColumn(name="ticket_id", nullable = false)
     var ticket : Ticket? = null
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     var sender : Profile? = null
 
     @OneToMany(mappedBy = "message")

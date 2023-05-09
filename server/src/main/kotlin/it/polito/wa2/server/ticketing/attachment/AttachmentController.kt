@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AttachmentController (private val attachmentService : AttachmentService) {
     @GetMapping("/API/attachment/{attachmentId}")
-    fun getAttachment(@PathVariable attachmentId: String) : AttachmentDTO {
+    fun getAttachment(@PathVariable attachmentId: Long) : AttachmentDTO {
         return attachmentService.getAttachment(attachmentId)
     }
 }

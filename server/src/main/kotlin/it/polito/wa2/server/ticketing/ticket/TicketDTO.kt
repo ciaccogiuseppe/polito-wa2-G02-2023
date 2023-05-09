@@ -1,8 +1,10 @@
 package it.polito.wa2.server.ticketing.ticket
 
+import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductDTO
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.products.toDTO
+import it.polito.wa2.server.profiles.Profile
 //import it.polito.wa2.server.products.toProduct
 import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
@@ -11,6 +13,7 @@ import jakarta.validation.constraints.*
 // import it.polito.wa2.server.profiles.toProfile
 import org.springframework.data.repository.findByIdOrNull
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 data class TicketDTO(
     @field:Positive
@@ -20,7 +23,7 @@ data class TicketDTO(
     @field:NotBlank
     val description: String,
     @field:PositiveOrZero
-    val priority: Int,
+    val priority: Int?,
     @field:Size(min = 13, max = 13)
     val productId: String,
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
@@ -46,24 +49,21 @@ fun Ticket.toDTO(): TicketDTO {
         createdTimestamp
     )
 }
-/*
-fun TicketDTO.toTicket(
-    ticketRepository: TicketRepository,
-    productRepository: ProductRepository,
-    profileRepository: ProfileRepository): Ticket {
-    var ticket = if(ticketId!=null){ticketRepository.findByIdOrNull(ticketId)} else {null}
-    if(ticket != null)
-        return ticket
-    ticket = Ticket()
-    ticket.ticketId = ticketId
+
+fun TicketDTO.toNewTicket(
+    product: Product,
+    customer: Profile
+): Ticket {
+    val ticket = Ticket()
     ticket.title = title
     ticket.description = description
-    ticket.priority = priority
-    ticket.product = product?.toProduct(productRepository)
-    ticket.customer = customer?.toProfile(profileRepository)
-    ticket.expert = expert?.toProfile(profileRepository)
-    ticket.status = status
-    ticket.createdTimestamp = createdTimestamp
+    ticket.priority = 0
+    ticket.product = product
+    ticket.customer = customer
+    ticket.expert = null
+    ticket.status = TicketStatus.OPEN
+    ticket.createdTimestamp = Timestamp.valueOf(LocalDateTime.now())
     return ticket
 }
-*/
+
+data class TicketIdDTO(val ticketId: Long)

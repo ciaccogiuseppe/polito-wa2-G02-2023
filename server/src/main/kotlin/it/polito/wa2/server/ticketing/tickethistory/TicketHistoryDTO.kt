@@ -18,10 +18,10 @@ data class TicketHistoryDTO(
     @field:NotBlank(message="email is mandatory")
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
-    val user: String,
+    val userId: String,
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
-    val currentExpert: String?,
+    val currentExpertId: String?,
     val updatedTimestamp: Timestamp,
     val oldState: TicketStatus,
     val newState: TicketStatus

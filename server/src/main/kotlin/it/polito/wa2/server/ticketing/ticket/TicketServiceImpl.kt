@@ -5,7 +5,7 @@ import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
-import it.polito.wa2.server.profiles.toProfile
+//import it.polito.wa2.server.profiles.toProfile
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
@@ -24,6 +24,7 @@ class TicketServiceImpl(
         return ticket.toDTO()
     }
 
+    /*
     override fun getTicketsFiltered(
         customerId: Long?,
         minPriority: Int?,
@@ -58,17 +59,24 @@ class TicketServiceImpl(
                 (status != null && status.contains(it.status))
             }.map { it.toDTO() }
     }
+     */
 
-    override fun addTicket(ticket: TicketDTO): Long {
+    override fun addTicket(ticket: TicketDTO): TicketIdDTO {
         // TODO: get user_id from session
-        val id: Long = 1
+        val userId: Long = 1
         // productId is not null, already checked in the controller
-        checkIfProductAndCustomerExists(ticket.product!!, id)
-        return ticketRepository.save(ticket.toTicket(ticketRepository, productRepository, profileRepository)).ticketId!!
+        val returnedEntities = checkIfProductAndCustomerExists(ticket.productId, userId)
+        val ticketId =  ticketRepository.save(ticket.toNewTicket(returnedEntities.product, returnedEntities.customer)).ticketId!!
+        return TicketIdDTO(ticketId)
     }
 
-    private fun checkIfProductAndCustomerExists(prod: ProductDTO, customerId: Long) {
-        productService.getProduct(prod.productId)
-        profileService.getProfileById(customerId)
+    private fun checkIfProductAndCustomerExists(productId: String, customerId: Long): RepositoryObjectsTicketServ {
+        val repProductId = productService.getProduct(productId).productId
+        val repProfileId = profileService.getProfileById(customerId).email
+        val product = productRepository.findByIdOrNull(repProductId)!!
+        val customer = profileRepository.findByEmail(repProfileId)!!
+        return RepositoryObjectsTicketServ(product, customer)
     }
+
+    data class RepositoryObjectsTicketServ(val product: Product, val customer:Profile)
 }

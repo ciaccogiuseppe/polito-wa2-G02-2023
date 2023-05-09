@@ -10,12 +10,15 @@ import java.sql.Timestamp
 
 @RestController
 class TicketController(private val ticketService: TicketService) {
-    private val validStates = arrayListOf("OPEN", "RESOLVED", "CLOSED", "IN PROGRESS", "REOPENED")
+    // private val validStates = arrayListOf("OPEN", "RESOLVED", "CLOSED", "IN PROGRESS", "REOPENED")
     @GetMapping("/API/ticketing/{ticketId}")
     fun getTicket(@PathVariable ticketId: Long): TicketDTO {
+        if(ticketId < 1)
+            throw UnprocessableTicketException("Invalid ticket id")
         return ticketService.getTicket(ticketId)
     }
 
+    /*
     @GetMapping("/API/ticketing/filter")
     fun getTicketsFiltered(
         customerId: Long?,
@@ -36,9 +39,10 @@ class TicketController(private val ticketService: TicketService) {
             createdAfter, createdBefore, expertId, status
         )
     }
+     */
 
     @PostMapping("/API/ticketing/")
-    fun addTicket(@RequestBody @Valid ticket: TicketDTO?, br: BindingResult): Long {
+    fun addTicket(@RequestBody @Valid ticket: TicketDTO?, br: BindingResult): TicketIdDTO {
         checkAddParameters(ticket, br)
         return ticketService.addTicket(ticket!!)
     }
@@ -53,6 +57,7 @@ class TicketController(private val ticketService: TicketService) {
         TODO("Not yet implemented")
     }
 
+    /*
     fun checkFilterParameters(
         customerId: Long?,
         minPriority: Int?,
@@ -72,13 +77,11 @@ class TicketController(private val ticketService: TicketService) {
         if (status != null && validStates.containsAll(status))
             throw UnprocessableTicketException("Some states are invalid")
     }
-
+     */
     fun checkAddParameters(ticket: TicketDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
         if (ticket == null)
             throw BadRequestProfileException("Ticket must not be NULL")
-        if (ticket.product == null)
-            throw UnprocessableTicketException("Wrong ticket format")
     }
 }

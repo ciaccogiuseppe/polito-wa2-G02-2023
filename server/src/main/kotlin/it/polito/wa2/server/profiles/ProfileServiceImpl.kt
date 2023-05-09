@@ -26,7 +26,7 @@ class ProfileServiceImpl(
     override fun addProfile(profile: ProfileDTO) {
         if (profileRepository.findByEmail(profile.email) != null)
             throw DuplicateProfileException("Profile with email '${profile.email}' already exists")
-        profileRepository.save(profile.toProfile(profileRepository))
+        profileRepository.save(profile.toNewProfile())
    }
 
     override fun updateProfile(email: String, newProfile: ProfileDTO) {

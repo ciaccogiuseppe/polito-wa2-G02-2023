@@ -16,8 +16,7 @@ class Attachment {
     var attachment: ByteArray = byteArrayOf()
 
     @ManyToOne
-    @JoinColumn(name="message_id")
-    @Column(nullable = false)
+    @JoinColumn(name="message_id", nullable = false)
     var message : Message? = null
 
     @Id

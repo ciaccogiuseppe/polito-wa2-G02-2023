@@ -25,12 +25,11 @@ class Ticket {
     var createdTimestamp : Timestamp? = null
 
     @ManyToOne
-    @JoinColumn(name="product_id")
-    @Column(nullable = false)
+    @JoinColumn(name="product_id", nullable = false)
     var product : Product? = null
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     var customer : Profile? = null
 
     @ManyToOne

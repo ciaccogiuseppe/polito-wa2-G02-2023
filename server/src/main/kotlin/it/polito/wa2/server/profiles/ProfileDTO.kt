@@ -17,15 +17,11 @@ data class ProfileDTO(
 fun Profile.toDTO(): ProfileDTO {
     return ProfileDTO(email, name, surname)
 }
-/*
-fun ProfileDTO.toProfile(profileRepository: ProfileRepository): Profile {
-    var profile = profileRepository.findByEmail(email)
-    if(profile != null)
-        return profile
-    profile = Profile()
+
+fun ProfileDTO.toNewProfile(): Profile {
+    val profile = Profile()
     profile.email = email
     profile.name = name
     profile.surname = surname
     return profile
 }
- */

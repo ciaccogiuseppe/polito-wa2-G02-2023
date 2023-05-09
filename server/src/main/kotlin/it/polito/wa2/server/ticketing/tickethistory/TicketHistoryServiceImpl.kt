@@ -5,7 +5,8 @@ import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketService
-import it.polito.wa2.server.ticketing.ticket.toTicket
+//import it.polito.wa2.server.ticketing.ticket.toTicket
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,7 +22,8 @@ class TicketHistoryServiceImpl(
     }
 
     override fun getTicketHistory(ticketId: Long): List<TicketHistoryDTO> {
-        val ticket = ticketService.getTicket(ticketId).toTicket(ticketRepository, productRepository, profileRepository)
+        val ticketDTO = ticketService.getTicket(ticketId)
+        val ticket = ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
         return ticketHistoryRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 

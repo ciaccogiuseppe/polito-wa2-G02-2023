@@ -38,15 +38,9 @@ fun Attachment.toDTO() : AttachmentDTO{
     return AttachmentDTO(attachmentId, attachment, name)
 }
 
-/*
-fun AttachmentDTO.toAttachment(attachmentRepository: AttachmentRepository): Attachment{
-    var attachmentObj = attachmentRepository.findByIdOrNull(attachmentId.toString())
-    if(attachmentObj != null)
-        return attachmentObj
-    attachmentObj = Attachment()
-    attachmentObj.attachmentId = attachmentId
+fun AttachmentDTO.toNewAttachment(): Attachment{
+    val attachmentObj = Attachment()
     attachmentObj.name = name
     attachmentObj.attachment = attachment
     return attachmentObj
 }
- */

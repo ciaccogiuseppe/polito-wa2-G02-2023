@@ -1,14 +1,17 @@
 package it.polito.wa2.server.ticketing.message
 
 import it.polito.wa2.server.products.ProductRepository
+import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.toDTO
+import it.polito.wa2.server.ticketing.attachment.Attachment
 //import it.polito.wa2.server.profiles.toProfile
 import it.polito.wa2.server.ticketing.attachment.AttachmentDTO
 import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
 // import it.polito.wa2.server.ticketing.attachment.toAttachment
 import it.polito.wa2.server.ticketing.attachment.toDTO
+import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketDTO
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.toDTO
@@ -27,7 +30,7 @@ data class MessageDTO(
     val ticketId: Long,
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
-    val sender: String?,
+    val senderId: String?,
     @field:NotBlank(message="a message text is mandatory")
     val text: String,
     val sentTimestamp: Timestamp?,
@@ -41,7 +44,7 @@ data class MessageDTO(
 
         if (messageId != other.messageId) return false
         if (ticketId != other.ticketId) return false
-        if (sender != other.sender) return false
+        if (senderId != other.senderId) return false
         if (text != other.text) return false
         if (sentTimestamp != other.sentTimestamp) return false
         if (attachments != other.attachments) return false
@@ -52,7 +55,7 @@ data class MessageDTO(
     override fun hashCode(): Int {
         var result = messageId?.hashCode() ?: 0
         result = 31 * result + ticketId.hashCode()
-        result = 31 * result + (sender?.hashCode() ?: 0)
+        result = 31 * result + (senderId?.hashCode() ?: 0)
         result = 31 * result + text.hashCode()
         result = 31 * result + (sentTimestamp?.hashCode() ?: 0)
         result = 31 * result + attachments.hashCode()
@@ -65,24 +68,16 @@ fun Message.toDTO(): MessageDTO {
         text, sentTimestamp, attachments.map{it.toDTO()}.toMutableSet())
 }
 
-/*
-fun MessageDTO.toMessage(
-    messageRepository: MessageRepository,
-    profileRepository: ProfileRepository,
-    attachmentRepository: AttachmentRepository,
-    ticketRepository: TicketRepository,
-    productRepository: ProductRepository,
-    ): Message {
-    var message = messageRepository.findByIdOrNull(messageId.toString())
-    if(message!=null)
-        return message
-    message = Message()
-    message.attachments = attachments.map{it.toAttachment(attachmentRepository)}.toMutableSet()
+fun MessageDTO.toNewMessage(
+    attachments: MutableSet<Attachment>,
+    sender: Profile,
+    ticket: Ticket): Message {
+    val message = Message()
+    message.attachments = attachments
     message.messageId = messageId
     message.text = text
-    message.sender = sender?.toProfile(profileRepository)
-    message.ticket = ticket?.toTicket(ticketRepository, productRepository, profileRepository)
+    message.sender = sender
+    message.ticket = ticket
     message.sentTimestamp = sentTimestamp
     return message
 }
-*/

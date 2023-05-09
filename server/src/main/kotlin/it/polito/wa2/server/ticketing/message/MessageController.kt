@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class MessageController(private val messageService: MessageService) {
     @GetMapping("/API/chat/{ticketId}")
-    fun getMessage(@PathVariable ticketId: String) : List<MessageDTO> {
+    fun getMessage(@PathVariable ticketId: Long) : List<MessageDTO> {
         return messageService.getChat(ticketId)
     }
 
     @PostMapping("/API/chat/{ticketId}")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addMessage(@PathVariable ticketId: String, @RequestBody @Valid message: MessageDTO?, br: BindingResult) {
+    fun addMessage(@PathVariable ticketId: Long, @RequestBody @Valid message: MessageDTO?, br: BindingResult) {
         checkInputMessage(message, br)
         messageService.addMessage(ticketId, message!!)
     }

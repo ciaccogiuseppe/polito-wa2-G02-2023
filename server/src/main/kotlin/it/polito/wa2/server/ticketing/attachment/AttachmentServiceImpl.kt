@@ -9,8 +9,12 @@ import org.springframework.stereotype.Service
 class AttachmentServiceImpl(
     private val attachmentRepository: AttachmentRepository
 ): AttachmentService {
-    override fun getAttachment(attachmentID: String): AttachmentDTO {
+    override fun getAttachment(attachmentID: Long): AttachmentDTO {
         return attachmentRepository.findByIdOrNull(attachmentID)?.toDTO()?:
             throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
+    }
+
+    override fun addAttachment(attachmentDTO: AttachmentDTO): Long {
+        return attachmentRepository.save(attachmentDTO.toNewAttachment()).attachmentId!!
     }
 }
