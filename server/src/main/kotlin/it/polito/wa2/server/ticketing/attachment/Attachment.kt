@@ -13,7 +13,7 @@ class Attachment {
 
     @Lob
     @Column(columnDefinition="bytea", nullable = false)
-    var attachment: ByteArray? = null
+    var attachment: ByteArray = byteArrayOf()
 
     @ManyToOne
     @JoinColumn(name="message_id")

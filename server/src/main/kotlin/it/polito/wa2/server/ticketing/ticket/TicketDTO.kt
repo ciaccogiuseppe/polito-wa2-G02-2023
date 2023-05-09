@@ -3,17 +3,17 @@ package it.polito.wa2.server.ticketing.ticket
 import it.polito.wa2.server.products.ProductDTO
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.products.toDTO
-import it.polito.wa2.server.products.toProduct
+//import it.polito.wa2.server.products.toProduct
 import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.toDTO
-import it.polito.wa2.server.profiles.toProfile
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.PositiveOrZero
+import jakarta.validation.constraints.*
+// import it.polito.wa2.server.profiles.toProfile
 import org.springframework.data.repository.findByIdOrNull
 import java.sql.Timestamp
 
 data class TicketDTO(
+    @field:Positive
     val ticketId : Long?,
     @field:NotBlank(message = "A title is required")
     val title: String,
@@ -21,10 +21,15 @@ data class TicketDTO(
     val description: String,
     @field:PositiveOrZero
     val priority: Int,
-    val product: ProductDTO?,
-    val customer: ProfileDTO?,
-    val expert: ProfileDTO?,
-    val status: String,
+    @field:Size(min = 13, max = 13)
+    val productId: String,
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
+    val customerId: String?,
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
+    val expertId: String?,
+    val status: TicketStatus?,
     val createdTimestamp: Timestamp?
 )
 
@@ -34,14 +39,14 @@ fun Ticket.toDTO(): TicketDTO {
         title,
         description,
         priority,
-        product?.toDTO(),
-        customer?.toDTO(),
-        expert?.toDTO(),
+        product?.productId!!,
+        customer?.email,
+        expert?.email,
         status,
         createdTimestamp
     )
 }
-
+/*
 fun TicketDTO.toTicket(
     ticketRepository: TicketRepository,
     productRepository: ProductRepository,
@@ -61,3 +66,4 @@ fun TicketDTO.toTicket(
     ticket.createdTimestamp = createdTimestamp
     return ticket
 }
+*/

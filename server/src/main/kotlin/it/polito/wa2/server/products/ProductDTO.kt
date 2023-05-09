@@ -13,6 +13,7 @@ data class ProductDTO(
     val brand: String
 )
 
+/*
 fun ProductDTO.toProduct(productRepository: ProductRepository): Product {
     var product = productRepository.findByIdOrNull(productId)
     if(product!=null)
@@ -23,6 +24,7 @@ fun ProductDTO.toProduct(productRepository: ProductRepository): Product {
     product.brand = brand
     return product
 }
+*/
 
 fun Product.toDTO(): ProductDTO {
     return ProductDTO(productId, name, brand)

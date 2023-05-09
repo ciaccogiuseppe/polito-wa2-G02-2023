@@ -17,7 +17,7 @@ data class ProfileDTO(
 fun Profile.toDTO(): ProfileDTO {
     return ProfileDTO(email, name, surname)
 }
-
+/*
 fun ProfileDTO.toProfile(profileRepository: ProfileRepository): Profile {
     var profile = profileRepository.findByEmail(email)
     if(profile != null)
@@ -28,3 +28,4 @@ fun ProfileDTO.toProfile(profileRepository: ProfileRepository): Profile {
     profile.surname = surname
     return profile
 }
+ */
