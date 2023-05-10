@@ -72,8 +72,8 @@ class TicketServiceImpl(
 
     override fun assignTicket(ticketAssignDTO: TicketAssignDTO) {
         val expert = getProfileByEmail(ticketAssignDTO.expertId!!)
-        val ticketId = getTicket(ticketAssignDTO.ticketId!!).ticketId!!
-        val ticket = ticketRepository.findByIdOrNull(ticketId)!!
+        val ticket = ticketRepository.findByIdOrNull(ticketAssignDTO.ticketId)
+            ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketAssignDTO.ticketId} does not exists")
         val oldState = ticket.status
         if (ticket.status != TicketStatus.OPEN && ticket.status == TicketStatus.REOPENED)
             throw UnprocessableTicketException("A ticket can't be assigned with the actual status")
@@ -85,7 +85,7 @@ class TicketServiceImpl(
         ticketRepository.save(ticket)
         ticketHistoryService.addTicketHistory(
             TicketHistoryDTO(
-                ticketId,
+                ticket.ticketId!!,
                 ticket.customer!!.email,
                 expert.email,
                 null,
@@ -96,8 +96,8 @@ class TicketServiceImpl(
     }
 
     override fun updateTicket(ticketUpdateDTO: TicketUpdateDTO) {
-        val ticketId = getTicket(ticketUpdateDTO.ticketId!!).ticketId!!
-        val ticket = ticketRepository.findByIdOrNull(ticketId)!!
+        val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
+            ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
         val oldState = ticket.status
         val newState = ticketUpdateDTO.newState
 
@@ -113,7 +113,7 @@ class TicketServiceImpl(
         ticketRepository.save(ticket)
         ticketHistoryService.addTicketHistory(
             TicketHistoryDTO(
-                ticketId,
+                ticket.ticketId!!,
                 ticket.customer!!.email,
                 ticket.expert!!.email,
                 null,
