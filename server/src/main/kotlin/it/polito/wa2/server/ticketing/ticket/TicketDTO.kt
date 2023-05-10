@@ -29,17 +29,17 @@ data class TicketDTO(
 
 data class TicketAssignDTO(
     @field:Positive
-    val ticketId : Long?,
+    val ticketId : Long,
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
-    val expertId: String?,
+    val expertId: String,
     @field:PositiveOrZero
-    val priority: Int?
+    val priority: Int
 )
 
 data class TicketUpdateDTO(
     @field:Positive
-    val ticketId : Long?,
+    val ticketId : Long,
     val newState: TicketStatus
 )
 

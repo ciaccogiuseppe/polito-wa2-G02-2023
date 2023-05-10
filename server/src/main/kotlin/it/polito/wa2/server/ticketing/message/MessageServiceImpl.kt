@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.message
 
+import it.polito.wa2.server.BadRequestMessageException
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
@@ -29,11 +30,13 @@ class MessageServiceImpl(
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
-    override fun addMessage(ticketId: Long, message: MessageDTO) {
+    override fun addMessage(ticketId: Long, messageDTO: MessageDTO) {
+        if(ticketId != messageDTO.ticketId)
+            throw BadRequestMessageException("The ticket ids are different")
         val ticket = getTicket(ticketId)
-        val attachments = message.attachments.map{getAttachment(it)}.toMutableSet()
+        val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
         val sender = getProfile(1)
-        ticket.messages.add(message.toNewMessage(attachments, sender, ticket))
+        ticket.messages.add(messageDTO.toNewMessage(attachments, sender, ticket))
         ticketRepository.save(ticket)
     }
 
@@ -42,12 +45,12 @@ class MessageServiceImpl(
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 
-    private fun getAttachment(attachment: AttachmentDTO): Attachment {
-        var attachmentId = attachment.attachmentId
+    private fun getAttachment(attachmentDTO: AttachmentDTO): Attachment {
+        var attachmentId = attachmentDTO.attachmentId
         if(attachmentId == null)
-            attachmentId = attachmentService.addAttachment(attachment)
-        val attachmentDTO = attachmentService.getAttachment(attachmentId)
-        return attachmentRepository.findByIdOrNull(attachmentDTO.attachmentId)!!
+            attachmentId = attachmentService.addAttachment(attachmentDTO)
+        val newAttachmentDTO = attachmentService.getAttachment(attachmentId)
+        return attachmentRepository.findByIdOrNull(newAttachmentDTO.attachmentId)!!
     }
 
     private fun getProfile(profileId: Long): Profile {

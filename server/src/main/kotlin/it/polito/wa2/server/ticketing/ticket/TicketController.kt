@@ -40,21 +40,21 @@ class TicketController(private val ticketService: TicketService) {
     }
 
     @PostMapping("/API/ticketing/")
-    fun addTicket(@RequestBody @Valid ticket: TicketDTO?, br: BindingResult): TicketIdDTO {
-        checkAddParameters(ticket, br)
-        return ticketService.addTicket(ticket!!)
+    fun addTicket(@RequestBody @Valid ticketDTO: TicketDTO?, br: BindingResult): TicketIdDTO {
+        checkAddParameters(ticketDTO, br)
+        return ticketService.addTicket(ticketDTO!!)
     }
 
     @PutMapping("/API/ticketing/assign")
-    fun assignTicket(@RequestBody @Valid ticket: TicketAssignDTO?, br: BindingResult){
-        checkAssignParameters(ticket, br)
-        ticketService.assignTicket(ticket!!)
+    fun assignTicket(@RequestBody @Valid ticketAssignDTO: TicketAssignDTO?, br: BindingResult){
+        checkAssignParameters(ticketAssignDTO, br)
+        ticketService.assignTicket(ticketAssignDTO!!)
     }
 
     @PutMapping("/API/ticketing/update")
-    fun updateTicket(@RequestBody @Valid ticket: TicketUpdateDTO?, br: BindingResult){
-        checkUpdateParameters(ticket, br)
-        ticketService.updateTicket(ticket!!)
+    fun updateTicket(@RequestBody @Valid ticketUpdateDTO: TicketUpdateDTO?, br: BindingResult){
+        checkUpdateParameters(ticketUpdateDTO, br)
+        ticketService.updateTicket(ticketUpdateDTO!!)
     }
 
     fun checkFilterParameters(
@@ -75,24 +75,24 @@ class TicketController(private val ticketService: TicketService) {
             throw UnprocessableTicketException("<created_after> is after <created_before>")
     }
 
-    fun checkAddParameters(ticket: TicketDTO?, br: BindingResult) {
+    fun checkAddParameters(ticketDTO: TicketDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
-        if (ticket == null)
+        if (ticketDTO == null)
             throw BadRequestProfileException("Ticket must not be NULL")
     }
 
-    fun checkAssignParameters(ticket: TicketAssignDTO?, br: BindingResult) {
+    fun checkAssignParameters(ticketAssignDTO: TicketAssignDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
-        if (ticket == null)
+        if (ticketAssignDTO == null)
             throw BadRequestProfileException("Ticket must not be NULL")
     }
 
-    fun checkUpdateParameters(ticket: TicketUpdateDTO?, br: BindingResult) {
+    fun checkUpdateParameters(ticketUpdateDTO: TicketUpdateDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
-        if (ticket == null)
+        if (ticketUpdateDTO == null)
             throw BadRequestProfileException("Ticket must not be NULL")
     }
 }
