@@ -36,8 +36,11 @@ class MessageServiceImpl(
         val ticket = getTicket(ticketId)
         val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
         val sender = getProfile(1)
-        ticket.messages.add(messageDTO.toNewMessage(attachments, sender, ticket))
+        val message = messageDTO.toNewMessage(attachments, sender, ticket)
+        messageRepository.save(message)
+        ticket.messages.add(message)
         ticketRepository.save(ticket)
+
     }
 
     private fun getTicket(ticketId: Long): Ticket {
