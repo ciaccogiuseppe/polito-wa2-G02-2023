@@ -4,10 +4,12 @@ package it.polito.wa2.server
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
+import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
 import it.polito.wa2.server.ticketing.message.Message
+import it.polito.wa2.server.ticketing.message.MessageDTO
 import it.polito.wa2.server.ticketing.message.MessageRepository
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
@@ -395,6 +397,186 @@ class MessageControllerTests {
         messageRepository.delete(message2)
         messageRepository.delete(message1)
         ticketRepository.delete(ticket2)
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+
+    @Test
+    @DirtiesContext
+    fun addMessageSuccessful() {
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.product = product
+        ticket.customer = customer
+        ticket.status = TicketStatus.IN_PROGRESS
+        ticket.expert = expert
+        ticket.priority = 2
+        ticket.title = "Ticket sample"
+        ticket.description = "Ticket description sample"
+
+        val ticket2 = Ticket()
+        ticket2.createdTimestamp = Timestamp(1)
+        ticket2.product = product
+        ticket2.customer = customer
+        ticket2.status = TicketStatus.IN_PROGRESS
+        ticket2.expert = expert
+        ticket2.priority = 2
+        ticket2.title = "Ticket sample"
+        ticket2.description = "Ticket description sample"
+
+        ticketRepository.save(ticket)
+        ticketRepository.save(ticket2)
+
+        val message = MessageDTO(
+            null,
+            ticket.ticketId!!,
+            customer.email,
+            "message text",
+            Timestamp(0),
+            mutableSetOf()
+        )
+
+        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val uri = URI(url)
+        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message)
+        val result = restTemplate.postForEntity(uri, requestEntity, message.javaClass)
+
+        Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
+
+        val addedMessage = messageRepository.findAllByTicket(ticket)
+
+        Assertions.assertEquals(1, addedMessage.size)
+        Assertions.assertEquals(message.text, addedMessage[0].text)
+        Assertions.assertEquals(1, addedMessage[0].messageId)
+
+        messageRepository.delete(addedMessage[0])
+        ticketRepository.delete(ticket2)
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun addMessageNonExistingTicket() {
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+
+        productRepository.save(product)
+
+
+        val message = MessageDTO(
+            null,
+            25,
+            customer.email,
+            "message text",
+            Timestamp(0),
+            mutableSetOf()
+        )
+
+        val url = "http://localhost:$port/API/chat/25"
+        val uri = URI(url)
+        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message)
+        val result = restTemplate.postForEntity(uri, requestEntity, String.javaClass)
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun addMessageNonExistingProfile() {
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.product = product
+        ticket.customer = customer
+        ticket.status = TicketStatus.IN_PROGRESS
+        ticket.expert = expert
+        ticket.priority = 2
+        ticket.title = "Ticket sample"
+        ticket.description = "Ticket description sample"
+
+
+        ticketRepository.save(ticket)
+
+        val message = MessageDTO(
+            null,
+            ticket.ticketId!!,
+            "something@mail.it",
+            "message text",
+            Timestamp(0),
+            mutableSetOf()
+        )
+
+        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val uri = URI(url)
+        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message)
+        val result = restTemplate.postForEntity(uri, requestEntity, String.javaClass)
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
