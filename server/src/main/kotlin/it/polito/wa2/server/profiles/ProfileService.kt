@@ -5,7 +5,7 @@ interface ProfileService {
 
     fun getProfileById(id: Long): ProfileDTO
 
-    fun addProfile(profile: ProfileDTO)
+    fun addProfile(profileDTO: ProfileDTO)
 
-    fun updateProfile(email: String, newProfile: ProfileDTO)
+    fun updateProfile(email: String, newProfileDTO: ProfileDTO)
 }

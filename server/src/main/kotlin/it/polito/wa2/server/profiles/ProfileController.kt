@@ -18,22 +18,22 @@ class ProfileController(private val profileService: ProfileService) {
 
     @PostMapping("/API/profiles")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addProfile(@RequestBody @Valid profile: ProfileDTO?, br: BindingResult) {
-        checkInputProfile(profile, br)
-        profileService.addProfile(profile!!)
+    fun addProfile(@RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
+        checkInputProfile(profileDTO, br)
+        profileService.addProfile(profileDTO!!)
     }
 
     @PutMapping("/API/profiles/{email}")
-    fun updateProfile(@PathVariable email: String, @RequestBody @Valid profile: ProfileDTO?, br: BindingResult) {
+    fun updateProfile(@PathVariable email: String, @RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
         checkEmail(email)
-        checkInputProfile(profile, br)
-        profileService.updateProfile(email, profile!!)
+        checkInputProfile(profileDTO, br)
+        profileService.updateProfile(email, profileDTO!!)
     }
 
-    fun checkInputProfile(profile: ProfileDTO?, br: BindingResult){
+    fun checkInputProfile(profileDTO: ProfileDTO?, br: BindingResult){
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong profile format")
-        if (profile == null)
+        if (profileDTO == null)
             throw BadRequestProfileException("Profile must not be NULL")
     }
 

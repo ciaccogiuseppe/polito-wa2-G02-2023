@@ -31,7 +31,7 @@ class Profile {
     val ticketsExpert = mutableSetOf<Ticket>()
 
     @OneToMany(mappedBy = "sender")
-    val messageSender = mutableSetOf<Message>()
+    val messagesSender = mutableSetOf<Message>()
 
     @OneToMany(mappedBy = "user")
     val historyEditor = mutableSetOf<TicketHistory>()

@@ -18,20 +18,20 @@ class MessageController(private val messageService: MessageService) {
 
     @PostMapping("/API/chat/{ticketId}")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addMessage(@PathVariable ticketId: Long, @RequestBody @Valid message: MessageDTO?, br: BindingResult) {
+    fun addMessage(@PathVariable ticketId: Long, @RequestBody @Valid messageDTO: MessageDTO?, br: BindingResult) {
         checkTicketId(ticketId)
-        checkInputMessage(message, br)
-        messageService.addMessage(ticketId, message!!)
+        checkInputMessage(messageDTO, br)
+        messageService.addMessage(ticketId, messageDTO!!)
     }
 
     fun checkTicketId(ticketId: Long){
         if(ticketId <= 0)
             throw UnprocessableTicketException("Wrong ticket id value")
     }
-    fun checkInputMessage(message: MessageDTO?, br: BindingResult){
+    fun checkInputMessage(messageDTO: MessageDTO?, br: BindingResult){
         if (br.hasErrors())
             throw UnprocessableMessageException("Wrong message format")
-        if (message == null)
+        if (messageDTO == null)
             throw BadRequestMessageException("Message must not be NULL")
     }
 }
