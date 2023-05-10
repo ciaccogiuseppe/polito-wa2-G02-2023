@@ -17,7 +17,7 @@ interface TicketService {
         status: List<TicketStatus>?
     ): List<TicketDTO>
 
-    fun addTicket(ticket: TicketDTO): TicketIdDTO
+    fun addTicket(ticketDTO: TicketDTO): TicketIdDTO
     fun assignTicket(ticketAssignDTO: TicketAssignDTO)
     fun updateTicket(ticketUpdateDTO: TicketUpdateDTO)
 
