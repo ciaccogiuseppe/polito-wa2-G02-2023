@@ -9,9 +9,10 @@ import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.ticketing.tickethistory.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 
-@Service
+@Service @Transactional
 class TicketServiceImpl(
     private val ticketRepository: TicketRepository,
     private val profileRepository: ProfileRepository,
@@ -20,12 +21,14 @@ class TicketServiceImpl(
     private val productService: ProductService,
     private val profileService: ProfileService
 ): TicketService {
+    @Transactional(readOnly = true)
     override fun getTicket(ticketId: Long): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
         return ticket.toDTO()
     }
 
+    @Transactional(readOnly = true)
     override fun getTicketsFiltered(
         customerId: Long?,
         minPriority: Int?,
