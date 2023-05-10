@@ -21,13 +21,15 @@ data class TicketHistoryDTO(
     val currentExpertId: String?,
     val updatedTimestamp: Timestamp?,
     val oldState: TicketStatus,
-    val newState: TicketStatus
+    val newState: TicketStatus,
+    @field:Positive
+    val historyId: Long?
 )
 
 fun TicketHistory.toDTO(): TicketHistoryDTO {
     return TicketHistoryDTO(ticket?.ticketId!!,
         user!!.email, currentExpert?.email, updatedTimestamp,
-        oldState, newState)
+        oldState, newState, historyId)
 }
 
 fun newTicketHistory(
