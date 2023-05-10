@@ -4,6 +4,7 @@ import it.polito.wa2.server.*
 import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
+import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.ticketing.tickethistory.*
 import org.springframework.data.repository.findByIdOrNull
@@ -64,7 +65,10 @@ class TicketServiceImpl(
         // TODO: get user_id from session
         // productId is not null, already checked in the controller
         val product = getProduct(ticketDTO.productId)
-        val customer = getProfile(1)
+        val customer = getProfileByEmail(ticketDTO.customerId!!)
+        if (customer.role != ProfileRole.CUSTOMER)
+            throw UnprocessableTicketException("The requester profile is not a customer")
+
         val ticket =  ticketRepository.save(ticketDTO.toNewTicket(product, customer))
         ticketHistoryRepository.save(
             newTicketHistory(
@@ -83,8 +87,11 @@ class TicketServiceImpl(
         val ticket = ticketRepository.findByIdOrNull(ticketAssignDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketAssignDTO.ticketId} does not exists")
         val oldState = ticket.status
+
         if (ticket.status != TicketStatus.OPEN && ticket.status == TicketStatus.REOPENED)
             throw UnprocessableTicketException("A ticket can't be assigned with the actual status")
+        if (expert.role != ProfileRole.EXPERT)
+            throw UnprocessableTicketException("The assigned profile is not an expert")
 
         ticket.expert = expert
         ticket.priority = ticketAssignDTO.priority
