@@ -4,11 +4,11 @@ package it.polito.wa2.server
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
+import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
-import it.polito.wa2.server.ticketing.ticket.Ticket
-import it.polito.wa2.server.ticketing.ticket.TicketRepository
-import it.polito.wa2.server.ticketing.ticket.TicketStatus
+import it.polito.wa2.server.ticketing.ticket.*
+import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryRepository
 import jakarta.validation.constraints.NotBlank
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -61,6 +61,8 @@ class TicketControllerTests {
     lateinit var productRepository: ProductRepository
     @Autowired
     lateinit var ticketRepository: TicketRepository
+    @Autowired
+    lateinit var ticketHistoryRepository: TicketHistoryRepository
     @Test
     @DirtiesContext
     fun getExistingTicket() {
@@ -232,7 +234,9 @@ class TicketControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
         profileRepository.delete(customer)
+        profileRepository.delete(customer2)
         profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
@@ -324,6 +328,9 @@ class TicketControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
         profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -416,6 +423,9 @@ class TicketControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
         profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -508,6 +518,9 @@ class TicketControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
         profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -606,7 +619,9 @@ class TicketControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
         profileRepository.delete(customer)
+        profileRepository.delete(customer2)
         profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
         productRepository.delete(product2)
     }
@@ -705,7 +720,9 @@ class TicketControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
         profileRepository.delete(customer)
+        profileRepository.delete(customer2)
         profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
         productRepository.delete(product2)
     }
@@ -803,10 +820,1680 @@ class TicketControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
         profileRepository.delete(customer)
+        profileRepository.delete(customer2)
         profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
         productRepository.delete(product2)
     }
 
+
+    @Test
+    @DirtiesContext
+    fun addTicketSuccessful(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = TicketDTO(
+            null,
+            "Ticket title",
+            "Ticket description",
+            null,
+            "0000000000000",
+            "mario.rossi@polito.it",
+            "mario.bianchi@polito.it",
+            null,
+            null
+        )
+
+        val url = "http://localhost:$port/API/ticketing/"
+        val uri = URI(url)
+        val json = BasicJsonParser()
+
+        val requestEntity : HttpEntity<TicketDTO> = HttpEntity(ticket)
+        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
+
+        val id = json.parseMap(result.body)["ticketId"] as Long
+
+        val createdTicket = ticketRepository.findById(id)
+
+
+        Assertions.assertTrue(createdTicket.isPresent)
+        Assertions.assertEquals(ticket.title, createdTicket.get().title)
+        Assertions.assertEquals(TicketStatus.OPEN, createdTicket.get().status)
+        Assertions.assertEquals(ticket.description, createdTicket.get().description)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(createdTicket.get())
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(createdTicket.get())
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun addTicketCustomerNotFound(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = TicketDTO(
+            null,
+            "Ticket title",
+            "Ticket description",
+            null,
+            "0000000000000",
+            "mario.grossi@polito.it",
+            null,
+            null,
+            null
+        )
+
+        val url = "http://localhost:$port/API/ticketing/"
+        val uri = URI(url)
+        val json = BasicJsonParser()
+
+        val requestEntity : HttpEntity<TicketDTO> = HttpEntity(ticket)
+        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun addTicketProductNotFound(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = TicketDTO(
+            null,
+            "Ticket title",
+            "Ticket description",
+            null,
+            "0000000000001",
+            "mario.rossi@polito.it",
+            null,
+            null,
+            null
+        )
+
+        val url = "http://localhost:$port/API/ticketing/"
+        val uri = URI(url)
+        val json = BasicJsonParser()
+
+        val requestEntity : HttpEntity<TicketDTO> = HttpEntity(ticket)
+        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun addTicketProductWrongFormat(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = TicketDTO(
+            null,
+            "Ticket title",
+            "Ticket description",
+            null,
+            "0000000000001abc",
+            "mario.rossi@polito.it",
+            null,
+            null,
+            null
+        )
+
+        val url = "http://localhost:$port/API/ticketing/"
+        val uri = URI(url)
+        val json = BasicJsonParser()
+
+        val requestEntity : HttpEntity<TicketDTO> = HttpEntity(ticket)
+        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun addTicketWithStatus(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = TicketDTO(
+            null,
+            "Ticket title",
+            "Ticket description",
+            null,
+            "0000000000000",
+            "mario.rossi@polito.it",
+            null,
+            TicketStatus.IN_PROGRESS,
+            null
+        )
+
+        val url = "http://localhost:$port/API/ticketing/"
+        val uri = URI(url)
+        val json = BasicJsonParser()
+
+        val requestEntity : HttpEntity<TicketDTO> = HttpEntity(ticket)
+        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
+
+        val id = json.parseMap(result.body)["ticketId"] as Long
+
+        val createdTicket = ticketRepository.findById(id)
+
+
+        Assertions.assertTrue(createdTicket.isPresent)
+        Assertions.assertEquals(ticket.title, createdTicket.get().title)
+        Assertions.assertEquals(TicketStatus.OPEN, createdTicket.get().status)
+        Assertions.assertEquals(ticket.description, createdTicket.get().description)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(createdTicket.get())
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(createdTicket.get())
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun assignTicketSuccessful(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.OPEN
+        ticketRepository.save(ticket)
+
+        val ticketAssign = TicketAssignDTO(
+            ticket.ticketId!!,
+            expert.email,
+            2
+        )
+
+        val url = "http://localhost:$port/API/ticketing/assign"
+        val uri = URI(url)
+        val json = BasicJsonParser()
+
+        val requestEntity : HttpEntity<TicketAssignDTO> = HttpEntity(ticketAssign)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(ticket.title, updatedTicket.get().title)
+        Assertions.assertEquals(TicketStatus.IN_PROGRESS, updatedTicket.get().status)
+        Assertions.assertEquals(expert.email, updatedTicket.get().expert!!.email)
+        Assertions.assertEquals(2, updatedTicket.get().priority)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun assignReopenedTicketSuccessful(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.REOPENED
+        ticketRepository.save(ticket)
+
+        val ticketAssign = TicketAssignDTO(
+            ticket.ticketId!!,
+            expert.email,
+            2
+        )
+
+        val url = "http://localhost:$port/API/ticketing/assign"
+        val uri = URI(url)
+        val json = BasicJsonParser()
+
+        val requestEntity : HttpEntity<TicketAssignDTO> = HttpEntity(ticketAssign)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(ticket.title, updatedTicket.get().title)
+        Assertions.assertEquals(TicketStatus.IN_PROGRESS, updatedTicket.get().status)
+        Assertions.assertEquals(expert.email, updatedTicket.get().expert!!.email)
+        Assertions.assertEquals(2, updatedTicket.get().priority)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun assignTicketToCustomer(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.OPEN
+        ticketRepository.save(ticket)
+
+        val ticketAssign = TicketAssignDTO(
+            ticket.ticketId!!,
+            customer.email,
+            2
+        )
+
+        val url = "http://localhost:$port/API/ticketing/assign"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketAssignDTO> = HttpEntity(ticketAssign)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun wrongReassignTicket(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.OPEN
+        ticketRepository.save(ticket)
+
+        val ticketAssign = TicketAssignDTO(
+            ticket.ticketId!!,
+            expert.email,
+            2
+        )
+
+        val url = "http://localhost:$port/API/ticketing/assign"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketAssignDTO> = HttpEntity(ticketAssign)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+        val result2 = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result2.statusCode)
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun assignToClosedTicket(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.CLOSED
+        ticketRepository.save(ticket)
+
+        val ticketAssign = TicketAssignDTO(
+            ticket.ticketId!!,
+            expert.email,
+            2
+        )
+
+        val url = "http://localhost:$port/API/ticketing/assign"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketAssignDTO> = HttpEntity(ticketAssign)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulInProgressToClosed(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.IN_PROGRESS
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.CLOSED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulInProgressToOpen(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.IN_PROGRESS
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.OPEN
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.OPEN, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulOpenToClosed(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.OPEN
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.CLOSED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulResolvedToClosed(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.RESOLVED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.CLOSED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulReopenedToClosed(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.REOPENED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.CLOSED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulOpenToResolved(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.OPEN
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.RESOLVED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulInProgressToResolved(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.IN_PROGRESS
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.RESOLVED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulReopenedToResolved(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.REOPENED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.RESOLVED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongReopenedToInProgress(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.REOPENED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.IN_PROGRESS
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulClosedToReopen(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.CLOSED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.REOPENED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.REOPENED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketSuccessfulResolvedToReopen(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.RESOLVED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.REOPENED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+
+        Assertions.assertTrue(updatedTicket.isPresent)
+        Assertions.assertEquals(TicketStatus.REOPENED, updatedTicket.get().status)
+
+
+        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
+        ticketHistoryRepository.delete(createdTicketHistory[0])
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongOpenToReopened(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.OPEN
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.REOPENED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongClosedToOpen(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.CLOSED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.OPEN
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongClosedToInProgress(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.CLOSED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.IN_PROGRESS
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongClosedToResolved(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.CLOSED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.RESOLVED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongInProgressToReopened(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.IN_PROGRESS
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.REOPENED
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongReopenedToOpen(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.REOPENED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.OPEN
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongResolvedToInProgress(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.RESOLVED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.IN_PROGRESS
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
+
+    @Test
+    @DirtiesContext
+    fun updateTicketWrongResolvedToOpen(){
+        val customer = Profile()
+        customer.email = "mario.rossi@polito.it"
+        customer.name = "Mario"
+        customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
+
+
+        val expert = Profile()
+        expert.email = "mario.bianchi@polito.it"
+        expert.name = "Mario"
+        expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer)
+        profileRepository.save(expert)
+
+        val product = Product()
+        product.productId = "0000000000000"
+        product.name = "PC Omen Intel i7"
+        product.brand = "HP"
+        productRepository.save(product)
+
+        val ticket = Ticket()
+        ticket.product = product
+        ticket.title = "Ticket title"
+        ticket.description = "Ticket description"
+        ticket.customer = customer
+        ticket.createdTimestamp = Timestamp(0)
+        ticket.status = TicketStatus.RESOLVED
+        ticketRepository.save(ticket)
+
+        val ticketUpdate = TicketUpdateDTO(
+            ticket.ticketId!!,
+            TicketStatus.OPEN
+        )
+
+        val url = "http://localhost:$port/API/ticketing/update"
+        val uri = URI(url)
+
+        val requestEntity : HttpEntity<TicketUpdateDTO> = HttpEntity(ticketUpdate)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        ticketRepository.delete(ticket)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+    }
 }
 
