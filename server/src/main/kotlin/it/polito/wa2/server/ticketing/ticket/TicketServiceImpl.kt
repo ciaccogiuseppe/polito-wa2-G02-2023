@@ -61,17 +61,17 @@ class TicketServiceImpl(
             }.map { it.toDTO() }
     }
 
-    override fun addTicket(ticket: TicketDTO): TicketIdDTO {
+    override fun addTicket(ticketDTO: TicketDTO): TicketIdDTO {
         // TODO: get user_id from session
         // productId is not null, already checked in the controller
-        val product = getProduct(ticket.productId)
+        val product = getProduct(ticketDTO.productId)
         val customer = getProfile(1)
-        val ticketId =  ticketRepository.save(ticket.toNewTicket(product, customer)).ticketId!!
+        val ticketId =  ticketRepository.save(ticketDTO.toNewTicket(product, customer)).ticketId!!
         return TicketIdDTO(ticketId)
     }
 
     override fun assignTicket(ticketAssignDTO: TicketAssignDTO) {
-        val expert = getProfileByEmail(ticketAssignDTO.expertId!!)
+        val expert = getProfileByEmail(ticketAssignDTO.expertId)
         val ticket = ticketRepository.findByIdOrNull(ticketAssignDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketAssignDTO.ticketId} does not exists")
         val oldState = ticket.status
@@ -79,7 +79,7 @@ class TicketServiceImpl(
             throw UnprocessableTicketException("A ticket can't be assigned with the actual status")
 
         ticket.expert = expert
-        ticket.priority = ticketAssignDTO.priority!!
+        ticket.priority = ticketAssignDTO.priority
         ticket.status = TicketStatus.IN_PROGRESS
 
         ticketRepository.save(ticket)
