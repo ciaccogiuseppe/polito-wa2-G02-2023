@@ -56,7 +56,8 @@ class ProfileControllerTests {
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null
         ).toNewProfile()
 
         profileRepository.save(profile)
@@ -82,7 +83,8 @@ class ProfileControllerTests {
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null
         ).toNewProfile()
 
         profileRepository.save(profile)
@@ -134,7 +136,8 @@ class ProfileControllerTests {
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null
         )
 
         val requestEntity : HttpEntity<ProfileDTO> = HttpEntity(profile)
@@ -161,7 +164,8 @@ class ProfileControllerTests {
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null
         )
 
         val requestEntity : HttpEntity<ProfileDTO> = HttpEntity(profile)
@@ -186,22 +190,26 @@ class ProfileControllerTests {
         val profile1 = ProfileDTO(
             "mario.rossipolito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null
         )
         val profile2 = ProfileDTO(
             "mario.rossi@polito",
             "mario",
-            "rossi"
+            "rossi",
+            null
         )
         val profile3 = ProfileDTO(
             "mario.rossi@polito.i",
             "mario",
-            "rossi"
+            "rossi",
+            null
         )
         val profile4 = ProfileDTO(
             "mario.rossi@polito.",
             "mario",
-            "rossi"
+            "rossi",
+            null
         )
 
         val requestEntity1 : HttpEntity<ProfileDTO> = HttpEntity(profile1)
@@ -292,13 +300,15 @@ class ProfileControllerTests {
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null
         ).toNewProfile()
 
         val newProfile = ProfileDTO(
             "mario.bianchi@polimi.it",
             "Mario",
-            "Bianchi"
+            "Bianchi",
+            null
         )
 
         profileRepository.save(profile)
@@ -329,13 +339,15 @@ class ProfileControllerTests {
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null
         ).toNewProfile()
 
         val newProfile = ProfileDTO(
             "mario.bianchi@polimi.it",
             "Mario",
-            "Bianchi"
+            "Bianchi",
+            null
         )
 
         profileRepository.save(profile)
@@ -359,13 +371,16 @@ class ProfileControllerTests {
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
-            "rossi"
+            "rossi",
+            null,
         ).toNewProfile()
+
 
         val newProfile = ProfileDTO(
             "mario.bianchipolimi.it",
             "Mario",
-            "Bianchi"
+            "Bianchi",
+            null
         )
 
         profileRepository.save(profile)
