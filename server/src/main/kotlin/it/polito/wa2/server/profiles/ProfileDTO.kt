@@ -2,6 +2,7 @@ package it.polito.wa2.server.profiles
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Positive
 
 data class ProfileDTO(
     @field:NotBlank(message="email is mandatory")
@@ -15,11 +16,13 @@ data class ProfileDTO(
     @field:NotBlank(message="surname is mandatory")
     @field:Pattern(regexp = "([a-zA-Z]+'?\\s?)+",
         message="surname must be valid")
-    val surname: String
+    val surname: String,
+    @field:Positive
+    val profileId: Long?
 )
 
 fun Profile.toDTO(): ProfileDTO {
-    return ProfileDTO(email, name, surname)
+    return ProfileDTO(email, name, surname, profileId)
 }
 
 fun ProfileDTO.toNewProfile(): Profile {

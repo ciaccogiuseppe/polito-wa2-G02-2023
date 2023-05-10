@@ -23,6 +23,9 @@ class Profile {
     var name: String = ""
     @Column(nullable = false)
     var surname: String = ""
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    var role: ProfileRole? = null
 
     @OneToMany(mappedBy = "customer")
     val ticketsCustomer = mutableSetOf<Ticket>()
@@ -38,4 +41,8 @@ class Profile {
 
     @OneToMany(mappedBy = "currentExpert")
     val historyExpert = mutableSetOf<TicketHistory>()
+}
+
+enum class ProfileRole {
+    CUSTOMER, EXPERT, ADMIN
 }
