@@ -23,33 +23,7 @@ data class MessageDTO(
     val text: String,
     val sentTimestamp: Timestamp?,
     val attachments: MutableSet<AttachmentDTO>,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MessageDTO
-
-        if (messageId != other.messageId) return false
-        if (ticketId != other.ticketId) return false
-        if (senderId != other.senderId) return false
-        if (text != other.text) return false
-        if (sentTimestamp != other.sentTimestamp) return false
-        if (attachments != other.attachments) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = messageId?.hashCode() ?: 0
-        result = 31 * result + ticketId.hashCode()
-        result = 31 * result + (senderId?.hashCode() ?: 0)
-        result = 31 * result + text.hashCode()
-        result = 31 * result + (sentTimestamp?.hashCode() ?: 0)
-        result = 31 * result + attachments.hashCode()
-        return result
-    }
-}
+)
 
 fun Message.toDTO(): MessageDTO {
     return MessageDTO(messageId, ticket?.ticketId!!, sender?.email,
