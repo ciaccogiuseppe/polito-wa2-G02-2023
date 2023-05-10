@@ -35,7 +35,7 @@ class MessageServiceImpl(
             throw BadRequestMessageException("The ticket ids are different")
         val ticket = getTicket(ticketId)
         val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
-        val sender = getProfile(1)
+        val sender = getProfileByEmail(messageDTO.senderId)
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
         messageRepository.save(message)
         ticket.messages.add(message)
@@ -56,8 +56,8 @@ class MessageServiceImpl(
         return attachmentRepository.findByIdOrNull(newAttachmentDTO.attachmentId)!!
     }
 
-    private fun getProfile(profileId: Long): Profile {
-        val profileDTO = profileService.getProfileById(profileId)
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 }

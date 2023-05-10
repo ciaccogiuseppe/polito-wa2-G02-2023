@@ -18,7 +18,7 @@ data class MessageDTO(
     val ticketId: Long,
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
-    val senderId: String?,
+    val senderId: String,
     @field:NotBlank(message="a message text is mandatory")
     val text: String,
     val sentTimestamp: Timestamp?,
@@ -26,7 +26,7 @@ data class MessageDTO(
 )
 
 fun Message.toDTO(): MessageDTO {
-    return MessageDTO(messageId, ticket?.ticketId!!, sender?.email,
+    return MessageDTO(messageId, ticket?.ticketId!!, sender!!.email,
         text, sentTimestamp, attachments.map{it.toDTO()}.toMutableSet())
 }
 
