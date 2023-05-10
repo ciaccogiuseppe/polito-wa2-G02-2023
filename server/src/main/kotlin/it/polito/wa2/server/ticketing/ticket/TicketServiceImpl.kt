@@ -5,6 +5,8 @@ import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
+import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryDTO
+import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
@@ -12,10 +14,11 @@ import java.sql.Timestamp
 @Service
 class TicketServiceImpl(
     private val ticketRepository: TicketRepository,
+    private val profileRepository: ProfileRepository,
+    private val productRepository: ProductRepository,
     private val productService: ProductService,
     private val profileService: ProfileService,
-    private val profileRepository: ProfileRepository,
-    private val productRepository: ProductRepository
+    private val ticketHistoryService: TicketHistoryService
 ): TicketService {
     override fun getTicket(ticketId: Long): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
@@ -67,8 +70,66 @@ class TicketServiceImpl(
         return TicketIdDTO(ticketId)
     }
 
+    override fun assignTicket(ticketAssignDTO: TicketAssignDTO) {
+        val expert = getProfileByEmail(ticketAssignDTO.expertId!!)
+        val ticketId = getTicket(ticketAssignDTO.ticketId!!).ticketId!!
+        val ticket = ticketRepository.findByIdOrNull(ticketId)!!
+        val oldState = ticket.status
+        if (ticket.status != TicketStatus.OPEN && ticket.status == TicketStatus.REOPENED)
+            throw UnprocessableTicketException("A ticket can't be assigned with the actual status")
+
+        ticket.expert = expert
+        ticket.priority = ticketAssignDTO.priority!!
+        ticket.status = TicketStatus.IN_PROGRESS
+
+        ticketRepository.save(ticket)
+        ticketHistoryService.addTicketHistory(
+            TicketHistoryDTO(
+                ticketId,
+                ticket.customer!!.email,
+                expert.email,
+                null,
+                oldState,
+                ticket.status
+            )
+        )
+    }
+
+    override fun updateTicket(ticketUpdateDTO: TicketUpdateDTO) {
+        val ticketId = getTicket(ticketUpdateDTO.ticketId!!).ticketId!!
+        val ticket = ticketRepository.findByIdOrNull(ticketId)!!
+        val oldState = ticket.status
+        val newState = ticketUpdateDTO.newState
+
+        when (ticket.status) {
+            TicketStatus.OPEN -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+            TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED, TicketStatus.CLOSED))
+            TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
+            TicketStatus.IN_PROGRESS -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.OPEN))
+            TicketStatus.REOPENED -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+        }
+
+        ticket.status = newState
+        ticketRepository.save(ticket)
+        ticketHistoryService.addTicketHistory(
+            TicketHistoryDTO(
+                ticketId,
+                ticket.customer!!.email,
+                ticket.expert!!.email,
+                null,
+                oldState,
+                newState
+            )
+        )
+    }
+
     private fun getProfile(profileId: Long): Profile {
         val profileDTO = profileService.getProfileById(profileId)
+        return profileRepository.findByEmail(profileDTO.email)!!
+    }
+
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 
@@ -77,4 +138,8 @@ class TicketServiceImpl(
         return productRepository.findByIdOrNull(productDTO.productId)!!
     }
 
+    private fun isNextStateValid(newStatus: TicketStatus, validValues: HashSet<TicketStatus>) {
+        if (!validValues.contains(newStatus))
+            throw UnprocessableTicketException("The new state is invalid according to the current state")
+    }
 }
