@@ -53,6 +53,8 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     @ExceptionHandler(BadRequestMessageException::class)
     fun handleMessageBadRequest(e: BadRequestMessageException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
 
+    @ExceptionHandler(UnauthorizedMessageException::class)
+    fun handleMessageBadRequest(e: UnauthorizedMessageException) = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.message!! )
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message)
@@ -68,3 +70,4 @@ class TicketNotFoundException(message: String): RuntimeException(message)
 class UnprocessableTicketException(message: String): RuntimeException(message)
 class UnprocessableMessageException(message: String): RuntimeException(message)
 class BadRequestMessageException(message: String): RuntimeException(message)
+class UnauthorizedMessageException(message: String): RuntimeException(message)
