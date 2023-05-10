@@ -5,8 +5,7 @@ import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
-import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryDTO
-import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryService
+import it.polito.wa2.server.ticketing.tickethistory.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
@@ -16,9 +15,9 @@ class TicketServiceImpl(
     private val ticketRepository: TicketRepository,
     private val profileRepository: ProfileRepository,
     private val productRepository: ProductRepository,
+    private val ticketHistoryRepository: TicketHistoryRepository,
     private val productService: ProductService,
-    private val profileService: ProfileService,
-    private val ticketHistoryService: TicketHistoryService
+    private val profileService: ProfileService
 ): TicketService {
     override fun getTicket(ticketId: Long): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
@@ -66,8 +65,17 @@ class TicketServiceImpl(
         // productId is not null, already checked in the controller
         val product = getProduct(ticketDTO.productId)
         val customer = getProfile(1)
-        val ticketId =  ticketRepository.save(ticketDTO.toNewTicket(product, customer)).ticketId!!
-        return TicketIdDTO(ticketId)
+        val ticket =  ticketRepository.save(ticketDTO.toNewTicket(product, customer))
+        ticketHistoryRepository.save(
+            newTicketHistory(
+                ticket,
+                ticket.customer!!,
+                ticket.expert,
+                TicketStatus.OPEN,
+                ticket.status
+            )
+        )
+        return TicketIdDTO(ticket.ticketId!!)
     }
 
     override fun assignTicket(ticketAssignDTO: TicketAssignDTO) {
@@ -83,12 +91,11 @@ class TicketServiceImpl(
         ticket.status = TicketStatus.IN_PROGRESS
 
         ticketRepository.save(ticket)
-        ticketHistoryService.addTicketHistory(
-            TicketHistoryDTO(
-                ticket.ticketId!!,
-                ticket.customer!!.email,
-                expert.email,
-                null,
+        ticketHistoryRepository.save(
+            newTicketHistory(
+                ticket,
+                ticket.customer!!,
+                ticket.expert,
                 oldState,
                 ticket.status
             )
@@ -102,21 +109,32 @@ class TicketServiceImpl(
         val newState = ticketUpdateDTO.newState
 
         when (ticket.status) {
-            TicketStatus.OPEN -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+            TicketStatus.OPEN -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS)
+                    throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS> without assigning an expert")
+            }
             TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED, TicketStatus.CLOSED))
             TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
-            TicketStatus.IN_PROGRESS -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.OPEN))
-            TicketStatus.REOPENED -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+            TicketStatus.IN_PROGRESS -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.OPEN))
+                if (newState == TicketStatus.OPEN)
+                    ticket.expert = null
+            }
+            TicketStatus.REOPENED -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS && ticket.expert == null)
+                    throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS> without assigning an expert")
+            }
         }
 
         ticket.status = newState
         ticketRepository.save(ticket)
-        ticketHistoryService.addTicketHistory(
-            TicketHistoryDTO(
-                ticket.ticketId!!,
-                ticket.customer!!.email,
-                ticket.expert!!.email,
-                null,
+        ticketHistoryRepository.save(
+            newTicketHistory(
+                ticket,
+                ticket.customer!!,
+                ticket.expert,
                 oldState,
                 newState
             )

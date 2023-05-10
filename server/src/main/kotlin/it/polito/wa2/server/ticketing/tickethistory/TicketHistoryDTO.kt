@@ -30,10 +30,13 @@ fun TicketHistory.toDTO(): TicketHistoryDTO {
         oldState, newState)
 }
 
-fun TicketHistoryDTO.toNewTicketHistory(
-    ticket:Ticket,
+fun newTicketHistory(
+    ticket: Ticket,
     user: Profile,
-    currentExpert: Profile?): TicketHistory {
+    currentExpert: Profile?,
+    oldState: TicketStatus,
+    newState: TicketStatus
+): TicketHistory {
     val ticketHistory = TicketHistory()
     ticketHistory.ticket = ticket
     ticketHistory.user = user
