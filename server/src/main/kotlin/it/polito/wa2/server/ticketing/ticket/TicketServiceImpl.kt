@@ -49,7 +49,6 @@ class TicketServiceImpl(
             expert = getProfile(expertId)
         if (productId != null)
             product = getProduct(productId)
-
         return ticketRepository
             .findAll()
             .filter {
@@ -57,8 +56,8 @@ class TicketServiceImpl(
                 (minPriority == null || it.priority >= minPriority) &&
                 (maxPriority == null || it.priority <= maxPriority) &&
                 (product == null || it.product == product) &&
-                (createdAfter == null || it.createdTimestamp!!.after(createdAfter)) &&
-                (createdBefore == null || it.createdTimestamp!!.before(createdBefore)) &&
+                (createdAfter == null || it.createdTimestamp!!.after(createdAfter) || it.createdTimestamp!!.equals(createdAfter)) &&
+                (createdBefore == null || it.createdTimestamp!!.before(createdBefore) || it.createdTimestamp!!.equals(createdBefore)) &&
                 (expert == null || it.expert == expert) &&
                 (status == null || status.contains(it.status))
             }.map { it.toDTO() }

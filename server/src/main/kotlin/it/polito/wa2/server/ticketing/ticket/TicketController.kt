@@ -7,6 +7,7 @@ import jakarta.validation.Valid
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @RestController
 class TicketController(private val ticketService: TicketService) {
@@ -24,18 +25,18 @@ class TicketController(private val ticketService: TicketService) {
         @RequestParam(name="minPriority", required=false) minPriority: Int?,
         @RequestParam(name="maxPriority", required=false) maxPriority: Int?,
         @RequestParam(name="productId", required=false) productId: String?,
-        @RequestParam(name="createdAfter", required=false) createdAfter: Timestamp?,
-        @RequestParam(name="createdBefore", required=false) createdBefore: Timestamp?,
+        @RequestParam(name="createdAfter", required=false) createdAfter: LocalDateTime?,
+        @RequestParam(name="createdBefore", required=false) createdBefore: LocalDateTime?,
         @RequestParam(name="expertId", required=false) expertId: Long?,
         @RequestParam(name="status", required=false) status: List<TicketStatus>?
     ): List<TicketDTO> {
         checkFilterParameters(
             customerId, minPriority, maxPriority, productId,
-            createdAfter, createdBefore, expertId, status
+            createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertId, status
         )
         return ticketService.getTicketsFiltered(
             customerId, minPriority, maxPriority, productId,
-            createdAfter, createdBefore, expertId, status
+            createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertId, status
         )
     }
 
