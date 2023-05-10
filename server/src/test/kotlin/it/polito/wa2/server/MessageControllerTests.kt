@@ -6,6 +6,7 @@ import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
+import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
 import it.polito.wa2.server.ticketing.message.Message
@@ -77,11 +78,13 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
 
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -186,11 +189,13 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
 
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -295,11 +300,13 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
 
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -411,11 +418,13 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
 
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -455,9 +464,12 @@ class MessageControllerTests {
             ticket.ticketId!!,
             customer.email,
             "message text",
-            Timestamp(0),
+            Timestamp(1),
             mutableSetOf()
         )
+
+
+        println(message)
 
         val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
         val uri = URI(url)
@@ -487,11 +499,13 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
 
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -532,11 +546,13 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
 
         profileRepository.save(customer)
         profileRepository.save(expert)

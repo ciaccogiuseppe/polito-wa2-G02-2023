@@ -5,6 +5,7 @@ import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
+import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
 import it.polito.wa2.server.ticketing.message.Message
@@ -71,11 +72,13 @@ class AttachmentControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
+        customer.role = ProfileRole.CUSTOMER
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
+        expert.role = ProfileRole.EXPERT
 
         profileRepository.save(customer)
         profileRepository.save(expert)
