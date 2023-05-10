@@ -46,13 +46,15 @@ class TicketController(private val ticketService: TicketService) {
     }
 
     @PutMapping("/API/ticketing/assign")
-    fun assignTicket(){
-        TODO("Not yet implemented")
+    fun assignTicket(@RequestBody @Valid ticket: TicketAssignDTO?, br: BindingResult){
+        checkAssignParameters(ticket, br)
+        ticketService.assignTicket(ticket!!)
     }
 
     @PutMapping("/API/ticketing/update")
-    fun updateTicket(){
-        TODO("Not yet implemented")
+    fun updateTicket(@RequestBody @Valid ticket: TicketUpdateDTO?, br: BindingResult){
+        checkUpdateParameters(ticket, br)
+        ticketService.updateTicket(ticket!!)
     }
 
     fun checkFilterParameters(
@@ -74,6 +76,20 @@ class TicketController(private val ticketService: TicketService) {
     }
 
     fun checkAddParameters(ticket: TicketDTO?, br: BindingResult) {
+        if (br.hasErrors())
+            throw UnprocessableProfileException("Wrong ticket format")
+        if (ticket == null)
+            throw BadRequestProfileException("Ticket must not be NULL")
+    }
+
+    fun checkAssignParameters(ticket: TicketAssignDTO?, br: BindingResult) {
+        if (br.hasErrors())
+            throw UnprocessableProfileException("Wrong ticket format")
+        if (ticket == null)
+            throw BadRequestProfileException("Ticket must not be NULL")
+    }
+
+    fun checkUpdateParameters(ticket: TicketUpdateDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
         if (ticket == null)

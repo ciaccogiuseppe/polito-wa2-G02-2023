@@ -27,6 +27,22 @@ data class TicketDTO(
     val createdTimestamp: Timestamp?
 )
 
+data class TicketAssignDTO(
+    @field:Positive
+    val ticketId : Long?,
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
+    val expertId: String?,
+    @field:PositiveOrZero
+    val priority: Int?
+)
+
+data class TicketUpdateDTO(
+    @field:Positive
+    val ticketId : Long?,
+    val newState: TicketStatus
+)
+
 fun Ticket.toDTO(): TicketDTO {
     return TicketDTO(
         ticketId,
