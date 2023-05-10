@@ -50,14 +50,14 @@ class TicketServiceImpl(
         return ticketRepository
             .findAll()
             .filter {
-                (customer != null && it.customer == customer) &&
-                (minPriority != null && it.priority >= minPriority) &&
-                (maxPriority != null && it.priority <= maxPriority) &&
-                (product != null && it.product == product) &&
-                (createdAfter != null && it.createdTimestamp!!.after(createdAfter)) &&
-                (createdBefore != null && it.createdTimestamp!!.before(createdBefore)) &&
-                (expert != null && it.expert == expert) &&
-                (status != null && status.contains(it.status))
+                (customer == null || it.customer == customer) &&
+                (minPriority == null || it.priority >= minPriority) &&
+                (maxPriority == null || it.priority <= maxPriority) &&
+                (product == null || it.product == product) &&
+                (createdAfter == null || it.createdTimestamp!!.after(createdAfter)) &&
+                (createdBefore == null || it.createdTimestamp!!.before(createdBefore)) &&
+                (expert == null || it.expert == expert) &&
+                (status == null || status.contains(it.status))
             }.map { it.toDTO() }
     }
 
