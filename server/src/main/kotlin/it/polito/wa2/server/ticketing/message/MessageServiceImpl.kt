@@ -1,6 +1,7 @@
 package it.polito.wa2.server.ticketing.message
 
 import it.polito.wa2.server.BadRequestMessageException
+import it.polito.wa2.server.UnauthorizedMessageException
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
@@ -36,6 +37,8 @@ class MessageServiceImpl(
         val ticket = getTicket(ticketId)
         val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
         val sender = getProfileByEmail(messageDTO.senderId)
+        if(sender != ticket.customer || (ticket.expert != null && ticket.expert != sender))
+            throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
         messageRepository.save(message)
         ticket.messages.add(message)
