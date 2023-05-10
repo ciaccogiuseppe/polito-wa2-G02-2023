@@ -4,6 +4,7 @@ import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableTicketException
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.sql.Timestamp
@@ -41,6 +42,7 @@ class TicketController(private val ticketService: TicketService) {
     }
 
     @PostMapping("/API/ticketing/")
+    @ResponseStatus(HttpStatus.CREATED)
     fun addTicket(@RequestBody @Valid ticketDTO: TicketDTO?, br: BindingResult): TicketIdDTO {
         checkAddParameters(ticketDTO, br)
         return ticketService.addTicket(ticketDTO!!)

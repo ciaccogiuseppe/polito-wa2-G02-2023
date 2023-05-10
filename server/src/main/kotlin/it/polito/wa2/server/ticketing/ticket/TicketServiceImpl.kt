@@ -90,7 +90,7 @@ class TicketServiceImpl(
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketAssignDTO.ticketId} does not exists")
         val oldState = ticket.status
 
-        if (ticket.status != TicketStatus.OPEN && ticket.status == TicketStatus.REOPENED)
+        if (ticket.status != TicketStatus.OPEN && ticket.status != TicketStatus.REOPENED)
             throw UnprocessableTicketException("A ticket can't be assigned with the actual status")
         if (expert.role != ProfileRole.EXPERT)
             throw UnprocessableTicketException("The assigned profile is not an expert")
