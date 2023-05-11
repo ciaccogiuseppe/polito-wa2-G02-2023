@@ -18,8 +18,8 @@ class ProfileServiceImpl(
     }
 
     @Transactional(readOnly = true)
-    override fun getProfileById(id: Long): ProfileDTO {
-        return profileRepository.findByIdOrNull(id)?.toDTO()
+    override fun getProfileById(profileId: Long): ProfileDTO {
+        return profileRepository.findByIdOrNull(profileId)?.toDTO()
             ?: throw ProfileNotFoundException("Profile not found")
     }
 

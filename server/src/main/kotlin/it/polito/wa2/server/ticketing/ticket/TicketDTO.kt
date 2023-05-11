@@ -17,12 +17,10 @@ data class TicketDTO(
     val priority: Int?,
     @field:Size(min = 13, max = 13)
     val productId: String,
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
-    val customerId: String?,
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
-    val expertId: String?,
+    @field:Positive
+    val customerId: Long?,
+    @field:Positive
+    val expertId: Long?,
     val status: TicketStatus?,
     val createdTimestamp: Timestamp?
 )
@@ -30,9 +28,8 @@ data class TicketDTO(
 data class TicketAssignDTO(
     @field:Positive
     val ticketId : Long,
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
-    val expertId: String,
+    @field:Positive
+    val expertId: Long,
     @field:PositiveOrZero
     val priority: Int
 )
@@ -50,8 +47,8 @@ fun Ticket.toDTO(): TicketDTO {
         description,
         priority,
         product?.productId!!,
-        customer?.email,
-        expert?.email,
+        customer?.profileId,
+        expert?.profileId,
         status,
         createdTimestamp
     )
