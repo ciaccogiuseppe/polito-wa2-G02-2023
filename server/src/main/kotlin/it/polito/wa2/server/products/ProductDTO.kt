@@ -12,14 +12,6 @@ data class ProductDTO(
     val brand: String
 )
 
-fun ProductDTO.toProduct(): Product {
-    val product = Product()
-    product.productId = productId
-    product.name = name
-    product.brand = brand
-    return product
-}
-
 fun Product.toDTO(): ProductDTO {
     return ProductDTO(productId, name, brand)
 }

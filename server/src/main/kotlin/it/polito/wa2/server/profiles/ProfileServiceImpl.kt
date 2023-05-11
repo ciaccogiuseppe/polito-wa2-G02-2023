@@ -18,25 +18,25 @@ class ProfileServiceImpl(
     }
 
     @Transactional(readOnly = true)
-    override fun getProfileById(id: Long): ProfileDTO {
-        return profileRepository.findByIdOrNull(id)?.toDTO()
+    override fun getProfileById(profileId: Long): ProfileDTO {
+        return profileRepository.findByIdOrNull(profileId)?.toDTO()
             ?: throw ProfileNotFoundException("Profile not found")
     }
 
-    override fun addProfile(profile: ProfileDTO) {
-        if (profileRepository.findByEmail(profile.email) != null)
-            throw DuplicateProfileException("Profile with email '${profile.email}' already exists")
-        profileRepository.save(profile.toProfile())
+    override fun addProfile(profileDTO: ProfileDTO) {
+        if (profileRepository.findByEmail(profileDTO.email) != null)
+            throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
+        profileRepository.save(profileDTO.toNewProfile())
    }
 
-    override fun updateProfile(email: String, newProfile: ProfileDTO) {
+    override fun updateProfile(email: String, newProfileDTO: ProfileDTO) {
         val profile = profileRepository.findByEmail(email)
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
-        if(email != newProfile.email && profileRepository.findByEmail(newProfile.email) != null)
-            throw DuplicateProfileException("Profile with email '${newProfile.email}' already exists")
-        profile.email = newProfile.email
-        profile.name = newProfile.name
-        profile.surname = newProfile.surname
+        if(email != newProfileDTO.email && profileRepository.findByEmail(newProfileDTO.email) != null)
+            throw DuplicateProfileException("Profile with email '${newProfileDTO.email}' already exists")
+        profile.email = newProfileDTO.email
+        profile.name = newProfileDTO.name
+        profile.surname = newProfileDTO.surname
         profileRepository.save(profile)
     }
 }

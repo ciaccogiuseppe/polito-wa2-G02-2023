@@ -1,29 +1,43 @@
 package it.polito.wa2.server.ticketing.ticket
 
-import it.polito.wa2.server.products.ProductDTO
-import it.polito.wa2.server.products.toDTO
-import it.polito.wa2.server.products.toProduct
-import it.polito.wa2.server.profiles.ProfileDTO
-import it.polito.wa2.server.profiles.toDTO
-import it.polito.wa2.server.profiles.toProfile
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
+import it.polito.wa2.server.products.Product
+import it.polito.wa2.server.profiles.Profile
+import jakarta.validation.constraints.*
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 data class TicketDTO(
+    @field:Positive
     val ticketId : Long?,
     @field:NotBlank(message = "A title is required")
     val title: String,
     @field:NotBlank
     val description: String,
-    @field:NotBlank
-    val priority: Int,
+    @field:PositiveOrZero
+    val priority: Int?,
     @field:Size(min = 13, max = 13)
-    val product: ProductDTO?,
-    val customer: ProfileDTO?,
-    val expert: ProfileDTO?,
-    val status: String,
+    val productId: String,
+    @field:Positive
+    val customerId: Long?,
+    @field:Positive
+    val expertId: Long?,
+    val status: TicketStatus?,
     val createdTimestamp: Timestamp?
+)
+
+data class TicketAssignDTO(
+    @field:Positive
+    val ticketId : Long,
+    @field:Positive
+    val expertId: Long,
+    @field:PositiveOrZero
+    val priority: Int
+)
+
+data class TicketUpdateDTO(
+    @field:Positive
+    val ticketId : Long,
+    val newState: TicketStatus
 )
 
 fun Ticket.toDTO(): TicketDTO {
@@ -32,24 +46,28 @@ fun Ticket.toDTO(): TicketDTO {
         title,
         description,
         priority,
-        product?.toDTO(),
-        customer?.toDTO(),
-        expert?.toDTO(),
+        product?.productId!!,
+        customer?.profileId,
+        expert?.profileId,
         status,
         createdTimestamp
     )
 }
 
-fun TicketDTO.toTicket(): Ticket {
+fun TicketDTO.toNewTicket(
+    product: Product,
+    customer: Profile
+): Ticket {
     val ticket = Ticket()
-    ticket.ticketId = ticketId
     ticket.title = title
     ticket.description = description
-    ticket.priority = priority
-    ticket.product = product?.toProduct()
-    ticket.customer = customer?.toProfile()
-    ticket.expert = expert?.toProfile()
-    ticket.status = status
-    ticket.createdTimestamp = createdTimestamp
+    ticket.priority = 0
+    ticket.product = product
+    ticket.customer = customer
+    ticket.expert = null
+    ticket.status = TicketStatus.OPEN
+    ticket.createdTimestamp = Timestamp.valueOf(LocalDateTime.now())
     return ticket
 }
+
+data class TicketIdDTO(val ticketId: Long)

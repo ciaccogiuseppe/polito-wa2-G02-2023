@@ -14,9 +14,11 @@ interface TicketService {
         createdAfter: Timestamp?,
         createdBefore: Timestamp?,
         expertId: Long?,
-        status: List<String>?
+        status: List<TicketStatus>?
     ): List<TicketDTO>
 
-    fun addTicket(ticket: TicketDTO): Long
+    fun addTicket(ticketDTO: TicketDTO): TicketIdDTO
+    fun assignTicket(ticketAssignDTO: TicketAssignDTO)
+    fun updateTicket(ticketUpdateDTO: TicketUpdateDTO)
 
 }

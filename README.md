@@ -6,6 +6,11 @@
 
 - Import project in IntelliJ IDEA as ```File > New > Project from Version Control...```
 
+## Docker JIB deploy
+- If running Postgres and Server on the same host edit ```application.properties``` file, changing ```spring.datasource.url=jdbc:postgresql://localhost:5432/ticketing``` to ```spring.datasource.url=jdbc:postgresql://host.docker.internal:5432/ticketing```
+- Run gradle task jibDockerBuild to build locally
+- A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
+
 ## Database
 
 - Install Docker and deploy Postgres
@@ -51,21 +56,21 @@ To package the React application:
   - **Response body**: profile corresponding to `email` / Error message in case of error
   ```
   {
-    "id": <id>,
+    "id": <id>, //not returned
+    "email": <email>,
     "name": <name>,
-    "surname": <surname>,
-    "email": <email>
+    "surname": <surname>
   }
   ```
-| Field     | Content         |
-|-----------|-----------------|
-| `id`      | profile id      |
-| `name`    | profile name    |
-| `surname` | profile surname |
-| `email`   | profile email   |
+| Field     | Content                   |
+|-----------|---------------------------|
+| `id`      | profile id //not returned |
+| `name`    | profile name              |
+| `surname` | profile surname           |
+| `email`   | profile email             |
 
 
-- **METHOD** `POST` **URL**: `/API/profiles/`
+- **METHOD** `POST` **URL**: `/API/profiles`
 
   - **Description**: Create new profile, given its properties
   - **Permissions allowed**:
@@ -117,11 +122,11 @@ To package the React application:
     - `500 Internal Server Error`
   - **Response body**: _None_ / Error message in case of error
 
-| Field     | Content         |
-|-----------|-----------------|
-| `name`    | profile name    |
-| `surname` | profile surname |
-| `email`   | profile email   |
+| Field     | Content             |
+|-----------|---------------------|
+| `name`    | new profile name    |
+| `surname` | new profile surname |
+| `email`   | new profile email   |
 
 ### Products
 - **METHOD** `GET` **URL**: `/API/products/`
@@ -139,18 +144,18 @@ To package the React application:
   {
     [
       {
-        "id": <id>,
+        "productId": <id>,
         "name": <name>,
         "brand": <brand>
       }, {...}, ...
     ]
   }
   ```
-| Field   | Content              |
-|---------|----------------------|
-| `id`    | product id           |
-| `name`  | product name         |
-| `brand` | brand of the product |
+| Field       | Content              |
+|-------------|----------------------|
+| `productId` | product id           |
+| `name`      | product name         |
+| `brand`     | brand of the product |
 
 - **METHOD** `GET` **URL**: `/API/products/{productId}`
 
@@ -167,23 +172,23 @@ To package the React application:
   - **Response body**: product details / Error message in case of error
   ```
   {
-    "id": <id>,
+    "productId": <id>,
     "name": <name>,
     "brand": <brand>
   }
   ```
-| Field   | Content              |
-|---------|----------------------|
-| `id`    | product id           |
-| `name`  | product name         |
-| `brand` | brand of the product |
+| Field       | Content              |
+|-------------|----------------------|
+| `productId` | product id           |
+| `name`      | product name         |
+| `brand`     | brand of the product |
 
 ### Ticketing
-- **METHOD** `GET` **URL**: `/API/ticketing/{ticket_id}`
+- **METHOD** `GET` **URL**: `/API/ticketing/{ticketId}`
 
-  - **Description**: Get ticket, if existing, with id corresponding to parameter `ticket_id`
+  - **Description**: Get ticket, if existing, with id corresponding to parameter `ticketId`
   - **Permissions allowed**:
-  - **Request query parameter**: `ticket_id` to retrieve the corresponding ticket
+  - **Request query parameter**: `ticketId` to retrieve the corresponding ticket
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
@@ -191,55 +196,55 @@ To package the React application:
     - `404 Not Found` (profile with email `email` not existing)
     - `422 Unprocessable Entity` (wrong format for `email`)
     - `500 Internal Server Error`
-  - **Response body**: ticket corresponding to ticket_id / Error message in case of error
+  - **Response body**: ticket corresponding to ticketId / Error message in case of error
   ```
   {
-    "ticket_id": <ticket_id>,
+    "ticketId": <ticketId>,
     "title": <title>,
     "description": <description>,
-    "priority": <priority>,       
-    "product_id": <product_id>, 
-    "customer_id": <customer_id>,
-    "expert_id": <expert_id>,
-    "status": <status>,
-    "created_date": <created_date>
+    "priority": <priority>,   
+    "productId": <productId>, 
+    "customerId": <customerId>,  
+    "expertId": <expertId>, 
+    "status": <status>, 
+    "createdDate": <createdDate> 
   }
   ```
-| Field          | Content                         |
-|----------------|---------------------------------|
-| `ticket_id`    | ticket id                       |
-| `title`        | title of the ticket             |
-| `description`  | description of the ticket       |
-| `priority`     | priority of the ticket          |
-| `product_id`   | id of the product of the ticket |
-| `customer_id`  | customer who created the ticket |
-| `expert_id`    | expert assigned to the ticket   |
-| `status`       | status of the ticket            |
-| `created_date` | timestamp of ticket creation    |
+| Field         | Content                         |
+|---------------|---------------------------------|
+| `ticketId`    | ticket id                       |
+| `title`       | title of the ticket             |
+| `description` | description of the ticket       |
+| `priority`    | priority of the ticket          |
+| `productId`   | id of the product of the ticket |
+| `customerId`  | customer who created the ticket |
+| `expertId`    | expert assigned to the ticket   |
+| `status`      | status of the ticket            |
+| `createdDate` | timestamp of ticket creation    |
 
-- **METHOD** `GET` **URL**: `/API/ticketing/history/{ticket_id}`
+- **METHOD** `GET` **URL**: `/API/ticketing/history/{ticketId}`
 
-  - **Description**: Get ticket history about ticket with id corresponding to parameter `ticket_id`, if existing
+  - **Description**: Get ticket history about ticket with id corresponding to parameter `ticketId`, if existing
   - **Permissions allowed**:
-  - **Request query parameter**: `ticket_id` to retrieve the corresponding ticket
+  - **Request query parameter**: `ticketId` to retrieve the corresponding ticket
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
-    - `404 Not Found` (ticket with id `ticket_id` not existing)
-    - `422 Unprocessable Entity` (wrong format for `ticket_id`)
+    - `404 Not Found` (ticket with id `ticketId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `ticketId`)
     - `500 Internal Server Error`
-  - **Response body**: array of ticket history events, regarding ticket corresponding to ticket_id / Error message in case of error
+  - **Response body**: array of ticket history events, regarding ticket corresponding to ticketId / Error message in case of error
   ```
   {
     [
       {
-        "history_id": <history_id>,
-        "ticket_id": <ticket_id>,
-        "old_state": <old_state>,
-        "new_state": <new_state>,
-        "user_id": <user_id>,
-        "expert_id": <expert_id>,
+        "historyId": <historyId>,
+        "ticketId": <ticketId>,
+        "oldState": <oldState>,
+        "newState": <newState>,
+        "userId": <userId>,
+        "expertId": <expertId>,
         "timestamp": <timestamp>
       }
       ,
@@ -248,15 +253,15 @@ To package the React application:
   }
   ```
 
-| Field        | Content                   |
-|--------------|---------------------------|
-| `history_id` | history event id          |
-| `ticket_id`  | ticket id of the event    |
-| `old_state`  | old state of ticket       |
-| `new_state`  | new state of ticket       |
-| `user_id`    | user who updated ticket   |
-| `expert_id`  | expert assigned to ticket |
-| `timestamp`  | timestamp of update       |
+| Field       | Content                   |
+|-------------|---------------------------|
+| `historyId` | history event id          |
+| `ticketId`  | ticket id of the event    |
+| `oldState`  | old state of ticket       |
+| `newState`  | new state of ticket       |
+| `userId`    | user who updated ticket   |
+| `expertId`  | expert assigned to ticket |
+| `timestamp` | timestamp of update       |
 
 
 - **METHOD** `GET` **URL**: `/API/ticketing/filter`
@@ -267,13 +272,13 @@ To package the React application:
   - **Request body**: Required filters (only needed ones to be specified)
   ```
   {
-    "customer_id": <customer_id>,
-    "min_priority": <min_priority>,
-    "max_priority": <max_priority>,
-    "product_id": <product_id>,
-    "created_after": <created_after>,
-    "created_before": <created_before>,
-    "expert_id": <expert_id>,
+    "customerId": <customerId>,
+    "minPriority": <minPriority>,
+    "maxPriority": <maxPriority>,
+    "productId": <productId>,
+    "createdAfter": <createdAfter>,
+    "createdBefore": <createdBefore>,
+    "expertId": <expertId>,
     "status": [<status1>, <status2>, <status3>...]    
   }
   ```
@@ -281,8 +286,8 @@ To package the React application:
  - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
-    - `404 Not Found` (ticket with id `ticket_id` not existing)
-    - `422 Unprocessable Entity` (wrong format for `ticket_id`)
+    - `404 Not Found` (ticket with id `ticketId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `ticketId`)
     - `500 Internal Server Error`
   - **Response body**: list of tickets satisfying the given filtering conditions / Error message in case of error
   ```
@@ -296,16 +301,16 @@ To package the React application:
     ]
   }
   ```
-| Field            | Content                                                 |
-|------------------|---------------------------------------------------------|
-| `customer_id`    | get tickets created by customer with `id = customer_id` |
-| `min_priority`   | minimum priority of required tickets                    |
-| `max_priority`   | maximum priority of required tickets                    |
-| `product_id`     | get tickets regarding product `product_id`              |
-| `created_after`  | get tickets with `created_time >= created_after`        |
-| `created_before` | get tickets with `created_time <= created_before`       |
-| `expert_id`      | get tickets assigned to expert `expert_id`              |
-| `status`         | get tickets with status in `status` list                |
+| Field           | Content                                                |
+|-----------------|--------------------------------------------------------|
+| `customerId`    | get tickets created by customer with `id = customerId` |
+| `minPriority`   | minimum priority of required tickets                   |
+| `maxPriority`   | maximum priority of required tickets                   |
+| `productId`     | get tickets regarding product `productId`              |
+| `createdAfter`  | get tickets with `createdTime >= createdAfter`         |
+| `createdBefore` | get tickets with `createdTime <= createdBefore`        |
+| `expertId`      | get tickets assigned to expert `expertId`              |
+| `status`        | get tickets with status in `status` list               |
 
 - **METHOD** `POST` **URL**: `/API/ticketing/`
 
@@ -318,28 +323,28 @@ To package the React application:
     {
       "title": <title>,
       "description": <description>,
-      "product_id": <product_id>,
+      "productId": <productId>,
     }
     ```
     - **Response**: `201 Created` (success)
     - **Error responses**:
       - `400 Bad Request`
-      - `404 Not Found` (product with id `product_id` not existing)
+      - `404 Not Found` (product with id `productId` not existing)
       - `422 Unprocessable Entity` (wrong format for request body)
       - `500 Internal Server Error`
     - **Response body**: id assigned to the created ticket / Error message in case of errors
     ```
       {
-        "ticket_id": <ticket_id>
+        "ticketId": <ticketId>
       }
     ```
-    - **Note**: `user_id` is obtained from the session
+    - **Note**: `userId` is obtained from the session
 
-| Field         | Content                                        |
-|---------------|------------------------------------------------|
-| `title`       | ticket title (textual field)                   |
-| `description` | ticket description (textual field)             |
-| `product_id`  | product id of the product linked to the ticket |
+| Field          | Content                                          |
+|----------------|--------------------------------------------------|
+| `title`        | ticket title (textual field)                     |
+| `description`  | ticket description (textual field)               |
+| `productId`    | product id of the product linked to the ticket   |
 
 
 
@@ -353,8 +358,8 @@ To package the React application:
 
     ```
     {
-      "ticket_id": <ticket_id>,
-      "expert_id": <expert_id>,
+      "ticketId": <ticketId>,
+      "expertId": <expertId>,
       "priority": <priority>
     }
     ```
@@ -366,13 +371,13 @@ To package the React application:
     - `422 Unprocessable Entity`  (wrong format for request body)
     - `500 Internal Server Error`
   - **Response body**: _None_ / Error message in case of error
-  - **Note**: `user_id` is obtained from the session
+  - **Note**: `userId` is obtained from the session
 
-| Field       | Content                                |
-|-------------|----------------------------------------|
-| `ticket_id` | ticket to assign                       |
-| `expert_id` | expert to which the ticket is assigned |
-| `priority`  | priority assigned to the ticket        |
+| Field        | Content                                |
+|--------------|----------------------------------------|
+| `ticketId`   | ticket to assign                       |
+| `expertId`   | expert to which the ticket is assigned |
+| `priority`   | priority assigned to the ticket        |
 
 
 - **METHOD** `PUT` **URL**: `/API/ticketing/update`
@@ -384,8 +389,8 @@ To package the React application:
 
     ```
     {
-      "ticket_id": <ticket_id>,
-      "new_state": <new_state>
+      "ticketId": <ticketId>,
+      "newState": <newState>
     }
     ```
 
@@ -396,35 +401,35 @@ To package the React application:
     - `422 Unprocessable Entity`  (wrong format for request body)
     - `500 Internal Server Error`
   - **Response body**: _None_ / Error message in case of error
-  - **Note**: `user_id` is obtained from the session
+  - **Note**: `userId` is obtained from the session
 
-| Field       | Content                      |
-|-------------|------------------------------|
-| `ticket_id` | ticket to update             |
-| `new_state` | new state assigned to ticket |
+| Field      | Content                      |
+|------------|------------------------------|
+| `ticketId` | ticket to update             |
+| `newState` | new state assigned to ticket |
 
 
 ### Chat
-- **METHOD** `GET` **URL**: `/API/chat/{ticket_id}`
+- **METHOD** `GET` **URL**: `/API/chat/{ticketId}`
 
-  - **Description**: Get messages of chat linked to `ticket_id`
+  - **Description**: Get messages of chat linked to `ticketId`
   - **Permissions allowed**:
-  - **Request query parameter**: `ticket_id` to retrieve the corresponding ticket
+  - **Request query parameter**: `ticketId` to retrieve the corresponding ticket
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
-    - `404 Not Found` (ticket with id `ticket_id` not existing)
-    - `422 Unprocessable Entity` (wrong format for `ticket_id`)
+    - `404 Not Found` (ticket with id `ticketId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `ticketId`)
     - `500 Internal Server Error`
-  - **Response body**: list of messages of chat corresponding to ticket_id / Error message in case of error
+  - **Response body**: list of messages of chat corresponding to ticketId / Error message in case of error
   ```
   {
     [
       {
-        "message_id": <message_id>,
-        "ticket_id": <ticket_id>,
-        "sender_id": <sender_id>,
+        "messageId": <messageId>,
+        "ticketId": <ticketId>,
+        "senderId": <senderId>,
         "text": <text>,
         "timestamp": <timestamp>,
         "attachments":[<attachment1>, <attachment2>...]
@@ -434,21 +439,21 @@ To package the React application:
     ]
   }
   ```
-| Field         | Content                                  |
-|---------------|------------------------------------------|
-| `message_id`  | id of the chat message                   |
-| `ticket_id`   | id of the ticket                         |
-| `sender_id`   | id of the sender user                    |
-| `text`        | textual content of the message           |
-| `timestamp`   | timestamp of the message                 |
-| `attachments` | IDs of attachments linked to the message |
+| Field          | Content                                  |
+|----------------|------------------------------------------|
+| `messageId`    | id of the chat message                   |
+| `ticketId`     | id of the ticket                         |
+| `senderId`     | id of the sender user                    |
+| `text`         | textual content of the message           |
+| `timestamp`    | timestamp of the message                 |
+| `attachments`  | IDs of attachments linked to the message |
 
 
-- **METHOD** `POST` **URL**: `/API/chat/{ticket_id}`
+- **METHOD** `POST` **URL**: `/API/chat/{ticketId}`
 
-  - **Description**: Add message to chat linked to `ticket_id`
+  - **Description**: Add message to chat linked to `ticketId`
   - **Permissions allowed**:
-  - **Request query parameter**: `ticket_id` to retrieve the corresponding ticket
+  - **Request query parameter**: `ticketId` to retrieve the corresponding ticket
   - **Request body**: Message to be added to chat
   ```
   {
@@ -459,47 +464,47 @@ To package the React application:
   - **Response**: `201 CREATED` (success)
   - **Error responses**:
     - `400 Bad Request`
-    - `404 Not Found` (ticket with id `ticket_id` not existing)
-    - `422 Unprocessable Entity` (wrong format for `ticket_id` or request body)
+    - `404 Not Found` (ticket with id `ticketId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `ticketId` or request body)
     - `500 Internal Server Error`
   - **Response body**: id of the added message / Error message in case of error
-  - **Note**: `sender_id` is obtained from the session
+  - **Note**: `senderId` is obtained from the session
   ```
   {
-    "message_id": <message_id>
+    "messageId": <messageId>
   }
   ```
-| Field         | Content                           |
-|---------------|-----------------------------------|
-| `message_id`  | id of the chat message            |
-| `ticket_id`   | id of the ticket                  |
-| `text`        | textual content of the message    |
-| `timestamp`   | timestamp of the message          |
-| `attachments` | attachments linked to the message |
+| Field          | Content                           |
+|----------------|-----------------------------------|
+| `messageId`    | id of the chat message            |
+| `ticketId`     | id of the ticket                  |
+| `text`         | textual content of the message    |
+| `timestamp`    | timestamp of the message          |
+| `attachments`  | attachments linked to the message |
 
 ### Attachment
-- **METHOD** `GET` **URL**: `/API/attachment/{attachment_id}`
+- **METHOD** `GET` **URL**: `/API/attachment/{attachmentId}`
 
-  - **Description**: Get attachment linked to `attachment_id`
+  - **Description**: Get attachment linked to `attachmentId`
   - **Permissions allowed**:
-  - **Request query parameter**: `attachment_id` to retrieve the corresponding attachment
+  - **Request query parameter**: `attachmentId` to retrieve the corresponding attachment
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
-    - `404 Not Found` (attachment with id `attachment_id` not existing)
-    - `422 Unprocessable Entity` (wrong format for `attachment_id`)
+    - `404 Not Found` (attachment with id `attachmentId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `attachmentId`)
     - `500 Internal Server Error`
-  - **Response body**: attachment corresponding to attachment_id / Error message in case of error
+  - **Response body**: attachment corresponding to attachmentId / Error message in case of error
   ```
   {
-    "attachment_id" : <attachment_id>
+    "attachmentId" : <attachmentId>
     "name" : <name>,
     "attachment": <attachment>
   }
   ```
-| Field           | Content                        |
-|-----------------|--------------------------------|
-| `attachment_id` | id of the chat attachment      |
-| `name`          | name of the attachment         |
-| `attachment`    | attachment data (binary array) |
+| Field            | Content                        |
+|------------------|--------------------------------|
+| `attachmentId`   | id of the chat attachment      |
+| `name`           | name of the attachment         |
+| `attachment`     | attachment data (binary array) |

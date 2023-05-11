@@ -15,10 +15,17 @@ class Profile {
         initialValue = 1,
         allocationSize = 1
     )
+    @Column(updatable = false, nullable = false)
     var profileId : Long? = null
+    @Column(nullable=false, unique = true)
     var email: String = ""
+    @Column(nullable = false)
     var name: String = ""
+    @Column(nullable = false)
     var surname: String = ""
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    var role: ProfileRole? = null
 
     @OneToMany(mappedBy = "customer")
     val ticketsCustomer = mutableSetOf<Ticket>()
@@ -27,11 +34,15 @@ class Profile {
     val ticketsExpert = mutableSetOf<Ticket>()
 
     @OneToMany(mappedBy = "sender")
-    val messageSender = mutableSetOf<Message>()
+    val messagesSender = mutableSetOf<Message>()
 
     @OneToMany(mappedBy = "user")
     val historyEditor = mutableSetOf<TicketHistory>()
 
     @OneToMany(mappedBy = "currentExpert")
     val historyExpert = mutableSetOf<TicketHistory>()
+}
+
+enum class ProfileRole {
+    CUSTOMER, EXPERT, MANAGER, ADMIN
 }
