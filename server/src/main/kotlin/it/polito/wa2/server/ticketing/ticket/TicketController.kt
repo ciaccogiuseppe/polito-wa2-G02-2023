@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.ticket
 
+import it.polito.wa2.server.BadRequestFilterException
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableTicketException
@@ -70,6 +71,10 @@ class TicketController(private val ticketService: TicketService) {
         expertId: Long?,
         status: List<TicketStatus>?
     ) {
+        if(customerId == null && minPriority == null && maxPriority == null &&
+            productId == null && createdAfter == null && createdBefore == null &&
+            expertId == null && status == null)
+            throw BadRequestFilterException("All filter parameters cannot be null")
         if ((minPriority != null) && (minPriority < 0))
             throw UnprocessableTicketException("Invalid min priority")
         if ((maxPriority != null) && (maxPriority < 0))

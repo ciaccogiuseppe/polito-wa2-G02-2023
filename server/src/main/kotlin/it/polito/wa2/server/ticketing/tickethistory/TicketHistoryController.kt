@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.tickethistory
 
+import it.polito.wa2.server.BadRequestFilterException
 import it.polito.wa2.server.UnprocessableTicketException
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -9,9 +10,6 @@ import java.time.LocalDateTime
 
 @RestController
 class TicketHistoryController(private val ticketHistoryService: TicketHistoryService) {
-    @GetMapping("/API/ticketing/history/")
-    fun getAllTicketHistory(): List<TicketHistoryDTO> =
-        ticketHistoryService.getAllTicketHistory()
 
     @GetMapping("/API/ticketing/history/filter")
     fun getTicketHistoryFiltered(
@@ -39,6 +37,9 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
         updatedBefore: Timestamp?,
         currentExpertId: Long?,
     ) {
+        if(ticketId == null && userId == null && currentExpertId == null &&
+            updatedAfter == null && updatedBefore == null)
+            throw BadRequestFilterException("All filter parameters cannot be null")
         if (updatedAfter != null && updatedBefore != null && updatedAfter.after(updatedBefore))
             throw UnprocessableTicketException("<updated_after> is after <updated_before>")
     }
