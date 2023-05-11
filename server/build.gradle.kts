@@ -6,11 +6,17 @@ plugins {
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
 	kotlin("plugin.jpa") version "1.7.22"
+	id("com.google.cloud.tools.jib") version "3.3.1"
 }
+
+
 
 group = "it.polito.wa2"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
+
+
+
 
 repositories {
 	mavenCentral()
@@ -37,6 +43,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.named("jibDockerBuild"){
+	jib.container.ports = listOf("8080")
 }
 
 dependencyManagement {
