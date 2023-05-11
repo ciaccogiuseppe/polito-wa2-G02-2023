@@ -42,5 +42,14 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
             throw BadRequestFilterException("All filter parameters cannot be null")
         if (updatedAfter != null && updatedBefore != null && updatedAfter.after(updatedBefore))
             throw UnprocessableTicketException("<updated_after> is after <updated_before>")
+        if (ticketId != null && ticketId < 0) {
+            throw UnprocessableTicketException("Negative ticketId")
+        }
+        if (userId != null && userId < 0) {
+            throw UnprocessableTicketException("Negative userId")
+        }
+        if (currentExpertId != null && currentExpertId < 0) {
+            throw UnprocessableTicketException("Negative currentExpertId")
+        }
     }
 }
