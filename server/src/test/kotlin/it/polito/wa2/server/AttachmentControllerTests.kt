@@ -13,7 +13,6 @@ import it.polito.wa2.server.ticketing.message.MessageRepository
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
-import jakarta.validation.constraints.NotBlank
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

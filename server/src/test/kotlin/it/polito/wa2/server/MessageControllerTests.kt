@@ -4,7 +4,6 @@ package it.polito.wa2.server
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
-import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.ticketing.attachment.Attachment
@@ -15,18 +14,15 @@ import it.polito.wa2.server.ticketing.message.MessageRepository
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
-import jakarta.validation.constraints.NotBlank
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
-import org.springframework.boot.json.GsonJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -34,7 +30,6 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.shaded.com.google.common.reflect.TypeToken
 import java.net.URI
 import java.sql.Timestamp
 import java.util.*
@@ -168,8 +163,8 @@ class MessageControllerTests {
 
         Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.ticketId})
 
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == customer.email})
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == expert.email})
+        Assertions.assertEquals(true, body.any{a -> a["senderId"] == customer.profileId})
+        Assertions.assertEquals(true, body.any{a -> a["senderId"] == expert.profileId})
 
         messageRepository.delete(message4)
         messageRepository.delete(message3)
@@ -462,7 +457,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             ticket.ticketId!!,
-            customer.email,
+            customer.profileId!!,
             "message text",
             Timestamp(1),
             mutableSetOf()
@@ -521,7 +516,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             25,
-            customer.email,
+            customer.profileId!!,
             "message text",
             Timestamp(0),
             mutableSetOf()
@@ -530,7 +525,7 @@ class MessageControllerTests {
         val url = "http://localhost:$port/API/chat/25"
         val uri = URI(url)
         val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message)
-        val result = restTemplate.postForEntity(uri, requestEntity, String.javaClass)
+        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 
@@ -580,7 +575,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             ticket.ticketId!!,
-            "something@mail.it",
+            123456,
             "message text",
             Timestamp(0),
             mutableSetOf()
@@ -589,7 +584,7 @@ class MessageControllerTests {
         val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
         val uri = URI(url)
         val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message)
-        val result = restTemplate.postForEntity(uri, requestEntity, String.javaClass)
+        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 

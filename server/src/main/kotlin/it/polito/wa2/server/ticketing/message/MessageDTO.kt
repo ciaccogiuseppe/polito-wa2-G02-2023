@@ -6,7 +6,6 @@ import it.polito.wa2.server.ticketing.attachment.AttachmentDTO
 import it.polito.wa2.server.ticketing.attachment.toDTO
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -16,9 +15,8 @@ data class MessageDTO(
     val messageId : Long?,
     @field:Positive
     val ticketId: Long,
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
-    val senderId: String,
+    @field:Positive
+    val senderId: Long,
     @field:NotBlank(message="a message text is mandatory")
     val text: String,
     val sentTimestamp: Timestamp?,
@@ -26,7 +24,7 @@ data class MessageDTO(
 )
 
 fun Message.toDTO(): MessageDTO {
-    return MessageDTO(messageId, ticket?.ticketId!!, sender!!.email,
+    return MessageDTO(messageId, ticket?.ticketId!!, sender?.profileId!!,
         text, sentTimestamp, attachments.map{it.toDTO()}.toMutableSet())
 }
 

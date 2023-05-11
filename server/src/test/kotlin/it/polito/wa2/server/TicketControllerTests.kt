@@ -4,17 +4,14 @@ package it.polito.wa2.server
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
-import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.ticketing.ticket.*
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryRepository
-import jakarta.validation.constraints.NotBlank
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
-import org.springframework.boot.json.GsonJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -28,7 +25,6 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.shaded.com.google.common.reflect.TypeToken
 import java.net.URI
 import java.sql.Timestamp
 import java.util.*
@@ -108,8 +104,8 @@ class TicketControllerTests {
         val body = json.parseMap(result.body)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         Assertions.assertEquals(product.productId, body["productId"])
-        Assertions.assertEquals(customer.email, body["customerId"])
-        Assertions.assertEquals(expert.email, body["expertId"])
+        Assertions.assertEquals(customer.profileId, body["customerId"])
+        Assertions.assertEquals(expert.profileId, body["expertId"])
         Assertions.assertNotNull(body["status"])
         Assertions.assertEquals(ticket.status, TicketStatus.valueOf(body["status"]!!.toString()))
         Assertions.assertEquals(ticket.priority.toLong(), body["priority"])
@@ -859,8 +855,8 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
-            "mario.rossi@polito.it",
-            "mario.bianchi@polito.it",
+            customer.profileId,
+            expert.profileId,
             null,
             null
         )
@@ -924,7 +920,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
-            "mario.grossi@polito.it",
+            123456,
             null,
             null,
             null
@@ -975,7 +971,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000001",
-            "mario.rossi@polito.it",
+            customer.profileId,
             null,
             null,
             null
@@ -1026,7 +1022,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000001abc",
-            "mario.rossi@polito.it",
+            customer.profileId,
             null,
             null,
             null
@@ -1077,7 +1073,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
-            "mario.rossi@polito.it",
+            customer.profileId,
             null,
             TicketStatus.IN_PROGRESS,
             null
@@ -1147,7 +1143,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.email,
+            expert.profileId!!,
             2
         )
 
@@ -1213,7 +1209,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.email,
+            expert.profileId!!,
             2
         )
 
@@ -1279,7 +1275,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            customer.email,
+            customer.profileId!!,
             2
         )
 
@@ -1333,7 +1329,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.email,
+            expert.profileId!!,
             2
         )
 
@@ -1391,7 +1387,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.email,
+            expert.profileId!!,
             2
         )
 

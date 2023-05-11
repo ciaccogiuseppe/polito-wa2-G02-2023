@@ -67,7 +67,7 @@ class TicketServiceImpl(
         // TODO: get user_id from session
         // productId is not null, already checked in the controller
         val product = getProduct(ticketDTO.productId)
-        val customer = getProfileByEmail(ticketDTO.customerId!!)
+        val customer = getProfile(ticketDTO.customerId!!)
         if (customer.role != ProfileRole.CUSTOMER)
             throw UnprocessableTicketException("The requester profile is not a customer")
 
@@ -85,7 +85,7 @@ class TicketServiceImpl(
     }
 
     override fun assignTicket(ticketAssignDTO: TicketAssignDTO) {
-        val expert = getProfileByEmail(ticketAssignDTO.expertId)
+        val expert = getProfile(ticketAssignDTO.expertId)
         val ticket = ticketRepository.findByIdOrNull(ticketAssignDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketAssignDTO.ticketId} does not exists")
         val oldState = ticket.status
@@ -152,11 +152,6 @@ class TicketServiceImpl(
 
     private fun getProfile(profileId: Long): Profile {
         val profileDTO = profileService.getProfileById(profileId)
-        return profileRepository.findByEmail(profileDTO.email)!!
-    }
-
-    private fun getProfileByEmail(email: String): Profile {
-        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 

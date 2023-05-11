@@ -16,6 +16,13 @@ class ProfileController(private val profileService: ProfileService) {
         return profileService.getProfile(email)
     }
 
+    @GetMapping("/API/profiles/profileId/{profileId}")
+    fun getProfileById(@PathVariable profileId: Long): ProfileDTO {
+        if(profileId<=0)
+            throw UnprocessableProfileException("Wrong profileId values")
+        return profileService.getProfileById(profileId)
+    }
+
     @PostMapping("/API/profiles")
     @ResponseStatus(HttpStatus.CREATED)
     fun addProfile(@RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
