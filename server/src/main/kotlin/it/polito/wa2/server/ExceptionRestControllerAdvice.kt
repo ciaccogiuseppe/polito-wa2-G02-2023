@@ -45,6 +45,8 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     @ExceptionHandler(UnprocessableTicketException::class)
     fun handleTicketNotFound(e: UnprocessableTicketException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
 
+    @ExceptionHandler(BadRequestFilterException::class)
+    fun handleFilterBadRequest(e: BadRequestFilterException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
 
     /************** Message exception handlers **************/
     @ExceptionHandler(UnprocessableMessageException::class)
@@ -71,3 +73,4 @@ class UnprocessableTicketException(message: String): RuntimeException(message)
 class UnprocessableMessageException(message: String): RuntimeException(message)
 class BadRequestMessageException(message: String): RuntimeException(message)
 class UnauthorizedMessageException(message: String): RuntimeException(message)
+class BadRequestFilterException(message: String): RuntimeException(message)
