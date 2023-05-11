@@ -44,5 +44,5 @@ class Profile {
 }
 
 enum class ProfileRole {
-    CUSTOMER, EXPERT, ADMIN
+    CUSTOMER, EXPERT, MANAGER, ADMIN
 }
