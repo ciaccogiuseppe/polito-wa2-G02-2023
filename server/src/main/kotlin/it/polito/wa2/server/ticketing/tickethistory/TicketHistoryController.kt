@@ -2,8 +2,10 @@ package it.polito.wa2.server.ticketing.tickethistory
 
 import it.polito.wa2.server.UnprocessableTicketException
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @RestController
 class TicketHistoryController(private val ticketHistoryService: TicketHistoryService) {
@@ -11,10 +13,33 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
     fun getAllTicketHistory(): List<TicketHistoryDTO> =
         ticketHistoryService.getAllTicketHistory()
 
-    @GetMapping("/API/ticketing/history/{ticketId}")
-    fun getTicketHistory(@PathVariable ticketId: Long): List<TicketHistoryDTO>{
-        if(ticketId <= 0)
-            throw UnprocessableTicketException("Wrong ticket id value")
-        return ticketHistoryService.getTicketHistory(ticketId)
+    @GetMapping("/API/ticketing/history/filter")
+    fun getTicketHistoryFiltered(
+        @RequestParam(name="ticketId", required=false) ticketId: Long?,
+        @RequestParam(name="userId", required=false) userId: Long?,
+        @RequestParam(name="updatedAfter", required=false) updatedAfter: LocalDateTime?,
+        @RequestParam(name="updatedBefore", required=false) updatedBefore: LocalDateTime?,
+        @RequestParam(name="currentExpertId", required=false) currentExpertId: Long?
+    ): List<TicketHistoryDTO> {
+        checkFilterParameters(
+            ticketId, userId,
+            updatedAfter?.let{ Timestamp.valueOf(updatedAfter)}, updatedBefore?.let{ Timestamp.valueOf(updatedBefore)},
+            currentExpertId
+        )
+        return ticketHistoryService.getTicketHistoryFiltered(
+            ticketId, userId,
+            updatedAfter?.let{ Timestamp.valueOf(updatedAfter)}, updatedBefore?.let{ Timestamp.valueOf(updatedBefore)}, currentExpertId
+        )
+    }
+
+    fun checkFilterParameters(
+        ticketId: Long?,
+        userId: Long?,
+        updatedAfter: Timestamp?,
+        updatedBefore: Timestamp?,
+        currentExpertId: Long?,
+    ) {
+        if (updatedAfter != null && updatedBefore != null && updatedAfter.after(updatedBefore))
+            throw UnprocessableTicketException("<updated_after> is after <updated_before>")
     }
 }
