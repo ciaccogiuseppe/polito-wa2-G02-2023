@@ -21,10 +21,10 @@
 - Database should now be running correctly
 
 ## Docker JIB deploy
-- If running Postgres and Server on the same host edit ```application.properties``` file, changing ```spring.datasource.url=jdbc:postgresql://localhost:5432/ticketing``` to ```spring.datasource.url=jdbc:postgresql://host.docker.internal:5432/ticketing```
 - Run gradle task ```jibDockerBuild``` to deploy locally
   - If Authorization Error rises, remove the ```"credsStore"``` entry in Docker ```config.json``` (found in ```<user>/.docker``` path)
-  - Now you should see ```server``` in your Docker Images, run it to create the container
+- Run ```docker-compose up``` in ```server/src/main/docker/``` directory
+  - On first run, set ```SPRING_JPA_HIBERNATE_DDL_AUTO``` to ```create```, on following runs set it to ```validate```
 - A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
 
 ## Client
