@@ -65,7 +65,6 @@ class TicketServiceImpl(
 
     override fun addTicket(ticketDTO: TicketDTO): TicketIdDTO {
         // TODO: get user_id from session
-        // productId is not null, already checked in the controller
         val product = getProduct(ticketDTO.productId)
         val customer = getProfile(ticketDTO.customerId!!)
         if (customer.role != ProfileRole.CUSTOMER)
