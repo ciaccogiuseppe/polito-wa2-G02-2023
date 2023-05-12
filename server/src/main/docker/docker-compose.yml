@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  server:
+    image:
+      'ticketing:latest'
+    build:
+      context: .
+    container_name: server
+    depends_on:
+      - database
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+    ports:
+      - "8080:8080"
+
+
+  database:
+    image: 'postgres:latest'
+    container_name: database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
