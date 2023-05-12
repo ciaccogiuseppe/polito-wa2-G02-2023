@@ -14,7 +14,9 @@
 - Open a Query Console for the selected Database
 - Run ```create database ticketing``` command
 - Select ```ticketing``` Database as main Database
-- Run query in ```server/main/resources/schema.sql```
+- Edit ```application.properties``` file, changing ```spring.jpa.hibernate.ddl-auto=validate``` to ```spring.jpa.hibernate.ddl-auto=create```
+- Run Server Application
+- Set again ```spring.jpa.hibernate.ddl-auto``` to ```validate```
 - Run query in ```server/main/resources/records.sql```
 - Database should now be running correctly
 
@@ -22,6 +24,7 @@
 - If running Postgres and Server on the same host edit ```application.properties``` file, changing ```spring.datasource.url=jdbc:postgresql://localhost:5432/ticketing``` to ```spring.datasource.url=jdbc:postgresql://host.docker.internal:5432/ticketing```
 - Run gradle task ```jibDockerBuild``` to deploy locally
   - If Authorization Error rises, remove the ```"credsStore"``` entry in Docker ```config.json``` (found in ```<user>/.docker``` path)
+  - Now you should see ```server``` in your Docker Images, run it to create the container
 - A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
 
 ## Client
