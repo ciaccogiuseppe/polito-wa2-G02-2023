@@ -6,12 +6,6 @@
 
 - Import project in IntelliJ IDEA as ```File > New > Project from Version Control...```
 
-## Docker JIB deploy
-- If running Postgres and Server on the same host edit ```application.properties``` file, changing ```spring.datasource.url=jdbc:postgresql://localhost:5432/ticketing``` to ```spring.datasource.url=jdbc:postgresql://host.docker.internal:5432/ticketing```
-- Run gradle task ```jibDockerBuild``` to deploy locally
-  - If Authorization Error rises, remove the ```"credsStore"``` entry in Docker ```config.json``` (found in ```<user>/.docker``` path)
-- A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
-
 ## Database
 
 - Install Docker and deploy Postgres
@@ -23,6 +17,12 @@
 - Run query in ```server/main/resources/schema.sql```
 - Run query in ```server/main/resources/records.sql```
 - Database should now be running correctly
+
+## Docker JIB deploy
+- If running Postgres and Server on the same host edit ```application.properties``` file, changing ```spring.datasource.url=jdbc:postgresql://localhost:5432/ticketing``` to ```spring.datasource.url=jdbc:postgresql://host.docker.internal:5432/ticketing```
+- Run gradle task ```jibDockerBuild``` to deploy locally
+  - If Authorization Error rises, remove the ```"credsStore"``` entry in Docker ```config.json``` (found in ```<user>/.docker``` path)
+- A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
 
 ## Client
 
