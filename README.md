@@ -46,7 +46,7 @@ To package the React application:
 
   - **Description**: Get profile, if existing, with email corresponding to `email`
   - **Permissions allowed**:
-  - **Request query parameter**: `email` to retrieve the corresponding profile
+  - **Request path parameter**: `email` to retrieve the corresponding profile
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
@@ -57,7 +57,7 @@ To package the React application:
   - **Response body**: profile corresponding to `email` / Error message in case of error
   ```
   {
-    "profileId": <id>,
+    "profileId": <profileId>,
     "email": <email>,
     "name": <name>,
     "surname": <surname>
@@ -75,7 +75,7 @@ To package the React application:
 
   - **Description**: Get profile, if existing, with profileId corresponding to `profileId`
   - **Permissions allowed**:
-  - **Request query parameter**: `profileId` to retrieve the corresponding profile
+  - **Request path parameter**: `profileId` to retrieve the corresponding profile
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
@@ -86,7 +86,7 @@ To package the React application:
   - **Response body**: profile corresponding to `profileId` / Error message in case of error
   ```
   {
-    "profileId": <id>,
+    "profileId": <profileId>,
     "email": <email>,
     "name": <name>,
     "surname": <surname>
@@ -133,7 +133,7 @@ To package the React application:
 
   - **Description**: Change data of given profile
   - **Permissions allowed**:
-  - **Request query parameter**:`email` to retrieve the corresponding profile
+  - **Request path parameter**:`email` to retrieve the corresponding profile
   - **Request body**: Update information of profile
 
     ```
@@ -175,7 +175,7 @@ To package the React application:
   {
     [
       {
-        "productId": <id>,
+        "productId": <productId>,
         "name": <name>,
         "brand": <brand>
       }, {...}, ...
@@ -192,7 +192,7 @@ To package the React application:
 
   - **Description**: Get details of product with id `{productId}`
   - **Permissions allowed**:
-  - **Request query parameter**: `{productId}` to get corresponding product
+  - **Request path parameter**: `{productId}` to get corresponding product
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
@@ -203,7 +203,7 @@ To package the React application:
   - **Response body**: product details / Error message in case of error
   ```
   {
-    "productId": <id>,
+    "productId": <productId>,
     "name": <name>,
     "brand": <brand>
   }
@@ -219,7 +219,7 @@ To package the React application:
 
   - **Description**: Get ticket, if existing, with id corresponding to parameter `ticketId`
   - **Permissions allowed**:
-  - **Request query parameter**: `ticketId` to retrieve the corresponding ticket
+  - **Request path parameter**: `ticketId` to retrieve the corresponding ticket
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
@@ -304,8 +304,7 @@ To package the React application:
 
   - **Description**: Get all tickets satisfying the given filters
   - **Permissions allowed**:
-  - **Request query parameter**: _None_
-  - **Request body**: Required filters (only needed ones to be specified)
+  - **Request query parameter**: Required filters (only needed ones to be specified)
     - `minPriority` specifies the minimum priority
     - `maxPriority` specifies the maximum priority
     - `productId` to retrieve the  records associated to the corresponding product
@@ -314,6 +313,7 @@ To package the React application:
     - `updatedBefore` to retrieve the records created before the given date
     - `expertId` to retrieve the records associated to the given expertId
     - `status`: list of the desired states of the records
+  - **Request body**: _None_
  - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
@@ -442,7 +442,7 @@ To package the React application:
 
   - **Description**: Get messages of chat linked to `ticketId`
   - **Permissions allowed**:
-  - **Request query parameter**: `ticketId` to retrieve the corresponding ticket
+  - **Request path parameter**: `ticketId` to retrieve the corresponding ticket
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
@@ -481,7 +481,7 @@ To package the React application:
 
   - **Description**: Add message to chat linked to `ticketId`
   - **Permissions allowed**:
-  - **Request query parameter**: `ticketId` to retrieve the corresponding ticket
+  - **Request path parameter**: `ticketId` to retrieve the corresponding ticket
   - **Request body**: Message to be added to chat
   ```
   {
@@ -516,7 +516,7 @@ To package the React application:
 
   - **Description**: Get attachment linked to `attachmentId`
   - **Permissions allowed**:
-  - **Request query parameter**: `attachmentId` to retrieve the corresponding attachment
+  - **Request path parameter**: `attachmentId` to retrieve the corresponding attachment
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
