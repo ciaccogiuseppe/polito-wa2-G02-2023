@@ -13,7 +13,6 @@ import java.time.LocalDateTime
 
 @RestController
 class TicketController(private val ticketService: TicketService) {
-    // private val validStates = arrayListOf("OPEN", "RESOLVED", "CLOSED", "IN PROGRESS", "REOPENED")
     @GetMapping("/API/ticketing/{ticketId}")
     fun getTicket(@PathVariable ticketId: Long): TicketDTO {
         if(ticketId < 1)
