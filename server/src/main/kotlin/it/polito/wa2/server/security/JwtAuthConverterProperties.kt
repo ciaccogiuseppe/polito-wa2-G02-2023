@@ -1,16 +1,15 @@
 package it.polito.wa2.server.security
 
-import lombok.Data
+// import lombok.Data
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.validation.annotation.Validated
 
-@Data
+// @Data
 @Validated
 @Configuration
-@ConfigurationProperties(prefix="jwt.auth.converter")
-class JwtAuthConverterProperties {
-    var resourceId: String? = null
-    var principalAttribute: String? = null
-
-}
+class JwtAuthConverterProperties(
+    @Value("\${jwt.auth.converter.resource-id}") val resourceId: String,
+    @Value("\${jwt.auth.converter.principal-attribute}") val principalAttribute: String
+)

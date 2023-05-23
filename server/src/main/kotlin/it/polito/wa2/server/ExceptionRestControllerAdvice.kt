@@ -31,6 +31,9 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     @ExceptionHandler(BadRequestProfileException::class)
     fun handleProfileBadRequest(e: BadRequestProfileException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
 
+    @ExceptionHandler(LoginFailedException::class)
+    fun handleLoginFailed(e: LoginFailedException) = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.message!! )
+
     /************** Attachment exception handlers **************/
     @ExceptionHandler(AttachmentNotFoundException::class)
     fun handleAttachmentNotFound(e: AttachmentNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
@@ -74,3 +77,4 @@ class UnprocessableMessageException(message: String): RuntimeException(message)
 class BadRequestMessageException(message: String): RuntimeException(message)
 class UnauthorizedMessageException(message: String): RuntimeException(message)
 class BadRequestFilterException(message: String): RuntimeException(message)
+class LoginFailedException(message: String): RuntimeException(message)
