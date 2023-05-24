@@ -10,5 +10,7 @@ interface TicketHistoryService {
         userId: Long?,
         updatedAfter: Timestamp?,
         updatedBefore: Timestamp?,
-        currentExpertId: Long?,): List<TicketHistoryDTO>
+        currentExpertId: Long?,
+        userEmail: String
+    ): List<TicketHistoryDTO>
 }

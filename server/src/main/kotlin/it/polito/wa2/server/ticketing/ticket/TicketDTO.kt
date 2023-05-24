@@ -18,9 +18,9 @@ data class TicketDTO(
     @field:Size(min = 13, max = 13)
     val productId: String,
     @field:Positive
-    val customerId: Long?,
+    val customerEmail: String?,
     @field:Positive
-    val expertId: Long?,
+    val expertEmail: String?,
     val status: TicketStatus?,
     val createdTimestamp: Timestamp?
 )
@@ -29,7 +29,7 @@ data class TicketAssignDTO(
     @field:Positive
     val ticketId : Long,
     @field:Positive
-    val expertId: Long,
+    val expertEmail: String,
     @field:PositiveOrZero
     val priority: Int
 )
@@ -47,8 +47,8 @@ fun Ticket.toDTO(): TicketDTO {
         description,
         priority,
         product?.productId!!,
-        customer?.profileId,
-        expert?.profileId,
+        customer?.email,
+        expert?.email,
         status,
         createdTimestamp
     )

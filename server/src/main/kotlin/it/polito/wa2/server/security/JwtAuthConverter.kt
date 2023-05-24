@@ -25,9 +25,7 @@ class JwtAuthConverter(private val properties: JwtAuthConverterProperties) : Con
     }
 
     private fun getPrincipalClaimName(source: Jwt): String{
-        var claimName: String? = JwtClaimNames.SUB
-        if(properties.principalAttribute != null)
-            claimName = properties.principalAttribute
+        val claimName: String = properties.principalAttribute
         return source.getClaim(claimName)
     }
 
