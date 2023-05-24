@@ -1229,7 +1229,7 @@ class MessageControllerTests {
 
     @Test
     @DirtiesContext
-    fun addMessageSuccessfulForbiddenClient() {
+    fun addMessageForbiddenClient() {
         val customer = Profile()
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
@@ -1402,7 +1402,7 @@ class MessageControllerTests {
 
     @Test
     @DirtiesContext
-    fun addMessageSuccessfulForbiddenExpert() {
+    fun addMessageForbiddenExpert() {
         val customer = Profile()
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
