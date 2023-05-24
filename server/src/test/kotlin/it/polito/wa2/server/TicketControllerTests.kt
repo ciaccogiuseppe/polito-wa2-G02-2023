@@ -855,8 +855,8 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
-            customer.profileId,
-            expert.profileId,
+            customer.email,
+            expert.email,
             null,
             null
         )
@@ -920,7 +920,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
-            123456,
+            "abc@mail.it",
             null,
             null,
             null
@@ -971,7 +971,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000001",
-            customer.profileId,
+            customer.email,
             null,
             null,
             null
@@ -1022,7 +1022,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000001abc",
-            customer.profileId,
+            customer.email,
             null,
             null,
             null
@@ -1073,7 +1073,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
-            customer.profileId,
+            customer.email,
             null,
             TicketStatus.IN_PROGRESS,
             null
@@ -1143,7 +1143,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.profileId!!,
+            expert.email!!,
             2
         )
 
@@ -1209,7 +1209,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.profileId!!,
+            expert.email!!,
             2
         )
 
@@ -1275,7 +1275,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            customer.profileId!!,
+            customer.email!!,
             2
         )
 
@@ -1329,7 +1329,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.profileId!!,
+            expert.email!!,
             2
         )
 
@@ -1387,7 +1387,7 @@ class TicketControllerTests {
 
         val ticketAssign = TicketAssignDTO(
             ticket.ticketId!!,
-            expert.profileId!!,
+            expert.email!!,
             2
         )
 

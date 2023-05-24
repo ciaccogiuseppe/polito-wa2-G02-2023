@@ -93,11 +93,11 @@ class AttachmentControllerTests {
 
 
             val createdManager =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.username)[0]
+                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.email)[0]
             val createdClient =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(client.username)[0]
+                keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
             val createdExpert =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.username)[0]
+                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
 
             val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
             val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
@@ -118,7 +118,7 @@ class AttachmentControllerTests {
                 .serverUrl(keycloak.authServerUrl)
                 .realm(realmName)
                 .clientId(clientId)
-                .username(manager.username)
+                .username(manager.email)
                 .password("password")
                 .build()
 
@@ -127,7 +127,7 @@ class AttachmentControllerTests {
                 .serverUrl(keycloak.authServerUrl)
                 .realm(realmName)
                 .clientId(clientId)
-                .username(client.username)
+                .username(client.email)
                 .password("password")
                 .build()
 
@@ -136,7 +136,7 @@ class AttachmentControllerTests {
                 .serverUrl(keycloak.authServerUrl)
                 .realm(realmName)
                 .clientId(clientId)
-                .username(expert.username)
+                .username(expert.email)
                 .password("password")
                 .build()
 
