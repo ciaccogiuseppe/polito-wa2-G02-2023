@@ -431,7 +431,7 @@ class AttachmentControllerTests {
 
     @Test
     @DirtiesContext
-    fun getExistingAttachmentUnauthorizedClient() {
+    fun getExistingAttachmentForbiddenClient() {
 
         val customer = Profile()
         customer.email = "mario.rossi@polito.it"
@@ -499,7 +499,7 @@ class AttachmentControllerTests {
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
 
 
         attachmentRepository.delete(attachment)
@@ -597,7 +597,7 @@ class AttachmentControllerTests {
 
     @Test
     @DirtiesContext
-    fun getExistingAttachmentUnauthorizedExpert() {
+    fun getExistingAttachmentForbiddenExpert() {
 
         val customer = Profile()
         customer.email = "mario.rossi@polito.it"
@@ -665,7 +665,7 @@ class AttachmentControllerTests {
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
 
 
         attachmentRepository.delete(attachment)
