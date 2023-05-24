@@ -26,15 +26,15 @@ class MessageServiceImpl(
     private val ticketService: TicketService,
     private val attachmentService: AttachmentService): MessageService {
     @Transactional(readOnly = true)
-    override fun getChat(ticketId: Long): List<MessageDTO> {
-        val ticket = getTicket(ticketId)
+    override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
+        val ticket = getTicket(ticketId, userEmail)
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
-    override fun addMessage(ticketId: Long, messageDTO: MessageDTO) {
+    override fun addMessage(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
-        val ticket = getTicket(ticketId)
+        val ticket = getTicket(ticketId, userEmail)
         val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
         val sender = getProfile(messageDTO.senderId)
         if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
@@ -46,8 +46,8 @@ class MessageServiceImpl(
 
     }
 
-    private fun getTicket(ticketId: Long): Ticket {
-        val ticketDTO = ticketService.getTicket(ticketId)
+    private fun getTicket(ticketId: Long, userEmail: String): Ticket {
+        val ticketDTO = ticketService.getTicket(ticketId, userEmail)
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 

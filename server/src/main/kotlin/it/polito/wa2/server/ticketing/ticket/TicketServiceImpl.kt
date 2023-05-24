@@ -22,7 +22,7 @@ class TicketServiceImpl(
     private val profileService: ProfileService
 ): TicketService {
     @Transactional(readOnly = true)
-    override fun getTicket(ticketId: Long): TicketDTO {
+    override fun getTicket(ticketId: Long, userEmail: String): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
         return ticket.toDTO()
@@ -30,23 +30,24 @@ class TicketServiceImpl(
 
     @Transactional(readOnly = true)
     override fun getTicketsFiltered(
-        customerId: Long?,
+        customerEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,
         createdAfter: Timestamp?,
         createdBefore: Timestamp?,
-        expertId: Long?,
-        status: List<TicketStatus>?
+        expertEmail: String?,
+        status: List<TicketStatus>?,
+        userEmail: String
     ): List<TicketDTO> {
         var customer: Profile? = null
         var expert: Profile? = null
         var product: Product? = null
 
-        if (customerId != null)
-            customer = getProfile(customerId)
-        if (expertId != null)
-            expert = getProfile(expertId)
+        if (customerEmail != null)
+            customer = getProfileByEmail(customerEmail)
+        if (expertEmail != null)
+            expert = getProfileByEmail(expertEmail)
         if (productId != null)
             product = getProduct(productId)
         return ticketRepository
@@ -63,12 +64,9 @@ class TicketServiceImpl(
             }.map { it.toDTO() }
     }
 
-    override fun addTicket(ticketDTO: TicketDTO): TicketIdDTO {
-        // TODO: get user_id from session
+    override fun addTicket(ticketDTO: TicketDTO, userEmail: String): TicketIdDTO {
         val product = getProduct(ticketDTO.productId)
-        val customer = getProfile(ticketDTO.customerId!!)
-        if (customer.role != ProfileRole.CUSTOMER)
-            throw UnprocessableTicketException("The requester profile is not a customer")
+        val customer = getProfileByEmail(userEmail)
 
         val ticket =  ticketRepository.save(ticketDTO.toNewTicket(product, customer))
         ticketHistoryRepository.save(
@@ -83,8 +81,8 @@ class TicketServiceImpl(
         return TicketIdDTO(ticket.ticketId!!)
     }
 
-    override fun assignTicket(ticketAssignDTO: TicketAssignDTO) {
-        val expert = getProfile(ticketAssignDTO.expertId)
+    override fun assignTicket(ticketAssignDTO: TicketAssignDTO, userEmail: String) {
+        val expert = getProfileByEmail(ticketAssignDTO.expertEmail)
         val ticket = ticketRepository.findByIdOrNull(ticketAssignDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketAssignDTO.ticketId} does not exists")
         val oldState = ticket.status
@@ -94,6 +92,8 @@ class TicketServiceImpl(
         if (expert.role != ProfileRole.EXPERT)
             throw UnprocessableTicketException("The assigned profile is not an expert")
 
+        val user = getProfileByEmail(userEmail)
+
         ticket.expert = expert
         ticket.priority = ticketAssignDTO.priority
         ticket.status = TicketStatus.IN_PROGRESS
@@ -102,7 +102,7 @@ class TicketServiceImpl(
         ticketHistoryRepository.save(
             newTicketHistory(
                 ticket,
-                ticket.customer!!,
+                user,
                 ticket.expert,
                 oldState,
                 ticket.status
@@ -110,11 +110,13 @@ class TicketServiceImpl(
         )
     }
 
-    override fun updateTicket(ticketUpdateDTO: TicketUpdateDTO) {
+    override fun managerUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
         val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
         val oldState = ticket.status
         val newState = ticketUpdateDTO.newState
+
+        val user = getProfileByEmail(userEmail)
 
         when (ticket.status) {
             TicketStatus.OPEN -> {
@@ -141,7 +143,93 @@ class TicketServiceImpl(
         ticketHistoryRepository.save(
             newTicketHistory(
                 ticket,
-                ticket.customer!!,
+                user,
+                ticket.expert,
+                oldState,
+                newState
+            )
+        )
+    }
+
+    override fun clientUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
+        val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
+            ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
+        val oldState = ticket.status
+        val newState = ticketUpdateDTO.newState
+
+        val user = getProfileByEmail(userEmail)
+        if(user != ticket.customer)
+            throw ForbiddenException("It's not possible to set the status of tickets that are not yours")
+
+        when (ticket.status) {
+            TicketStatus.OPEN -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS)
+                    throw ForbiddenException("It's not possible to set the status to <IN PROGRESS>")
+            }
+            TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED, TicketStatus.CLOSED))
+            TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
+            TicketStatus.IN_PROGRESS -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.OPEN))
+                if (newState == TicketStatus.OPEN)
+                    throw ForbiddenException("It's not possible to set the status to <OPEN>")
+            }
+            TicketStatus.REOPENED -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS)
+                    throw ForbiddenException("It's not possible to set the status to <IN PROGRESS>")
+            }
+        }
+
+        ticket.status = newState
+        ticketRepository.save(ticket)
+        ticketHistoryRepository.save(
+            newTicketHistory(
+                ticket,
+                user,
+                ticket.expert,
+                oldState,
+                newState
+            )
+        )
+    }
+
+    override fun expertUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
+        val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
+            ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
+        val oldState = ticket.status
+        val newState = ticketUpdateDTO.newState
+
+        val user = getProfileByEmail(userEmail)
+        if(user != ticket.expert)
+            throw ForbiddenException("It's not possible to set the status of tickets that are not assigned to you")
+
+        when (ticket.status) {
+            TicketStatus.OPEN -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS)
+                    throw ForbiddenException("It's not possible to set the status to <IN PROGRESS>")
+            }
+            TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED, TicketStatus.CLOSED))
+            TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
+            TicketStatus.IN_PROGRESS -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.OPEN))
+                if (newState == TicketStatus.OPEN)
+                    throw ForbiddenException("It's not possible to set the status to <OPEN>")
+            }
+            TicketStatus.REOPENED -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS && ticket.expert == null)
+                    throw ForbiddenException("It's not possible to set the status to <IN PROGRESS>")
+            }
+        }
+
+        ticket.status = newState
+        ticketRepository.save(ticket)
+        ticketHistoryRepository.save(
+            newTicketHistory(
+                ticket,
+                user,
                 ticket.expert,
                 oldState,
                 newState
@@ -151,6 +239,11 @@ class TicketServiceImpl(
 
     private fun getProfile(profileId: Long): Profile {
         val profileDTO = profileService.getProfileById(profileId)
+        return profileRepository.findByEmail(profileDTO.email)!!
+    }
+
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 

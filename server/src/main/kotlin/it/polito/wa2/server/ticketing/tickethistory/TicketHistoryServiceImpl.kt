@@ -30,14 +30,15 @@ class TicketHistoryServiceImpl(
         userId: Long?,
         updatedAfter: Timestamp?,
         updatedBefore: Timestamp?,
-        currentExpertId: Long?
+        currentExpertId: Long?,
+        userEmail: String
     ): List<TicketHistoryDTO> {
         var user: Profile? = null
         var currentExpert: Profile? = null
         var ticket: Ticket? = null
 
         if (ticketId != null)
-            ticket = getTicket(ticketId)
+            ticket = getTicket(ticketId, userEmail)
         if (userId != null)
             user = getProfile(userId)
         if (currentExpertId != null)
@@ -53,8 +54,8 @@ class TicketHistoryServiceImpl(
             }.map { it.toDTO() }
     }
 
-    private fun getTicket(ticketId: Long): Ticket {
-        val ticketDTO = ticketService.getTicket(ticketId)
+    private fun getTicket(ticketId: Long, userEmail: String): Ticket {
+        val ticketDTO = ticketService.getTicket(ticketId, userEmail)
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 

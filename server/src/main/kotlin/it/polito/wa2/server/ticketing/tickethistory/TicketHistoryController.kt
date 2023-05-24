@@ -2,9 +2,11 @@ package it.polito.wa2.server.ticketing.tickethistory
 
 import it.polito.wa2.server.BadRequestFilterException
 import it.polito.wa2.server.UnprocessableTicketException
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
@@ -13,12 +15,15 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
 
     @GetMapping("/API/ticketing/history/filter")
     fun getTicketHistoryFiltered(
+        principal: Principal,
         @RequestParam(name="ticketId", required=false) ticketId: Long?,
         @RequestParam(name="userId", required=false) userId: Long?,
         @RequestParam(name="updatedAfter", required=false) updatedAfter: LocalDateTime?,
         @RequestParam(name="updatedBefore", required=false) updatedBefore: LocalDateTime?,
         @RequestParam(name="currentExpertId", required=false) currentExpertId: Long?
     ): List<TicketHistoryDTO> {
+        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
+        val userEmail = token.tokenAttributes["email"] as String
         checkFilterParameters(
             ticketId, userId,
             updatedAfter?.let{ Timestamp.valueOf(updatedAfter)}, updatedBefore?.let{ Timestamp.valueOf(updatedBefore)},
@@ -26,7 +31,8 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
         )
         return ticketHistoryService.getTicketHistoryFiltered(
             ticketId, userId,
-            updatedAfter?.let{ Timestamp.valueOf(updatedAfter)}, updatedBefore?.let{ Timestamp.valueOf(updatedBefore)}, currentExpertId
+            updatedAfter?.let{ Timestamp.valueOf(updatedAfter)}, updatedBefore?.let{ Timestamp.valueOf(updatedBefore)},
+            currentExpertId, userEmail
         )
     }
 

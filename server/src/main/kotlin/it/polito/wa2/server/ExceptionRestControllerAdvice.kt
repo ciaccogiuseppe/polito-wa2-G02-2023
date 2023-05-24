@@ -8,6 +8,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice
 class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleUnauthorized(e: ForbiddenException) = ProblemDetail.forStatusAndDetail( HttpStatus.FORBIDDEN, e.message!! )
+
     /************** Product exception handlers **************/
     @ExceptionHandler(ProductNotFoundException::class)
     fun handleProductNotFound(e: ProductNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
@@ -78,3 +81,4 @@ class BadRequestMessageException(message: String): RuntimeException(message)
 class UnauthorizedMessageException(message: String): RuntimeException(message)
 class BadRequestFilterException(message: String): RuntimeException(message)
 class LoginFailedException(message: String): RuntimeException(message)
+class ForbiddenException(message: String): RuntimeException(message)
