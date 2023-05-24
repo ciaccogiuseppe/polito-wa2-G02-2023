@@ -43,6 +43,7 @@ dependencies {
 	// testImplementation("org.keycloak:keycloak-test-helper")
 	testImplementation ("org.testcontainers:junit-jupiter:1.16.3")
 	testImplementation("org.testcontainers:postgresql:1.16.3")
+	testImplementation("com.github.dasniko:testcontainers-keycloak:2.5.0")
 	// annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor")
 }
 
