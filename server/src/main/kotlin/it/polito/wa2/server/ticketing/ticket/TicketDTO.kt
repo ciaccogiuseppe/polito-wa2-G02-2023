@@ -17,9 +17,9 @@ data class TicketDTO(
     val priority: Int?,
     @field:Size(min = 13, max = 13)
     val productId: String,
-    @field:Positive
+    //@field:Positive
     val customerEmail: String?,
-    @field:Positive
+    //@field:Positive
     val expertEmail: String?,
     val status: TicketStatus?,
     val createdTimestamp: Timestamp?
@@ -28,7 +28,7 @@ data class TicketDTO(
 data class TicketAssignDTO(
     @field:Positive
     val ticketId : Long,
-    @field:Positive
+    //@field:Positive
     val expertEmail: String,
     @field:PositiveOrZero
     val priority: Int
