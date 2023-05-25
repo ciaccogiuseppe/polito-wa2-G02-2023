@@ -1,5 +1,6 @@
 package it.polito.wa2.server
 
+import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.Profile
@@ -11,14 +12,18 @@ import it.polito.wa2.server.ticketing.ticket.TicketStatus
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryRepository
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.keycloak.admin.client.KeycloakBuilder
+import org.keycloak.representations.idm.CredentialRepresentation
+import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.HttpStatus
+import org.springframework.http.*
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -36,6 +41,104 @@ class TicketHistoryControllerTests {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
 
+        @Container
+        val keycloak = KeycloakContainer().withRealmImportFile("keycloak/realm-test.json")
+
+        var managerToken = ""
+        var clientToken = ""
+        var expertToken = ""
+
+
+        @JvmStatic
+        @BeforeAll
+        fun setup(){
+            keycloak.start()
+
+            val realmName = "SpringBootKeycloak"
+            val clientId = "springboot-keycloak-client"
+
+            val manager = UserRepresentation()
+            manager.email = "manager@polito.it"
+            manager.username = "manager_01"
+            manager.isEnabled = true
+
+            val client = UserRepresentation()
+            client.email = "client@polito.it"
+            client.username = "client_01"
+            client.isEnabled = true
+
+            val expert = UserRepresentation()
+            expert.email = "expert@polito.it"
+            expert.username = "expert_01"
+            expert.isEnabled = true
+
+            val credential = CredentialRepresentation()
+            credential.isTemporary = false
+            credential.type = CredentialRepresentation.PASSWORD
+            credential.value = "password"
+
+            keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
+            keycloak.keycloakAdminClient.realm(realmName).users().create(client)
+            keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
+
+
+            val createdManager =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.email)[0]
+            val createdClient =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
+            val createdExpert =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
+
+            val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
+            val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
+            val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel().add(listOf(roleClient.toRepresentation()))
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
+
+
+            val kcManager = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username(manager.email)
+                .password("password")
+                .build()
+
+            val kcClient = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username(client.email)
+                .password("password")
+                .build()
+
+            val kcExpert = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username(expert.email)
+                .password("password")
+                .build()
+
+            kcManager.tokenManager().grantToken().expiresIn = 3600
+            kcClient.tokenManager().grantToken().expiresIn = 3600
+            kcExpert.tokenManager().grantToken().expiresIn = 3600
+
+
+            managerToken = kcManager.tokenManager().accessToken.token
+            clientToken = kcClient.tokenManager().accessToken.token
+            expertToken = kcExpert.tokenManager().accessToken.token
+        }
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -43,6 +146,9 @@ class TicketHistoryControllerTests {
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
             registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
+
+            registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
         }
     }
     @LocalServerPort
@@ -63,12 +169,94 @@ class TicketHistoryControllerTests {
     @Test
     @DirtiesContext
     fun getTicketHistoryWithNoFiltersAtAll() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
+
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        profileRepository.delete(manager)
+    }
+
+    @Test
+    @DirtiesContext
+    fun getTicketHistoryWithNoFiltersAtAllForbiddenClient() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
+        val url = "http://localhost:$port/API/ticketing/history/filter"
+        val uri = URI(url)
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(clientToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
+
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+        profileRepository.delete(manager)
+    }
+
+    @Test
+    @DirtiesContext
+    fun getTicketHistoryWithNoFiltersAtAllForbiddenExpert() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
+        val url = "http://localhost:$port/API/ticketing/history/filter"
+        val uri = URI(url)
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(expertToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
+
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     // --------------------------- ticketId
@@ -82,12 +270,20 @@ class TicketHistoryControllerTests {
         customer.surname = "Rossi"
         customer.role = ProfileRole.CUSTOMER
 
+
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
         expert.name = "Mario"
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -135,7 +331,18 @@ class TicketHistoryControllerTests {
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 0)
@@ -147,6 +354,7 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -164,6 +372,13 @@ class TicketHistoryControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -229,7 +444,18 @@ class TicketHistoryControllerTests {
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
@@ -259,6 +485,7 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -276,6 +503,14 @@ class TicketHistoryControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -311,7 +546,18 @@ class TicketHistoryControllerTests {
         val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=2"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 
@@ -320,28 +566,67 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByTicketIdNegative() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=-3"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByTicketIdAlphabetic() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=a"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     // --------------------------- userId
@@ -367,6 +652,13 @@ class TicketHistoryControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(customer2)
         profileRepository.save(expert)
@@ -418,11 +710,22 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2customer2)
         ticketHistoryRepository.save(history3customer2)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?userId=2"
+        val url = "http://localhost:$port/API/ticketing/history/filter?userId=3"
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
@@ -452,6 +755,7 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -469,6 +773,13 @@ class TicketHistoryControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert)
 
@@ -501,10 +812,21 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?userId=3"
+        val url = "http://localhost:$port/API/ticketing/history/filter?userId=4"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 
@@ -514,28 +836,67 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer1)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByUserIdNegative() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?userId=-3"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByUserIdAlphabetic() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?userId=a"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     // --------------------------- currentExpertId
@@ -561,6 +922,14 @@ class TicketHistoryControllerTests {
         expert3.surname = "Bianchi"
         expert3.role = ProfileRole.EXPERT
 
+
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
         profileRepository.save(expert3)
@@ -612,11 +981,22 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2expert3)
         ticketHistoryRepository.save(history3expert3)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=3"
+        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=4"
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
@@ -646,6 +1026,7 @@ class TicketHistoryControllerTests {
         profileRepository.delete(expert2)
         profileRepository.delete(expert3)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -663,6 +1044,13 @@ class TicketHistoryControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert)
 
@@ -695,10 +1083,21 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=3"
+        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=4"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 
@@ -708,28 +1107,67 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer1)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByCurrentExpertIdNegative() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=-3"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByCurrentExpertIdAlphabetic() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=a"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     // --------------------------- updatedAfter & updatedBefore
@@ -749,6 +1187,13 @@ class TicketHistoryControllerTests {
         expert2.surname = "Verdi"
         expert2.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
@@ -803,7 +1248,18 @@ class TicketHistoryControllerTests {
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
@@ -832,6 +1288,7 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -849,6 +1306,13 @@ class TicketHistoryControllerTests {
         expert2.surname = "Verdi"
         expert2.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
@@ -903,7 +1367,18 @@ class TicketHistoryControllerTests {
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 1)
@@ -924,6 +1399,7 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -941,6 +1417,13 @@ class TicketHistoryControllerTests {
         expert2.surname = "Verdi"
         expert2.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
@@ -995,7 +1478,18 @@ class TicketHistoryControllerTests {
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 1)
@@ -1016,6 +1510,7 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -1033,6 +1528,13 @@ class TicketHistoryControllerTests {
         expert2.surname = "Verdi"
         expert2.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
@@ -1087,7 +1589,18 @@ class TicketHistoryControllerTests {
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 0)
@@ -1100,26 +1613,64 @@ class TicketHistoryControllerTests {
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeUnprocessable() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(9).toLocalDateTime()}"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeEqual() {
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         val url = "http://localhost:$port/API/ticketing/history/filter?updatedAfter=${Timestamp(10).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}"
         val uri = URI(url)
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
     }
@@ -1153,6 +1704,13 @@ class TicketHistoryControllerTests {
         expert4.surname = "Viola"
         expert4.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@polito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(customer2)
         profileRepository.save(expert3)
@@ -1234,11 +1792,22 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history4ticket1user1expert4timestamp34)
         ticketHistoryRepository.save(history5ticket1user1expert3timestamp43)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=1&userId=1&currentExpertId=3&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=1&userId=2&currentExpertId=4&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
-        val result = restTemplate.getForEntity(uri, String::class.java)
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(managerToken)
+
+        val entity = HttpEntity(null, headers)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String::class.java
+        )
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
@@ -1272,5 +1841,6 @@ class TicketHistoryControllerTests {
         profileRepository.delete(expert3)
         profileRepository.delete(expert4)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 }
