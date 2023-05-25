@@ -31,11 +31,11 @@ class MessageServiceImpl(
     override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
         val ticket = getTicket(ticketId, userEmail)
         val user = profileRepository.findByEmail(userEmail)?:
-            throw UnauthorizedMessageException("It's not possible to get a chat if user is not registered")
+            throw ForbiddenException("It's not possible to get a chat if user is not registered")
         val customerOfTicket = ticket.customer!!
         val expertOfTicket = ticket.expert!!
         if(user != customerOfTicket && user != expertOfTicket && user.role != ProfileRole.MANAGER)
-            throw UnauthorizedMessageException("It's not possible to get a chat of a ticket in which you are not participating")
+            throw ForbiddenException("It's not possible to get a chat of a ticket in which you are not participating")
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
@@ -49,7 +49,7 @@ class MessageServiceImpl(
         val customerOfTicket = ticket.customer!!
         val expertOfTicket = ticket.expert!!
         if(user != customerOfTicket && user != expertOfTicket && user.role != ProfileRole.MANAGER)
-            throw UnauthorizedMessageException("It's not possible to get a chat of a ticket in which you are not participating")
+            throw ForbiddenException("It's not possible to get a chat of a ticket in which you are not participating")
 
         val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
         val sender = getProfile(messageDTO.senderId)
