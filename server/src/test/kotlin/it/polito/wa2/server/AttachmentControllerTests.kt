@@ -195,6 +195,13 @@ class AttachmentControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -253,6 +260,7 @@ class AttachmentControllerTests {
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
+        profileRepository.delete(manager)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
@@ -275,6 +283,13 @@ class AttachmentControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -339,6 +354,7 @@ class AttachmentControllerTests {
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
+        profileRepository.delete(manager)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
@@ -360,6 +376,13 @@ class AttachmentControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -425,6 +448,7 @@ class AttachmentControllerTests {
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
+        profileRepository.delete(manager)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -445,6 +469,13 @@ class AttachmentControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -506,6 +537,7 @@ class AttachmentControllerTests {
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
+        profileRepository.delete(manager)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -526,6 +558,13 @@ class AttachmentControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -593,6 +632,7 @@ class AttachmentControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -611,6 +651,13 @@ class AttachmentControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -674,11 +721,20 @@ class AttachmentControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getWrongIdAttachment() {
+
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
 
         val url = "http://localhost:$port/API/attachment/_abc"
         val uri = URI(url)
@@ -697,11 +753,20 @@ class AttachmentControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getNegativeIdAttachment() {
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
 
         val url = "http://localhost:$port/API/attachment/-1"
         val uri = URI(url)
@@ -720,11 +785,20 @@ class AttachmentControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getNonExistingAttachment() {
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
 
         val url = "http://localhost:$port/API/attachment/1"
         val uri = URI(url)
@@ -744,6 +818,7 @@ class AttachmentControllerTests {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 
+        profileRepository.delete(manager)
     }
 
 }
