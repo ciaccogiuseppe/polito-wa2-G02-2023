@@ -196,7 +196,7 @@ class AttachmentControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -284,7 +284,7 @@ class AttachmentControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -377,7 +377,7 @@ class AttachmentControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -470,7 +470,7 @@ class AttachmentControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -559,7 +559,7 @@ class AttachmentControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -652,7 +652,7 @@ class AttachmentControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -729,7 +729,7 @@ class AttachmentControllerTests {
     fun getWrongIdAttachment() {
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -761,7 +761,7 @@ class AttachmentControllerTests {
     @DirtiesContext
     fun getNegativeIdAttachment() {
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -793,7 +793,7 @@ class AttachmentControllerTests {
     @DirtiesContext
     fun getNonExistingAttachment() {
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER

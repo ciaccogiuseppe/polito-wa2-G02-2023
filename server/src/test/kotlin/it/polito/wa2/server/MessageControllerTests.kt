@@ -187,7 +187,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -318,7 +318,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -449,7 +449,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -565,7 +565,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -696,7 +696,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -811,7 +811,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -926,7 +926,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1023,7 +1023,7 @@ class MessageControllerTests {
     @DirtiesContext
     fun getNonExistingChat() {
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1054,7 +1054,7 @@ class MessageControllerTests {
     @DirtiesContext
     fun getWrongIdChat() {
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1097,7 +1097,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1235,7 +1235,7 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1334,7 +1334,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1425,7 +1425,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1523,7 +1523,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
@@ -1614,7 +1614,7 @@ class MessageControllerTests {
         expert.role = ProfileRole.EXPERT
 
         val manager = Profile()
-        manager.email = "manager@plito.it"
+        manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
