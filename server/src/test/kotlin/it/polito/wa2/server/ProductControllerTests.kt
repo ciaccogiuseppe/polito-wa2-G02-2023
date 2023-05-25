@@ -188,7 +188,22 @@ class ProductControllerTests {
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        Assertions.assertEquals(body.size, 3)
+
+        Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
+        Assertions.assertEquals(true, body.any{a -> a["productId"] == product2.productId})
+        Assertions.assertEquals(true, body.any{a -> a["productId"] == product3.productId})
+
+        Assertions.assertEquals(true, body.any{a -> a["name"] == product1.name})
+        Assertions.assertEquals(true, body.any{a -> a["name"] == product2.name})
+        Assertions.assertEquals(true, body.any{a -> a["name"] == product3.name})
+
+        Assertions.assertEquals(true, body.any{a -> a["brand"] == product1.brand})
+        Assertions.assertEquals(true, body.any{a -> a["brand"] == product2.brand})
+        Assertions.assertEquals(true, body.any{a -> a["brand"] == product3.brand})
 
         productRepository.delete(product1)
         productRepository.delete(product2)
@@ -535,9 +550,9 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductUnauthorized() {
-        val url = "http://localhost:$port/API/products/0000000000003"
+        val url = "http://localhost:$port/API/products/0000000000000"
         val uri = URI(url)
-
+        val json = BasicJsonParser()
         val product1 = Product()
         product1.productId = "0000000000000"
         product1.name = "PC Omen Intel i7"
@@ -568,7 +583,12 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+        val body = json.parseMap(result.body)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        Assertions.assertEquals(product1.productId, body["productId"])
+        Assertions.assertEquals(product1.name, body["name"])
+        Assertions.assertEquals(product1.brand, body["brand"])
 
         productRepository.delete(product1)
         productRepository.delete(product2)
