@@ -35,7 +35,7 @@ class MessageServiceImpl(
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
         val ticket = getTicket(ticketId, userEmail)
-        val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
+        val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
         val sender = getProfile(messageDTO.senderId)
         if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
@@ -51,11 +51,11 @@ class MessageServiceImpl(
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 
-    private fun getAttachment(attachmentDTO: AttachmentDTO): Attachment {
+    private fun getAttachment(attachmentDTO: AttachmentDTO, userEmail: String): Attachment {
         var attachmentId = attachmentDTO.attachmentId
         if(attachmentId == null)
             attachmentId = attachmentService.addAttachment(attachmentDTO)
-        val newAttachmentDTO = attachmentService.getAttachment(attachmentId)
+        val newAttachmentDTO = attachmentService.getAttachment(attachmentId, userEmail)
         return attachmentRepository.findByIdOrNull(newAttachmentDTO.attachmentId)!!
     }
 
