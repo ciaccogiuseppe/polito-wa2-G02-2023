@@ -192,6 +192,20 @@ class MessageControllerTests {
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+        val customer2 = Profile()
+        customer2.email = "client@polito.it"
+        customer2.name = "Mario"
+        customer2.surname = "Rossi"
+        customer2.role = ProfileRole.CUSTOMER
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer2)
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -323,6 +337,15 @@ class MessageControllerTests {
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -448,12 +471,28 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+
+
         val manager = Profile()
         manager.email = "manager@polito.it"
         manager.name = "Manager"
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+        val customer2 = Profile()
+        customer2.email = "client@polito.it"
+        customer2.name = "Mario"
+        customer2.surname = "Rossi"
+        customer2.role = ProfileRole.CUSTOMER
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer2)
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -701,6 +740,20 @@ class MessageControllerTests {
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+        val customer2 = Profile()
+        customer2.email = "client@polito.it"
+        customer2.name = "Mario"
+        customer2.surname = "Rossi"
+        customer2.role = ProfileRole.CUSTOMER
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer2)
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -816,6 +869,20 @@ class MessageControllerTests {
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+        val customer2 = Profile()
+        customer2.email = "client@polito.it"
+        customer2.name = "Mario"
+        customer2.surname = "Rossi"
+        customer2.role = ProfileRole.CUSTOMER
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer2)
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -931,6 +998,20 @@ class MessageControllerTests {
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+        val customer2 = Profile()
+        customer2.email = "client@polito.it"
+        customer2.name = "Mario"
+        customer2.surname = "Rossi"
+        customer2.role = ProfileRole.CUSTOMER
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer2)
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -1339,6 +1420,21 @@ class MessageControllerTests {
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+
+        val customer2 = Profile()
+        customer2.email = "client@polito.it"
+        customer2.name = "Mario"
+        customer2.surname = "Rossi"
+        customer2.role = ProfileRole.CUSTOMER
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer2)
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -1528,6 +1624,20 @@ class MessageControllerTests {
         manager.surname = "Polito"
         manager.role = ProfileRole.MANAGER
 
+        val customer2 = Profile()
+        customer2.email = "client@polito.it"
+        customer2.name = "Mario"
+        customer2.surname = "Rossi"
+        customer2.role = ProfileRole.CUSTOMER
+
+        val expert2 = Profile()
+        expert2.email = "expert@polito.it"
+        expert2.name = "Mario"
+        expert2.surname = "Bianchi"
+        expert2.role = ProfileRole.EXPERT
+
+        profileRepository.save(customer2)
+        profileRepository.save(expert2)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
