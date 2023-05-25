@@ -1,9 +1,11 @@
 package it.polito.wa2.server.ticketing.message
 
 import it.polito.wa2.server.BadRequestMessageException
+import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnauthorizedMessageException
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
+import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.attachment.AttachmentDTO
@@ -28,6 +30,12 @@ class MessageServiceImpl(
     @Transactional(readOnly = true)
     override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
         val ticket = getTicket(ticketId, userEmail)
+        val user = profileRepository.findByEmail(userEmail)?:
+            throw UnauthorizedMessageException("It's not possible to get a chat if user is not registered")
+        val customerOfTicket = ticket.customer!!
+        val expertOfTicket = ticket.expert!!
+        if(user != customerOfTicket && user != expertOfTicket && user.role != ProfileRole.MANAGER)
+            throw UnauthorizedMessageException("It's not possible to get a chat of a ticket in which you are not participating")
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
@@ -35,6 +43,14 @@ class MessageServiceImpl(
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
         val ticket = getTicket(ticketId, userEmail)
+
+        val user = profileRepository.findByEmail(userEmail)?:
+            throw ForbiddenException("It's not possible to get a chat if user is not registered")
+        val customerOfTicket = ticket.customer!!
+        val expertOfTicket = ticket.expert!!
+        if(user != customerOfTicket && user != expertOfTicket && user.role != ProfileRole.MANAGER)
+            throw UnauthorizedMessageException("It's not possible to get a chat of a ticket in which you are not participating")
+
         val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
         val sender = getProfile(messageDTO.senderId)
         if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
