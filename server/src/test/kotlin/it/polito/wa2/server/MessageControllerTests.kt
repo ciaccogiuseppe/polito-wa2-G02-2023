@@ -850,7 +850,7 @@ class MessageControllerTests {
 
     @Test
     @DirtiesContext
-    fun getExistingMessagesForbidden() {
+    fun getExistingMessagesUnauthorized() {
         val customer = Profile()
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
@@ -963,7 +963,7 @@ class MessageControllerTests {
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
 
         messageRepository.delete(message4)
         messageRepository.delete(message3)
