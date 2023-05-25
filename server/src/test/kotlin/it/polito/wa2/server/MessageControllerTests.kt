@@ -186,6 +186,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -291,6 +298,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
+        profileRepository.delete(manager)
         productRepository.delete(product)
     }
 
@@ -309,6 +317,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -414,6 +429,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
+        profileRepository.delete(manager)
         productRepository.delete(product)
     }
 
@@ -432,6 +448,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -522,6 +545,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
+        profileRepository.delete(manager)
         productRepository.delete(product)
     }
 
@@ -540,6 +564,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -644,6 +675,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
+        profileRepository.delete(manager)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -663,6 +695,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -752,6 +791,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
+        profileRepository.delete(manager)
         productRepository.delete(product)
     }
 
@@ -770,6 +810,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -859,6 +906,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
+        profileRepository.delete(manager)
         productRepository.delete(product)
     }
 
@@ -877,6 +925,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -961,11 +1016,19 @@ class MessageControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getNonExistingChat() {
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
 
         val url = "http://localhost:$port/API/chat/1"
         val uri = URI(url)
@@ -984,11 +1047,19 @@ class MessageControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     @Test
     @DirtiesContext
     fun getWrongIdChat() {
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
 
         val url = "http://localhost:$port/API/chat/abc"
         val uri = URI(url)
@@ -1006,6 +1077,8 @@ class MessageControllerTests {
             String::class.java
         )
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
+        profileRepository.delete(manager)
     }
 
     @Test
@@ -1022,6 +1095,14 @@ class MessageControllerTests {
         expert.name = "Mario"
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
+
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
 
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -1133,6 +1214,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
+        profileRepository.delete(manager)
         productRepository.delete(product)
     }
 
@@ -1140,6 +1222,7 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun addMessageSuccessfulAuthorizedClient() {
+
         val customer = Profile()
         customer.email = "client@polito.it"
         customer.name = "Mario"
@@ -1151,6 +1234,13 @@ class MessageControllerTests {
         expert.name = "Mario"
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
 
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -1224,6 +1314,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
+        profileRepository.delete(manager)
         productRepository.delete(product)
     }
 
@@ -1242,6 +1333,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -1306,6 +1404,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
+        profileRepository.delete(manager)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -1325,6 +1424,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -1396,6 +1502,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
+        profileRepository.delete(manager)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -1415,6 +1522,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -1479,6 +1593,7 @@ class MessageControllerTests {
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
         profileRepository.delete(customer)
+        profileRepository.delete(manager)
         profileRepository.delete(expert)
         productRepository.delete(product)
     }
@@ -1498,6 +1613,13 @@ class MessageControllerTests {
         expert.surname = "Bianchi"
         expert.role = ProfileRole.EXPERT
 
+        val manager = Profile()
+        manager.email = "manager@plito.it"
+        manager.name = "Manager"
+        manager.surname = "Polito"
+        manager.role = ProfileRole.MANAGER
+
+        profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
@@ -1538,6 +1660,7 @@ class MessageControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        profileRepository.delete(manager)
     }
 
     /*@Test
