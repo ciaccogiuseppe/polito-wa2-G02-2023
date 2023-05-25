@@ -1,5 +1,6 @@
 package it.polito.wa2.server.profiles
 
+import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.DuplicateProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import org.springframework.data.repository.findByIdOrNull
@@ -32,8 +33,8 @@ class ProfileServiceImpl(
     override fun updateProfile(email: String, newProfileDTO: ProfileDTO) {
         val profile = profileRepository.findByEmail(email)
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
-        if(email != newProfileDTO.email && profileRepository.findByEmail(newProfileDTO.email) != null)
-            throw DuplicateProfileException("Profile with email '${newProfileDTO.email}' already exists")
+        if(email != newProfileDTO.email)
+            throw BadRequestProfileException("Email in path doesn't match the email in the body")
         profile.email = newProfileDTO.email
         profile.name = newProfileDTO.name
         profile.surname = newProfileDTO.surname
