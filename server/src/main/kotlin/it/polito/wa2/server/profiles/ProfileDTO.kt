@@ -22,7 +22,7 @@ data class ProfileDTO(
 )
 
 fun Profile.toDTO(): ProfileDTO {
-    return ProfileDTO(email, name, surname, profileId)
+    return ProfileDTO(email, name, surname, this.getId())
 }
 
 fun ProfileDTO.toNewProfile(): Profile {

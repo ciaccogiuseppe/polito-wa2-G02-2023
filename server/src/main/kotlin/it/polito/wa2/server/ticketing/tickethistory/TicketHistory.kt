@@ -34,13 +34,4 @@ class TicketHistory:EntityBase<Long>() {
 
 
 
-    /*@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_history_generator")
-    @SequenceGenerator(name = "ticket_history_generator",
-        sequenceName = "tickets_history_id_seq",
-        initialValue = 1,
-        allocationSize = 1
-    )
-    @Column(updatable = false, nullable = false)
-    var historyId : Long? = null*/
 }

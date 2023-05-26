@@ -28,14 +28,4 @@ class Message: EntityBase<Long>() {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     var sentTimestamp : Timestamp? = null
-
-    /*@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_generator")
-    @SequenceGenerator(name = "message_generator",
-        sequenceName = "messages_id_seq",
-        initialValue = 1,
-        allocationSize = 1
-    )
-    @Column(updatable = false, nullable = false)
-    var messageId : Long? = null*/
 }

@@ -43,15 +43,6 @@ class Ticket:EntityBase<Long>() {
     var history = mutableListOf<TicketHistory>()
 
 
-    /*@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_generator")
-    @SequenceGenerator(name = "ticket_generator",
-        sequenceName = "tickets_id_seq",
-        initialValue = 1,
-        allocationSize = 1
-    )
-    @Column(updatable = false, nullable = false)
-    var ticketId : Long? = null*/
 
 
 }
