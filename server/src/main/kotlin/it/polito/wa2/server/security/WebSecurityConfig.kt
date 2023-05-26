@@ -46,6 +46,8 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.GET, "/API/products/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/login").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/manager/attachment/**").hasRole(MANAGER)
+            .requestMatchers(HttpMethod.GET, "/API/manager/chat/**").hasRole(MANAGER)
+            .requestMatchers(HttpMethod.POST, "/API/manager/chat/**").hasRole(MANAGER)
             .anyRequest().authenticated()
         httpSecurity.oauth2ResourceServer()
             .jwt()

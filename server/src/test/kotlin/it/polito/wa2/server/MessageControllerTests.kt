@@ -269,7 +269,7 @@ class MessageControllerTests {
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/manager/chat/${ticket.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
