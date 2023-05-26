@@ -4,7 +4,6 @@ package it.polito.wa2.server.ticketing.attachment
 import it.polito.wa2.server.AttachmentNotFoundException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.profiles.ProfileRepository
-import it.polito.wa2.server.profiles.ProfileRole
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,8 +21,15 @@ class AttachmentServiceImpl(
         val ticket = attachment.message!!.ticket!!
         val customerOfAttachment = ticket.customer!!
         val expertOfAttachment = ticket.expert!!
-        if(user != customerOfAttachment && user != expertOfAttachment && user.role != ProfileRole.MANAGER)
+        if(user != customerOfAttachment && user != expertOfAttachment)
             throw ForbiddenException("It's not possible to get an attachment of a message belonging to a ticket in which you are not participating")
+        return attachment.toDTO()
+    }
+
+    @Transactional(readOnly = true)
+    override fun getAttachmentManager(attachmentID: Long): AttachmentDTO {
+        val attachment = attachmentRepository.findByIdOrNull(attachmentID)?:
+            throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
         return attachment.toDTO()
     }
 

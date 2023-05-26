@@ -327,7 +327,7 @@ class AttachmentControllerTests {
 
         attachmentRepository.save(attachment)
 
-        val url = "http://localhost:$port/API/attachment/${attachment.attachmentId}"
+        val url = "http://localhost:$port/API/manager/attachment/${attachment.attachmentId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 

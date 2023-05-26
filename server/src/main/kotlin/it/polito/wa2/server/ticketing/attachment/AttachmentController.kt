@@ -18,4 +18,11 @@ class AttachmentController (private val attachmentService : AttachmentService) {
             throw UnprocessableAttachmentException("Wrong attachment id value")
         return attachmentService.getAttachment(attachmentId, userEmail)
     }
+
+    @GetMapping("/API/manager/attachment/{attachmentId}")
+    fun getAttachmentManager(principal: Principal, @PathVariable attachmentId: Long) : AttachmentDTO {
+        if(attachmentId <= 0)
+            throw UnprocessableAttachmentException("Wrong attachment id value")
+        return attachmentService.getAttachmentManager(attachmentId)
+    }
 }
