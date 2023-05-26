@@ -268,7 +268,7 @@ class TicketHistoryControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -364,7 +364,7 @@ class TicketHistoryControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -495,7 +495,7 @@ class TicketHistoryControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -638,13 +638,13 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "luigi.verdi@polito.it"
         customer2.name = "Luigi"
         customer2.surname = "Verdi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -765,7 +765,7 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -908,7 +908,7 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "luigi.verdi@polito.it"
@@ -1036,7 +1036,7 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1179,7 +1179,7 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "luigi.verdi@polito.it"
@@ -1298,7 +1298,7 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "luigi.verdi@polito.it"
@@ -1409,7 +1409,7 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "luigi.verdi@polito.it"
@@ -1520,7 +1520,7 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "luigi.verdi@polito.it"
@@ -1684,13 +1684,13 @@ class TicketHistoryControllerTests {
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
         customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CUSTOMER
+        customer1.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "luigi.verdi@polito.it"
         customer2.name = "Luigi"
         customer2.surname = "Verdi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert3 = Profile()
         expert3.email = "mario.bianchi@polito.it"

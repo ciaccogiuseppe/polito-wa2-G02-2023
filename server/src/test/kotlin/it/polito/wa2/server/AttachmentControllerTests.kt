@@ -14,16 +14,12 @@ import it.polito.wa2.server.ticketing.message.MessageRepository
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
-import org.apache.http.client.utils.URIBuilder
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.keycloak.admin.client.Config
 import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.representations.idm.CredentialRepresentation
-import org.keycloak.representations.idm.RoleRepresentation
 import org.keycloak.representations.idm.UserRepresentation
-import org.keycloak.representations.idm.UserSessionRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -34,8 +30,6 @@ import org.springframework.http.*
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -187,7 +181,7 @@ class AttachmentControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -275,7 +269,7 @@ class AttachmentControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -368,7 +362,7 @@ class AttachmentControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -461,7 +455,7 @@ class AttachmentControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -550,7 +544,7 @@ class AttachmentControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "expert@polito.it"
@@ -643,7 +637,7 @@ class AttachmentControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"

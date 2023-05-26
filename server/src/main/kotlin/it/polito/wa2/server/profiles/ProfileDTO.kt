@@ -30,6 +30,6 @@ fun ProfileDTO.toNewProfile(): Profile {
     profile.email = email
     profile.name = name
     profile.surname = surname
-    profile.role = ProfileRole.CUSTOMER
+    profile.role = ProfileRole.CLIENT
     return profile
 }

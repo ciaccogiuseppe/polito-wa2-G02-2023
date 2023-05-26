@@ -57,7 +57,7 @@ class MessageServiceImpl(
             throw ForbiddenException("It's not possible to get a chat of a ticket in which you are not participating")
 
         val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
-        val sender = getProfile(messageDTO.senderId)
+        val sender = getProfileByEmail(messageDTO.senderEmail)
         if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
@@ -72,7 +72,7 @@ class MessageServiceImpl(
         val ticket = getTicket(ticketId, userEmail)
 
         val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
-        val sender = getProfile(messageDTO.senderId)
+        val sender = getProfileByEmail(messageDTO.senderEmail)
         if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
@@ -96,6 +96,11 @@ class MessageServiceImpl(
 
     private fun getProfile(profileId: Long): Profile {
         val profileDTO = profileService.getProfileById(profileId)
+        return profileRepository.findByEmail(profileDTO.email)!!
+    }
+
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 }

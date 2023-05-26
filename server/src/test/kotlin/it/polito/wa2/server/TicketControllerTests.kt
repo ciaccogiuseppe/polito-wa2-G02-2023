@@ -170,7 +170,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -249,7 +249,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -328,7 +328,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "expert@polito.it"
@@ -407,7 +407,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -477,7 +477,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -612,13 +612,13 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "client2@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "client3@polito.it"
@@ -726,13 +726,13 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -840,13 +840,13 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -952,13 +952,13 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1066,13 +1066,13 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1180,13 +1180,13 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1294,13 +1294,13 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1408,13 +1408,13 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1528,13 +1528,13 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1647,13 +1647,13 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "mario.blu@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Blu"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1768,7 +1768,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -1857,7 +1857,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -1928,7 +1928,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2050,7 +2050,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2121,7 +2121,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2192,7 +2192,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2277,7 +2277,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2358,7 +2358,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2428,7 +2428,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2498,7 +2498,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2577,7 +2577,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2643,7 +2643,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2713,7 +2713,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2780,7 +2780,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2854,7 +2854,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -2928,7 +2928,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3002,7 +3002,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3076,7 +3076,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3141,7 +3141,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3207,7 +3207,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3281,7 +3281,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3355,7 +3355,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3429,7 +3429,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3503,7 +3503,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3577,7 +3577,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3643,13 +3643,13 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val customer2 = Profile()
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3717,7 +3717,7 @@ class TicketControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3791,7 +3791,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3865,7 +3865,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -3939,7 +3939,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4013,7 +4013,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4087,7 +4087,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4161,7 +4161,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4235,7 +4235,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4309,7 +4309,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4383,7 +4383,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "expert@polito.it"
@@ -4448,7 +4448,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4522,7 +4522,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4596,7 +4596,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4662,7 +4662,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4728,7 +4728,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4794,7 +4794,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4860,7 +4860,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4926,7 +4926,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -4992,7 +4992,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()
@@ -5058,7 +5058,7 @@ class TicketControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
 
         val expert = Profile()

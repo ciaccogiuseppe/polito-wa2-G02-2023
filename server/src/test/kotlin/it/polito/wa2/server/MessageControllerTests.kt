@@ -178,7 +178,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -196,7 +196,7 @@ class MessageControllerTests {
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "expert@polito.it"
@@ -301,8 +301,8 @@ class MessageControllerTests {
 
         Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.ticketId})
 
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == customer.profileId})
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == expert.profileId})
+        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
+        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
 
         messageRepository.delete(message4)
         messageRepository.delete(message3)
@@ -323,7 +323,7 @@ class MessageControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -441,8 +441,8 @@ class MessageControllerTests {
 
         Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.ticketId})
 
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == customer.profileId})
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == expert.profileId})
+        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
+        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
 
         messageRepository.delete(message4)
         messageRepository.delete(message3)
@@ -463,7 +463,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -483,7 +483,7 @@ class MessageControllerTests {
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "expert@polito.it"
@@ -595,7 +595,7 @@ class MessageControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "expert@polito.it"
@@ -704,8 +704,8 @@ class MessageControllerTests {
 
         Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.ticketId})
 
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == customer.profileId})
-        Assertions.assertEquals(true, body.any{a -> a["senderId"] == expert.profileId})
+        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
+        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
 
         messageRepository.delete(message4)
         messageRepository.delete(message3)
@@ -726,7 +726,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -744,7 +744,7 @@ class MessageControllerTests {
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "expert@polito.it"
@@ -855,7 +855,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -873,7 +873,7 @@ class MessageControllerTests {
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "expert@polito.it"
@@ -984,7 +984,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1002,7 +1002,7 @@ class MessageControllerTests {
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "expert@polito.it"
@@ -1169,7 +1169,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1275,9 +1275,9 @@ class MessageControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(1, body.size)
 
         Assertions.assertEquals(
@@ -1308,7 +1308,7 @@ class MessageControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1359,7 +1359,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             ticket.ticketId!!,
-            customer.profileId!!,
+            customer.email,
             "message text",
             Timestamp(1),
             mutableSetOf()
@@ -1406,7 +1406,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1425,7 +1425,7 @@ class MessageControllerTests {
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "expert@polito.it"
@@ -1472,7 +1472,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             ticket.ticketId!!,
-            customer.profileId!!,
+            customer.email!!,
             "message text",
             Timestamp(1),
             mutableSetOf()
@@ -1512,7 +1512,7 @@ class MessageControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "expert@polito.it"
@@ -1563,7 +1563,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             ticket.ticketId!!,
-            customer.profileId!!,
+            customer.email!!,
             "message text",
             Timestamp(1),
             mutableSetOf()
@@ -1610,7 +1610,7 @@ class MessageControllerTests {
         customer.email = "mario.rossi@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1628,7 +1628,7 @@ class MessageControllerTests {
         customer2.email = "client@polito.it"
         customer2.name = "Mario"
         customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CUSTOMER
+        customer2.role = ProfileRole.CLIENT
 
         val expert2 = Profile()
         expert2.email = "expert@polito.it"
@@ -1675,7 +1675,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             ticket.ticketId!!,
-            customer.profileId!!,
+            customer.email!!,
             "message text",
             Timestamp(1),
             mutableSetOf()
@@ -1715,7 +1715,7 @@ class MessageControllerTests {
         customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
+        customer.role = ProfileRole.CLIENT
 
         val expert = Profile()
         expert.email = "mario.bianchi@polito.it"
@@ -1744,7 +1744,7 @@ class MessageControllerTests {
         val message = MessageDTO(
             null,
             25,
-            customer.profileId!!,
+            customer.email!!,
             "message text",
             Timestamp(0),
             mutableSetOf()
