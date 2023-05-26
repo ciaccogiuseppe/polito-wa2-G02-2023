@@ -4,9 +4,35 @@ import java.sql.Timestamp
 
 
 interface TicketService {
-    fun getTicket(ticketId: Long, userEmail: String): TicketDTO
+    fun managerGetTicket(ticketId: Long, managerEmail: String): TicketDTO
+    fun clientGetTicket(ticketId: Long, clientEmail: String): TicketDTO
+    fun expertGetTicket(ticketId: Long, expertEmail: String): TicketDTO
 
-    fun getTicketsFiltered(
+    fun clientGetTicketsFiltered(
+        customerEmail: String?,
+        minPriority: Int?,
+        maxPriority: Int?,
+        productId: String?,
+        createdAfter: Timestamp?,
+        createdBefore: Timestamp?,
+        expertEmail: String?,
+        status: List<TicketStatus>?,
+        userEmail: String
+    ): List<TicketDTO>
+
+    fun expertGetTicketsFiltered(
+        customerEmail: String?,
+        minPriority: Int?,
+        maxPriority: Int?,
+        productId: String?,
+        createdAfter: Timestamp?,
+        createdBefore: Timestamp?,
+        expertEmail: String?,
+        status: List<TicketStatus>?,
+        userEmail: String
+    ): List<TicketDTO>
+
+    fun managerGetTicketsFiltered(
         customerEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,

@@ -208,7 +208,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/manager/ticketing/${ticket.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -287,7 +287,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/client/ticketing/${ticket.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -366,7 +366,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/expert/ticketing/${ticket.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -445,7 +445,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/client/ticketing/${ticket.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -515,7 +515,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/expert/ticketing/${ticket.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -551,7 +551,7 @@ class TicketControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/1"
+        val url = "http://localhost:$port/API/manager/ticketing/1"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -584,7 +584,7 @@ class TicketControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/abc"
+        val url = "http://localhost:$port/API/manager/ticketing/abc"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -686,7 +686,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?customerEmail=${customer.email}"
+        val url = "http://localhost:$port/API/manager/ticketing/filter?customerEmail=${customer.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -800,7 +800,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?customerEmail=${customer.email}"
+        val url = "http://localhost:$port/API/client/ticketing/filter?customerEmail=${customer.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -816,7 +816,7 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-        println(result.body)
+
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
@@ -837,7 +837,7 @@ class TicketControllerTests {
     @DirtiesContext
     fun getFilteredTicketsSingleCustomerFilterOtherClient(){
         val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
+        customer.email = "client@polito.it"
         customer.name = "Mario"
         customer.surname = "Rossi"
         customer.role = ProfileRole.CUSTOMER
@@ -914,7 +914,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?customerEmail=${customer.email}"
+        val url = "http://localhost:$port/API/client/ticketing/filter?customerEmail=${customer2.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1026,7 +1026,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert2.email}"
+        val url = "http://localhost:$port/API/manager/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert2.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1140,7 +1140,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert2.email}"
+        val url = "http://localhost:$port/API/client/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert2.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1254,7 +1254,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/filter?createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1368,7 +1368,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?minPriority=2&maxPriority=3"
+        val url = "http://localhost:$port/API/manager/ticketing/filter?minPriority=2&maxPriority=3"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1488,7 +1488,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?productId=0000000000001"
+        val url = "http://localhost:$port/API/manager/ticketing/filter?productId=0000000000001"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1608,7 +1608,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?status=IN_PROGRESS"
+        val url = "http://localhost:$port/API/manager/ticketing/filter?status=IN_PROGRESS"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1727,7 +1727,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val url = "http://localhost:$port/API/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert.email}&status=OPEN&productId=0000000000000&minPriority=1&maxPriority=2&createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert.email}&status=OPEN&productId=0000000000000&minPriority=1&maxPriority=2&createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -4384,7 +4384,6 @@ class TicketControllerTests {
         customer.name = "Mario"
         customer.surname = "Rossi"
         customer.role = ProfileRole.CUSTOMER
-
 
         val expert = Profile()
         expert.email = "expert@polito.it"

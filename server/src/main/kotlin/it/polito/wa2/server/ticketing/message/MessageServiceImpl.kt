@@ -63,7 +63,7 @@ class MessageServiceImpl(
     }
 
     private fun getTicket(ticketId: Long, userEmail: String): Ticket {
-        val ticketDTO = ticketService.getTicket(ticketId, userEmail)
+        val ticketDTO = ticketService.managerGetTicket(ticketId, userEmail)
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 
