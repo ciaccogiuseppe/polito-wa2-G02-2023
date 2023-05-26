@@ -60,6 +60,7 @@ tasks.withType<Test> {
 
 tasks.named("jibDockerBuild"){
 	jib.container.ports = listOf("8080")
+	jib.to.image = "ticketing"
 }
 
 dependencyManagement {
