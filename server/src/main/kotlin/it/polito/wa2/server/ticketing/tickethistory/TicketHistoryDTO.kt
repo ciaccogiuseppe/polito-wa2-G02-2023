@@ -13,9 +13,9 @@ data class TicketHistoryDTO(
     val ticketId: Long,
     @field:NotBlank(message="email is mandatory")
     @field:Positive
-    val userId: Long,
+    val userEmail: String,
     @field:Positive
-    val currentExpertId: Long?,
+    val currentExpertEmail: String?,
     val updatedTimestamp: Timestamp?,
     val oldState: TicketStatus,
     val newState: TicketStatus,
@@ -24,9 +24,9 @@ data class TicketHistoryDTO(
 )
 
 fun TicketHistory.toDTO(): TicketHistoryDTO {
-    return TicketHistoryDTO(ticket?.ticketId!!,
-        user?.profileId!!, currentExpert?.profileId, updatedTimestamp,
-        oldState, newState, historyId)
+    return TicketHistoryDTO(ticket?.getId()!!,
+        user?.email!!, currentExpert?.email, updatedTimestamp,
+        oldState, newState, this.getId())
 }
 
 fun newTicketHistory(

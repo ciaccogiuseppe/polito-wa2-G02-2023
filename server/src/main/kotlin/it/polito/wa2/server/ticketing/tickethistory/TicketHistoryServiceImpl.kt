@@ -27,21 +27,22 @@ class TicketHistoryServiceImpl(
     @Transactional(readOnly = true)
     override fun getTicketHistoryFiltered(
         ticketId: Long?,
-        userId: Long?,
+        userEmail: String?,
         updatedAfter: Timestamp?,
         updatedBefore: Timestamp?,
-        currentExpertId: Long?
+        currentExpertEmail: String?,
+        loggedUserEmail: String
     ): List<TicketHistoryDTO> {
         var user: Profile? = null
         var currentExpert: Profile? = null
         var ticket: Ticket? = null
 
         if (ticketId != null)
-            ticket = getTicket(ticketId)
-        if (userId != null)
-            user = getProfile(userId)
-        if (currentExpertId != null)
-            currentExpert = getProfile(currentExpertId)
+            ticket = getTicket(ticketId, loggedUserEmail)
+        if (userEmail != null)
+            user = getProfileByEmail(userEmail)
+        if (currentExpertEmail != null)
+            currentExpert = getProfileByEmail(currentExpertEmail)
         return ticketHistoryRepository
             .findAll()
             .filter {
@@ -53,13 +54,13 @@ class TicketHistoryServiceImpl(
             }.map { it.toDTO() }
     }
 
-    private fun getTicket(ticketId: Long): Ticket {
-        val ticketDTO = ticketService.getTicket(ticketId)
+    private fun getTicket(ticketId: Long, userEmail: String): Ticket {
+        val ticketDTO = ticketService.managerGetTicket(ticketId, userEmail)
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 
-    private fun getProfile(profileId: Long): Profile {
-        val profileDTO = profileService.getProfileById(profileId)
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 }

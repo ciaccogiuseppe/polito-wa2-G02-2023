@@ -1,6 +1,7 @@
 package it.polito.wa2.server.ticketing.message
 
 import it.polito.wa2.server.BadRequestMessageException
+import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnauthorizedMessageException
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
@@ -26,41 +27,80 @@ class MessageServiceImpl(
     private val ticketService: TicketService,
     private val attachmentService: AttachmentService): MessageService {
     @Transactional(readOnly = true)
-    override fun getChat(ticketId: Long): List<MessageDTO> {
-        val ticket = getTicket(ticketId)
+    override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
+        val ticket = getTicket(ticketId, userEmail)
+        val user = profileRepository.findByEmail(userEmail)?:
+            throw ForbiddenException("It's not possible to get a chat if user is not registered")
+        val customerOfTicket = ticket.customer!!
+        val expertOfTicket = ticket.expert!!
+        if(user != customerOfTicket && user != expertOfTicket)
+            throw ForbiddenException("It's not possible to get a chat of a ticket in which you are not participating")
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
-    override fun addMessage(ticketId: Long, messageDTO: MessageDTO) {
+    @Transactional(readOnly = true)
+    override fun getChatManager(ticketId: Long, userEmail: String): List<MessageDTO> {
+        val ticket = getTicket(ticketId, userEmail)
+        return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
+    }
+
+    override fun addMessage(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
-        val ticket = getTicket(ticketId)
-        val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
-        val sender = getProfile(messageDTO.senderId)
+        val ticket = getTicket(ticketId, userEmail)
+
+        val user = profileRepository.findByEmail(userEmail)?:
+            throw ForbiddenException("It's not possible to get a chat if user is not registered")
+        val customerOfTicket = ticket.customer!!
+        val expertOfTicket = ticket.expert!!
+        if(user != customerOfTicket && user != expertOfTicket)
+            throw ForbiddenException("It's not possible to get a chat of a ticket in which you are not participating")
+
+        val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
+        val sender = getProfileByEmail(messageDTO.senderEmail)
         if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
         messageRepository.save(message)
         ticket.messages.add(message)
         ticketRepository.save(ticket)
-
     }
 
-    private fun getTicket(ticketId: Long): Ticket {
-        val ticketDTO = ticketService.getTicket(ticketId)
+    override fun addMessageManager(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
+        if(ticketId != messageDTO.ticketId)
+            throw BadRequestMessageException("The ticket ids are different")
+        val ticket = getTicket(ticketId, userEmail)
+
+        val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
+        val sender = getProfileByEmail(messageDTO.senderEmail)
+        if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
+            throw UnauthorizedMessageException("Sender is not related to ticket")
+        val message = messageDTO.toNewMessage(attachments, sender, ticket)
+        messageRepository.save(message)
+        ticket.messages.add(message)
+        ticketRepository.save(ticket)
+    }
+
+    private fun getTicket(ticketId: Long, userEmail: String): Ticket {
+        val ticketDTO = ticketService.managerGetTicket(ticketId, userEmail)
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 
-    private fun getAttachment(attachmentDTO: AttachmentDTO): Attachment {
+    private fun getAttachment(attachmentDTO: AttachmentDTO, userEmail: String): Attachment {
         var attachmentId = attachmentDTO.attachmentId
         if(attachmentId == null)
             attachmentId = attachmentService.addAttachment(attachmentDTO)
-        val newAttachmentDTO = attachmentService.getAttachment(attachmentId)
+        val newAttachmentDTO = attachmentService.getAttachment(attachmentId, userEmail)
         return attachmentRepository.findByIdOrNull(newAttachmentDTO.attachmentId)!!
     }
 
     private fun getProfile(profileId: Long): Profile {
         val profileDTO = profileService.getProfileById(profileId)
+        return profileRepository.findByEmail(profileDTO.email)!!
+    }
+
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 }

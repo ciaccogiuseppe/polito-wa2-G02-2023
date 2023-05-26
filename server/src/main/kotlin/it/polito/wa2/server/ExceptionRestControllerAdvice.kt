@@ -8,6 +8,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice
 class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleUnauthorized(e: ForbiddenException) = ProblemDetail.forStatusAndDetail( HttpStatus.FORBIDDEN, e.message!! )
+
     /************** Product exception handlers **************/
     @ExceptionHandler(ProductNotFoundException::class)
     fun handleProductNotFound(e: ProductNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
@@ -30,6 +33,9 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(BadRequestProfileException::class)
     fun handleProfileBadRequest(e: BadRequestProfileException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
+
+    @ExceptionHandler(LoginFailedException::class)
+    fun handleLoginFailed(e: LoginFailedException) = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.message!! )
 
     /************** Attachment exception handlers **************/
     @ExceptionHandler(AttachmentNotFoundException::class)
@@ -74,3 +80,5 @@ class UnprocessableMessageException(message: String): RuntimeException(message)
 class BadRequestMessageException(message: String): RuntimeException(message)
 class UnauthorizedMessageException(message: String): RuntimeException(message)
 class BadRequestFilterException(message: String): RuntimeException(message)
+class LoginFailedException(message: String): RuntimeException(message)
+class ForbiddenException(message: String): RuntimeException(message)

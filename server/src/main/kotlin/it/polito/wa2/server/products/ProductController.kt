@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController
 @CrossOrigin(origins =["http://localhost:3000"])
 @RestController
 class ProductController(private val productService: ProductService) {
-    @GetMapping("/API/products/")
+    @GetMapping("/API/public/products/")
     fun getAllProducts(): List<ProductDTO> = productService.getAllProducts()
 
-    @GetMapping("/API/products/{productId}")
+    @GetMapping("/API/public/products/{productId}")
     fun getProduct(@PathVariable productId: String): ProductDTO {
         if (!productId.matches("\\d{13}".toRegex()))
             throw UnprocessableProductException("Wrong format for productId")

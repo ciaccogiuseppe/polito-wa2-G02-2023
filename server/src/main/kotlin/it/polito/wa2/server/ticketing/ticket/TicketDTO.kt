@@ -17,10 +17,10 @@ data class TicketDTO(
     val priority: Int?,
     @field:Size(min = 13, max = 13)
     val productId: String,
-    @field:Positive
-    val customerId: Long?,
-    @field:Positive
-    val expertId: Long?,
+    //@field:Positive
+    val customerEmail: String?,
+    //@field:Positive
+    val expertEmail: String?,
     val status: TicketStatus?,
     val createdTimestamp: Timestamp?
 )
@@ -28,8 +28,8 @@ data class TicketDTO(
 data class TicketAssignDTO(
     @field:Positive
     val ticketId : Long,
-    @field:Positive
-    val expertId: Long,
+    //@field:Positive
+    val expertEmail: String,
     @field:PositiveOrZero
     val priority: Int
 )
@@ -42,13 +42,13 @@ data class TicketUpdateDTO(
 
 fun Ticket.toDTO(): TicketDTO {
     return TicketDTO(
-        ticketId,
+        this.getId(),
         title,
         description,
         priority,
         product?.productId!!,
-        customer?.profileId,
-        expert?.profileId,
+        customer?.email,
+        expert?.email,
         status,
         createdTimestamp
     )

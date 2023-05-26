@@ -34,7 +34,7 @@ data class AttachmentDTO(
 }
 
 fun Attachment.toDTO() : AttachmentDTO{
-    return AttachmentDTO(attachmentId, attachment, name)
+    return AttachmentDTO(this.getId(), attachment, name)
 }
 
 fun AttachmentDTO.toNewAttachment(): Attachment{
