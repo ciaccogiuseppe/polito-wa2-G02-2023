@@ -1,5 +1,6 @@
 package it.polito.wa2.server.profiles
 
+import it.polito.wa2.server.EntityBase
 import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
@@ -7,16 +8,8 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name="profiles")
-class Profile {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_generator")
-    @SequenceGenerator(name = "profile_generator",
-        sequenceName = "profiles_id_seq",
-        initialValue = 1,
-        allocationSize = 1
-    )
-    @Column(updatable = false, nullable = false)
-    var profileId : Long? = null
+class Profile : EntityBase<Long>() {
+
     @Column(nullable=false, unique = true)
     var email: String = ""
     @Column(nullable = false)

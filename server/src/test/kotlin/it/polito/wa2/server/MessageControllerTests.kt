@@ -269,7 +269,7 @@ class MessageControllerTests {
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/manager/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/manager/chat/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -294,12 +294,12 @@ class MessageControllerTests {
         Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
         Assertions.assertEquals(true, body.any{a -> a["text"] == message3.text})
 
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.messageId})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.messageId})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.messageId})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.getId()})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.getId()})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.getId()})
 
 
-        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.ticketId})
+        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.getId()})
 
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
@@ -409,7 +409,7 @@ class MessageControllerTests {
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -434,12 +434,12 @@ class MessageControllerTests {
         Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
         Assertions.assertEquals(true, body.any{a -> a["text"] == message3.text})
 
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.messageId})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.messageId})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.messageId})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.getId()})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.getId()})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.getId()})
 
 
-        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.ticketId})
+        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.getId()})
 
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
@@ -556,7 +556,7 @@ class MessageControllerTests {
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -672,7 +672,7 @@ class MessageControllerTests {
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -697,12 +697,12 @@ class MessageControllerTests {
         Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
         Assertions.assertEquals(true, body.any{a -> a["text"] == message3.text})
 
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.messageId})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.messageId})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.messageId})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.getId()})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.getId()})
+        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.getId()})
 
 
-        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.ticketId})
+        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.getId()})
 
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
@@ -817,7 +817,7 @@ class MessageControllerTests {
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -946,7 +946,7 @@ class MessageControllerTests {
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1068,7 +1068,7 @@ class MessageControllerTests {
         messageRepository.save(message2)
         messageRepository.save(message3)
 
-        val url = "http://localhost:$port/API/manager/chat/${ticket2.ticketId}"
+        val url = "http://localhost:$port/API/manager/chat/${ticket2.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1259,7 +1259,7 @@ class MessageControllerTests {
         attachmentRepository.save(attachment1)
         attachmentRepository.save(attachment2)
 
-        val url = "http://localhost:$port/API/manager/chat/${ticket2.ticketId}"
+        val url = "http://localhost:$port/API/manager/chat/${ticket2.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1281,7 +1281,7 @@ class MessageControllerTests {
         Assertions.assertEquals(1, body.size)
 
         Assertions.assertEquals(
-            attachment2.attachmentId,
+            attachment2.getId(),
             ((body[0]["attachments"]as ArrayList<*>)[0] as LinkedHashMap<*,*>)["attachmentId"]
             )
 
@@ -1358,7 +1358,7 @@ class MessageControllerTests {
 
         val message = MessageDTO(
             null,
-            ticket.ticketId!!,
+            ticket.getId()!!,
             customer.email,
             "message text",
             Timestamp(1),
@@ -1366,7 +1366,7 @@ class MessageControllerTests {
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1388,7 +1388,7 @@ class MessageControllerTests {
 
         Assertions.assertEquals(1, addedMessage.size)
         Assertions.assertEquals(message.text, addedMessage[0].text)
-        Assertions.assertEquals(1, addedMessage[0].messageId)
+        Assertions.assertEquals(1, addedMessage[0].getId())
 
         messageRepository.delete(addedMessage[0])
         ticketRepository.delete(ticket2)
@@ -1471,7 +1471,7 @@ class MessageControllerTests {
 
         val message = MessageDTO(
             null,
-            ticket.ticketId!!,
+            ticket.getId()!!,
             customer.email!!,
             "message text",
             Timestamp(1),
@@ -1479,7 +1479,7 @@ class MessageControllerTests {
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1562,7 +1562,7 @@ class MessageControllerTests {
 
         val message = MessageDTO(
             null,
-            ticket.ticketId!!,
+            ticket.getId()!!,
             customer.email!!,
             "message text",
             Timestamp(1),
@@ -1570,7 +1570,7 @@ class MessageControllerTests {
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1592,7 +1592,7 @@ class MessageControllerTests {
 
         Assertions.assertEquals(1, addedMessage.size)
         Assertions.assertEquals(message.text, addedMessage[0].text)
-        Assertions.assertEquals(1, addedMessage[0].messageId)
+        Assertions.assertEquals(1, addedMessage[0].getId())
 
         messageRepository.delete(addedMessage[0])
         ticketRepository.delete(ticket2)
@@ -1674,7 +1674,7 @@ class MessageControllerTests {
 
         val message = MessageDTO(
             null,
-            ticket.ticketId!!,
+            ticket.getId()!!,
             customer.email!!,
             "message text",
             Timestamp(1),
@@ -1682,7 +1682,7 @@ class MessageControllerTests {
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
         val uri = URI(url)
 
         val headers = HttpHeaders()

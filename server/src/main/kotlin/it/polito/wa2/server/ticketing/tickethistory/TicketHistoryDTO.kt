@@ -24,9 +24,9 @@ data class TicketHistoryDTO(
 )
 
 fun TicketHistory.toDTO(): TicketHistoryDTO {
-    return TicketHistoryDTO(ticket?.ticketId!!,
+    return TicketHistoryDTO(ticket?.getId()!!,
         user?.email!!, currentExpert?.email, updatedTimestamp,
-        oldState, newState, historyId)
+        oldState, newState, this.getId())
 }
 
 fun newTicketHistory(

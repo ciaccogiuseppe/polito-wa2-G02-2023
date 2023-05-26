@@ -34,6 +34,6 @@ class AttachmentServiceImpl(
     }
 
     override fun addAttachment(attachmentDTO: AttachmentDTO): Long {
-        return attachmentRepository.save(attachmentDTO.toNewAttachment()).attachmentId!!
+        return attachmentRepository.save(attachmentDTO.toNewAttachment()).getId()!!
     }
 }
