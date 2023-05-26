@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.ticket
 
+import it.polito.wa2.server.EntityBase
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.ticketing.message.Message
@@ -9,7 +10,7 @@ import java.sql.Timestamp
 
 @Entity
 @Table(name="tickets")
-class Ticket {
+class Ticket:EntityBase<Long>() {
     @Column(nullable = false)
     var title : String = ""
     @Column(nullable = false)
@@ -42,7 +43,7 @@ class Ticket {
     var history = mutableListOf<TicketHistory>()
 
 
-    @Id
+    /*@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_generator")
     @SequenceGenerator(name = "ticket_generator",
         sequenceName = "tickets_id_seq",
@@ -50,7 +51,7 @@ class Ticket {
         allocationSize = 1
     )
     @Column(updatable = false, nullable = false)
-    var ticketId : Long? = null
+    var ticketId : Long? = null*/
 
 
 }

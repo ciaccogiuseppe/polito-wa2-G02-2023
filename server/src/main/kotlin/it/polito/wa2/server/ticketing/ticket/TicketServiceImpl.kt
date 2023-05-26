@@ -119,7 +119,7 @@ class TicketServiceImpl(
                 ticket.status
             )
         )
-        return TicketIdDTO(ticket.ticketId!!)
+        return TicketIdDTO(ticket.getId()!!)
     }
 
     override fun assignTicket(ticketAssignDTO: TicketAssignDTO, userEmail: String) {

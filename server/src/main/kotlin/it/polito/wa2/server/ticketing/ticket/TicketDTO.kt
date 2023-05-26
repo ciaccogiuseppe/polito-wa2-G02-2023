@@ -42,7 +42,7 @@ data class TicketUpdateDTO(
 
 fun Ticket.toDTO(): TicketDTO {
     return TicketDTO(
-        ticketId,
+        this.getId(),
         title,
         description,
         priority,

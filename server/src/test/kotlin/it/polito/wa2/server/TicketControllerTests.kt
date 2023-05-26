@@ -208,7 +208,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/manager/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/manager/ticketing/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -287,7 +287,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/client/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/client/ticketing/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -366,7 +366,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/expert/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/expert/ticketing/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -445,7 +445,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/client/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/client/ticketing/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -515,7 +515,7 @@ class TicketControllerTests {
 
         ticketRepository.save(ticket)
 
-        val url = "http://localhost:$port/API/expert/ticketing/${ticket.ticketId}"
+        val url = "http://localhost:$port/API/expert/ticketing/${ticket.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -2313,7 +2313,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             expert.email!!,
             2
         )
@@ -2333,7 +2333,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(ticket.title, updatedTicket.get().title)
@@ -2394,7 +2394,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             expert.email!!,
             2
         )
@@ -2464,7 +2464,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             expert.email!!,
             2
         )
@@ -2534,7 +2534,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             expert.email!!,
             2
         )
@@ -2552,7 +2552,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(ticket.title, updatedTicket.get().title)
@@ -2613,7 +2613,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             customer.email!!,
             2
         )
@@ -2679,7 +2679,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             expert.email!!,
             2
         )
@@ -2749,7 +2749,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             expert.email!!,
             2
         )
@@ -2816,7 +2816,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -2832,7 +2832,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -2890,7 +2890,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -2906,7 +2906,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -2964,7 +2964,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3038,7 +3038,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.OPEN
         )
 
@@ -3054,7 +3054,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.OPEN, updatedTicket.get().status)
@@ -3112,7 +3112,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.OPEN
         )
 
@@ -3177,7 +3177,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.OPEN
         )
 
@@ -3243,7 +3243,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3259,7 +3259,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -3317,7 +3317,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3333,7 +3333,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -3391,7 +3391,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3465,7 +3465,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3481,7 +3481,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -3539,7 +3539,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3555,7 +3555,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -3613,7 +3613,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3686,7 +3686,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3760,7 +3760,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3827,7 +3827,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3843,7 +3843,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -3901,7 +3901,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3975,7 +3975,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.CLOSED
         )
 
@@ -3991,7 +3991,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
@@ -4049,7 +4049,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.RESOLVED
         )
 
@@ -4065,7 +4065,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
@@ -4123,7 +4123,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.RESOLVED
         )
 
@@ -4139,7 +4139,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
@@ -4197,7 +4197,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.RESOLVED
         )
 
@@ -4271,7 +4271,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.RESOLVED
         )
 
@@ -4287,7 +4287,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
@@ -4345,7 +4345,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.RESOLVED
         )
 
@@ -4361,7 +4361,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
@@ -4418,7 +4418,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.IN_PROGRESS
         )
 
@@ -4484,7 +4484,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.REOPENED
         )
 
@@ -4500,7 +4500,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.REOPENED, updatedTicket.get().status)
@@ -4558,7 +4558,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.REOPENED
         )
 
@@ -4574,7 +4574,7 @@ class TicketControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val updatedTicket = ticketRepository.findById(ticket.ticketId!!)
+        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
 
         Assertions.assertTrue(updatedTicket.isPresent)
         Assertions.assertEquals(TicketStatus.REOPENED, updatedTicket.get().status)
@@ -4632,7 +4632,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.REOPENED
         )
 
@@ -4698,7 +4698,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.OPEN
         )
 
@@ -4764,7 +4764,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.IN_PROGRESS
         )
 
@@ -4830,7 +4830,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.RESOLVED
         )
 
@@ -4896,7 +4896,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.REOPENED
         )
 
@@ -4962,7 +4962,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.OPEN
         )
 
@@ -5028,7 +5028,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.IN_PROGRESS
         )
 
@@ -5094,7 +5094,7 @@ class TicketControllerTests {
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
-            ticket.ticketId!!,
+            ticket.getId()!!,
             TicketStatus.OPEN
         )
 

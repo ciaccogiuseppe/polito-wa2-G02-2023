@@ -233,7 +233,7 @@ class AttachmentControllerTests {
 
         attachmentRepository.save(attachment)
 
-        val url = "http://localhost:$port/API/attachment/${attachment.attachmentId}"
+        val url = "http://localhost:$port/API/attachment/${attachment.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -321,7 +321,7 @@ class AttachmentControllerTests {
 
         attachmentRepository.save(attachment)
 
-        val url = "http://localhost:$port/API/manager/attachment/${attachment.attachmentId}"
+        val url = "http://localhost:$port/API/manager/attachment/${attachment.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -342,7 +342,7 @@ class AttachmentControllerTests {
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         Assertions.assertEquals(attachment.name, body["name"])
         Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
-        Assertions.assertEquals(attachment.attachmentId, body["attachmentId"] )
+        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
 
 
         attachmentRepository.delete(attachment)
@@ -414,7 +414,7 @@ class AttachmentControllerTests {
 
         attachmentRepository.save(attachment)
 
-        val url = "http://localhost:$port/API/attachment/${attachment.attachmentId}"
+        val url = "http://localhost:$port/API/attachment/${attachment.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -435,7 +435,7 @@ class AttachmentControllerTests {
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         Assertions.assertEquals(attachment.name, body["name"])
         Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
-        Assertions.assertEquals(attachment.attachmentId, body["attachmentId"] )
+        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
 
 
         attachmentRepository.delete(attachment)
@@ -507,7 +507,7 @@ class AttachmentControllerTests {
 
         attachmentRepository.save(attachment)
 
-        val url = "http://localhost:$port/API/attachment/${attachment.attachmentId}"
+        val url = "http://localhost:$port/API/attachment/${attachment.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -596,7 +596,7 @@ class AttachmentControllerTests {
 
         attachmentRepository.save(attachment)
 
-        val url = "http://localhost:$port/API/attachment/${attachment.attachmentId}"
+        val url = "http://localhost:$port/API/attachment/${attachment.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -617,7 +617,7 @@ class AttachmentControllerTests {
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         Assertions.assertEquals(attachment.name, body["name"])
         Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
-        Assertions.assertEquals(attachment.attachmentId, body["attachmentId"] )
+        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
 
 
         attachmentRepository.delete(attachment)
@@ -689,7 +689,7 @@ class AttachmentControllerTests {
 
         attachmentRepository.save(attachment)
 
-        val url = "http://localhost:$port/API/attachment/${attachment.attachmentId}"
+        val url = "http://localhost:$port/API/attachment/${attachment.getId()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
