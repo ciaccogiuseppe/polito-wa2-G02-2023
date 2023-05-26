@@ -55,5 +55,3 @@ services:
 networks:
   app-network:
 
-volumes:
-  postgres-data:
