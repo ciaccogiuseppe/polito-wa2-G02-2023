@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 @RestController
 class TicketHistoryController(private val ticketHistoryService: TicketHistoryService) {
 
-    @GetMapping("/API/ticketing/history/filter")
+    @GetMapping("/API/manager/ticketing/history/filter")
     fun getTicketHistoryFiltered(
         principal: Principal,
         @RequestParam(name="ticketId", required=false) ticketId: Long?,

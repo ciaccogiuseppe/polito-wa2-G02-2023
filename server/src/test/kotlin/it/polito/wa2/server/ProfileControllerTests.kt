@@ -159,7 +159,7 @@ class ProfileControllerTests {
 
 
         val email = "mario.rossi@polito.it"
-        val url = "http://localhost:$port/API/profiles/$email"
+        val url = "http://localhost:$port/API/manager/profiles/$email"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -208,7 +208,7 @@ class ProfileControllerTests {
 
 
         val email = "mario.rossi@polito.it"
-        val url = "http://localhost:$port/API/profiles/$email"
+        val url = "http://localhost:$port/API/manager/profiles/$email"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -253,7 +253,7 @@ class ProfileControllerTests {
 
 
         val email = "mario.rossi@polito.it"
-        val url = "http://localhost:$port/API/profiles/$email"
+        val url = "http://localhost:$port/API/manager/profiles/$email"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -296,7 +296,7 @@ class ProfileControllerTests {
     @DirtiesContext
     fun getNonExistingProfile() {
         val email = "mario.bianchi@polito.it"
-        val url = "http://localhost:$port/API/profiles/$email"
+        val url = "http://localhost:$port/API/manager/profiles/$email"
         val uri = URI(url)
 
         val profile = ProfileDTO(
@@ -349,10 +349,10 @@ class ProfileControllerTests {
         val email3 = "abc@polito"
         val email4 = "abc@polito.i"
 
-        val url1 = "http://localhost:$port/API/profiles/$email1"
-        val url2 = "http://localhost:$port/API/profiles/$email2"
-        val url3 = "http://localhost:$port/API/profiles/$email3"
-        val url4 = "http://localhost:$port/API/profiles/$email4"
+        val url1 = "http://localhost:$port/API/manager/profiles/$email1"
+        val url2 = "http://localhost:$port/API/manager/profiles/$email2"
+        val url3 = "http://localhost:$port/API/manager/profiles/$email3"
+        val url4 = "http://localhost:$port/API/manager/profiles/$email4"
 
         val uri1 = URI(url1)
         val uri2 = URI(url2)
@@ -407,7 +407,7 @@ class ProfileControllerTests {
     @Test
     @DirtiesContext
     fun postProfileSuccess() {
-        val url = "http://localhost:$port/API/profiles"
+        val url = "http://localhost:$port/API/public/profiles"
         val uri = URI(url)
 
         val profile = ProfileDTO(
@@ -435,7 +435,7 @@ class ProfileControllerTests {
     @Test
     @DirtiesContext
     fun postProfileRepeatedMail() {
-        val url = "http://localhost:$port/API/profiles"
+        val url = "http://localhost:$port/API/public/profiles"
         val uri = URI(url)
 
         val profile = ProfileDTO(
@@ -461,7 +461,7 @@ class ProfileControllerTests {
     @Test
     @DirtiesContext
     fun postProfileWrongFormat() {
-        val url = "http://localhost:$port/API/profiles"
+        val url = "http://localhost:$port/API/public/profiles"
         val uri = URI(url)
 
         val profile1 = ProfileDTO(
@@ -518,7 +518,7 @@ class ProfileControllerTests {
     @Test
     @DirtiesContext
     fun postProfileMissingFields() {
-        val url = "http://localhost:$port/API/profiles"
+        val url = "http://localhost:$port/API/public/profiles"
         val uri = URI(url)
 
         data class WrongProfileDTO(

@@ -18,7 +18,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.web.client.HttpClientErrorException.Unauthorized
 import org.springframework.web.client.ResponseErrorHandler
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
@@ -128,7 +127,7 @@ class AuthControllerTest {
     @Test
     @DirtiesContext
     fun loginManagerSuccessful() {
-        val url = "http://localhost:$port/login"
+        val url = "http://localhost:$port/API/login"
         val uri = URI(url)
 
 
@@ -147,7 +146,7 @@ class AuthControllerTest {
     @Test
     @DirtiesContext
     fun loginManagerWrongPassword() {
-        val url = "http://localhost:$port/login"
+        val url = "http://localhost:$port/API/login"
         val uri = URI(url)
 
         val reqFactory = SimpleClientHttpRequestFactory()
@@ -182,7 +181,7 @@ class AuthControllerTest {
     @Test
     @DirtiesContext
     fun loginClientSuccessful() {
-        val url = "http://localhost:$port/login"
+        val url = "http://localhost:$port/API/login"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -199,7 +198,7 @@ class AuthControllerTest {
     @Test
     @DirtiesContext
     fun loginClientWrongPassword() {
-        val url = "http://localhost:$port/login"
+        val url = "http://localhost:$port/API/login"
         val uri = URI(url)
 
         val reqFactory = SimpleClientHttpRequestFactory()
@@ -236,7 +235,7 @@ class AuthControllerTest {
     @Test
     @DirtiesContext
     fun loginExpertSuccessful() {
-        val url = "http://localhost:$port/login"
+        val url = "http://localhost:$port/API/login"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -253,7 +252,7 @@ class AuthControllerTest {
     @Test
     @DirtiesContext
     fun loginExpertWrongPassword() {
-        val url = "http://localhost:$port/login"
+        val url = "http://localhost:$port/API/login"
         val uri = URI(url)
 
         val reqFactory = SimpleClientHttpRequestFactory()

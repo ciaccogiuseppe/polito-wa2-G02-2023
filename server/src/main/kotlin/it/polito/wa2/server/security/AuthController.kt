@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.json.BasicJsonParser
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
 
 
@@ -18,7 +17,7 @@ class AuthController(
 ) {
     private val restTemplate = RestTemplate()
 
-    @PostMapping("/login")
+    @PostMapping("/API/login")
     @ResponseBody
     fun login(@RequestBody loginRequest: LoginRequest): LoginResponse {
         val headers = HttpHeaders()

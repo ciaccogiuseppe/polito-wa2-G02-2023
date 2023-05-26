@@ -153,7 +153,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsUnauthorized() {
-        val url = "http://localhost:$port/API/products/"
+        val url = "http://localhost:$port/API/public/products/"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -213,7 +213,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsManager() {
-        val url = "http://localhost:$port/API/products/"
+        val url = "http://localhost:$port/API/public/products/"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -274,7 +274,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsClient() {
-        val url = "http://localhost:$port/API/products/"
+        val url = "http://localhost:$port/API/public/products/"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -335,7 +335,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsExpert() {
-        val url = "http://localhost:$port/API/products/"
+        val url = "http://localhost:$port/API/public/products/"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -397,7 +397,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductManager() {
-        val url = "http://localhost:$port/API/products/0000000000000"
+        val url = "http://localhost:$port/API/public/products/0000000000000"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -448,7 +448,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductClient() {
-        val url = "http://localhost:$port/API/products/0000000000000"
+        val url = "http://localhost:$port/API/public/products/0000000000000"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -499,7 +499,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductExpert() {
-        val url = "http://localhost:$port/API/products/0000000000000"
+        val url = "http://localhost:$port/API/public/products/0000000000000"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -550,7 +550,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductUnauthorized() {
-        val url = "http://localhost:$port/API/products/0000000000000"
+        val url = "http://localhost:$port/API/public/products/0000000000000"
         val uri = URI(url)
         val json = BasicJsonParser()
         val product1 = Product()
@@ -598,7 +598,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getNonExistingProductManager() {
-        val url = "http://localhost:$port/API/products/0000000000003"
+        val url = "http://localhost:$port/API/public/products/0000000000003"
         val uri = URI(url)
 
         val product1 = Product()
@@ -643,7 +643,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getNonExistingProductClient() {
-        val url = "http://localhost:$port/API/products/0000000000003"
+        val url = "http://localhost:$port/API/public/products/0000000000003"
         val uri = URI(url)
 
         val product1 = Product()
@@ -688,7 +688,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getNonExistingProductExpert() {
-        val url = "http://localhost:$port/API/products/0000000000003"
+        val url = "http://localhost:$port/API/public/products/0000000000003"
         val uri = URI(url)
 
         val product1 = Product()
@@ -733,7 +733,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductWrongIdManager() {
-        val url = "http://localhost:$port/API/products/000000000000"
+        val url = "http://localhost:$port/API/public/products/000000000000"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -765,7 +765,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductWrongIdClient() {
-        val url = "http://localhost:$port/API/products/000000000000"
+        val url = "http://localhost:$port/API/public/products/000000000000"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -797,7 +797,7 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductWrongIdExpert() {
-        val url = "http://localhost:$port/API/products/000000000000"
+        val url = "http://localhost:$port/API/public/products/000000000000"
         val uri = URI(url)
         val json = BasicJsonParser()
 

@@ -59,11 +59,6 @@ class TicketHistoryServiceImpl(
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 
-    private fun getProfile(profileId: Long): Profile {
-        val profileDTO = profileService.getProfileById(profileId)
-        return profileRepository.findByEmail(profileDTO.email)!!
-    }
-
     private fun getProfileByEmail(email: String): Profile {
         val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!

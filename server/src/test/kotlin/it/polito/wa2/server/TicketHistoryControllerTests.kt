@@ -176,7 +176,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -207,7 +207,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -238,7 +238,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -327,7 +327,7 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1ticket1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=2"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -440,7 +440,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2ticket2)
         ticketHistoryRepository.save(history3ticket2)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=2"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -543,7 +543,7 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1ticket1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=2"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -579,7 +579,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=-3"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=-3"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -609,7 +609,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=a"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=a"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -710,7 +710,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2customer2)
         ticketHistoryRepository.save(history3customer2)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=${customer2.email}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=${customer2.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -812,7 +812,7 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=not.found@polito.it"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=not.found@polito.it"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -849,7 +849,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=invalidEmail"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=invalidEmail"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -879,7 +879,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=33"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=33"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -981,7 +981,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2expert3)
         ticketHistoryRepository.save(history3expert3)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=${expert3.email}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=${expert3.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1083,7 +1083,7 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=not.found@polito.it"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=not.found@polito.it"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1120,7 +1120,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=invalidEmail"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=invalidEmail"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1150,7 +1150,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=33"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=33"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1244,7 +1244,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?updatedAfter=${Timestamp(20).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(20).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1363,7 +1363,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?updatedBefore=${Timestamp(19).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedBefore=${Timestamp(19).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1474,7 +1474,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?updatedAfter=${Timestamp(9).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(9).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1585,7 +1585,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(19).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(19).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1626,7 +1626,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(9).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(9).toLocalDateTime()}"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1656,7 +1656,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?updatedAfter=${Timestamp(10).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(10).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1792,7 +1792,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history4ticket1user1expert4timestamp34)
         ticketHistoryRepository.save(history5ticket1user1expert3timestamp43)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=1&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=1&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 

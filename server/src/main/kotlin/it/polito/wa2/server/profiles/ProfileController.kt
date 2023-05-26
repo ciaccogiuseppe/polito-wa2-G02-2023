@@ -13,20 +13,20 @@ import java.security.Principal
 @CrossOrigin(origins =["http://localhost:3000"])
 @RestController
 class ProfileController(private val profileService: ProfileService) {
-    @GetMapping("/API/profiles/{email}")
+    @GetMapping("/API/manager/profiles/{email}")
     fun getProfile(@PathVariable email: String): ProfileDTO {
         checkEmail(email)
         return profileService.getProfile(email)
     }
 
-    @GetMapping("/API/profiles/profileId/{profileId}")
+    @GetMapping("/API/manager/profiles/profileId/{profileId}")
     fun getProfileById(@PathVariable profileId: Long): ProfileDTO {
         if(profileId<=0)
             throw UnprocessableProfileException("Wrong profileId values")
         return profileService.getProfileById(profileId)
     }
 
-    @PostMapping("/API/profiles")
+    @PostMapping("/API/public/profiles")
     @ResponseStatus(HttpStatus.CREATED)
     fun addProfile(@RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
         checkInputProfile(profileDTO, br)

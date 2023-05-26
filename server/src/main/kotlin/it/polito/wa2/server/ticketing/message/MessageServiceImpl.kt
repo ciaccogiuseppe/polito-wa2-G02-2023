@@ -5,7 +5,6 @@ import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnauthorizedMessageException
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
-import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.attachment.AttachmentDTO
