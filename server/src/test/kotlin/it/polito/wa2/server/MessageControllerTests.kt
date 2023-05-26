@@ -1068,7 +1068,7 @@ class MessageControllerTests {
         messageRepository.save(message2)
         messageRepository.save(message3)
 
-        val url = "http://localhost:$port/API/chat/${ticket2.ticketId}"
+        val url = "http://localhost:$port/API/manager/chat/${ticket2.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1111,7 +1111,7 @@ class MessageControllerTests {
 
         profileRepository.save(manager)
 
-        val url = "http://localhost:$port/API/chat/1"
+        val url = "http://localhost:$port/API/manager/chat/1"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1142,7 +1142,7 @@ class MessageControllerTests {
 
         profileRepository.save(manager)
 
-        val url = "http://localhost:$port/API/chat/abc"
+        val url = "http://localhost:$port/API/manager/chat/abc"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1259,7 +1259,7 @@ class MessageControllerTests {
         attachmentRepository.save(attachment1)
         attachmentRepository.save(attachment2)
 
-        val url = "http://localhost:$port/API/chat/${ticket2.ticketId}"
+        val url = "http://localhost:$port/API/manager/chat/${ticket2.ticketId}"
         val uri = URI(url)
         val json = BasicJsonParser()
 

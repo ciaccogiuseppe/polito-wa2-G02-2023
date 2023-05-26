@@ -736,7 +736,7 @@ class AttachmentControllerTests {
 
         profileRepository.save(manager)
 
-        val url = "http://localhost:$port/API/attachment/_abc"
+        val url = "http://localhost:$port/API/manager/attachment/_abc"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -768,7 +768,7 @@ class AttachmentControllerTests {
 
         profileRepository.save(manager)
 
-        val url = "http://localhost:$port/API/attachment/-1"
+        val url = "http://localhost:$port/API/manager/attachment/-1"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -800,7 +800,7 @@ class AttachmentControllerTests {
 
         profileRepository.save(manager)
 
-        val url = "http://localhost:$port/API/attachment/1"
+        val url = "http://localhost:$port/API/manager/attachment/1"
         val uri = URI(url)
 
         val headers = HttpHeaders()
