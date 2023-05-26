@@ -1,6 +1,7 @@
 package it.polito.wa2.server.ticketing.tickethistory
 
 import it.polito.wa2.server.BadRequestFilterException
+import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableTicketException
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,33 +18,33 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
     fun getTicketHistoryFiltered(
         principal: Principal,
         @RequestParam(name="ticketId", required=false) ticketId: Long?,
-        @RequestParam(name="userId", required=false) userId: Long?,
+        @RequestParam(name="userEmail", required=false) userEmail: String?,
         @RequestParam(name="updatedAfter", required=false) updatedAfter: LocalDateTime?,
         @RequestParam(name="updatedBefore", required=false) updatedBefore: LocalDateTime?,
-        @RequestParam(name="currentExpertId", required=false) currentExpertId: Long?
+        @RequestParam(name="currentExpertEmail", required=false) currentExpertEmail: String?
     ): List<TicketHistoryDTO> {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
-        val userEmail = token.tokenAttributes["email"] as String
+        val loggedUserEmail = token.tokenAttributes["email"] as String
         checkFilterParameters(
-            ticketId, userId,
+            ticketId, userEmail,
             updatedAfter?.let{ Timestamp.valueOf(updatedAfter)}, updatedBefore?.let{ Timestamp.valueOf(updatedBefore)},
-            currentExpertId
+            currentExpertEmail
         )
         return ticketHistoryService.getTicketHistoryFiltered(
-            ticketId, userId,
+            ticketId, userEmail,
             updatedAfter?.let{ Timestamp.valueOf(updatedAfter)}, updatedBefore?.let{ Timestamp.valueOf(updatedBefore)},
-            currentExpertId, userEmail
+            currentExpertEmail, loggedUserEmail
         )
     }
 
     fun checkFilterParameters(
         ticketId: Long?,
-        userId: Long?,
+        userEmail: String?,
         updatedAfter: Timestamp?,
         updatedBefore: Timestamp?,
-        currentExpertId: Long?,
+        currentExpertEmail: String?,
     ) {
-        if(ticketId == null && userId == null && currentExpertId == null &&
+        if(ticketId == null && userEmail == null && currentExpertEmail == null &&
             updatedAfter == null && updatedBefore == null)
             throw BadRequestFilterException("All filter parameters cannot be null")
         if (updatedAfter != null && updatedBefore != null && updatedAfter.after(updatedBefore))
@@ -51,11 +52,16 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
         if (ticketId != null && ticketId < 0) {
             throw UnprocessableTicketException("Negative ticketId")
         }
-        if (userId != null && userId < 0) {
-            throw UnprocessableTicketException("Negative userId")
+        if (userEmail != null) {
+            checkEmail(userEmail)
         }
-        if (currentExpertId != null && currentExpertId < 0) {
-            throw UnprocessableTicketException("Negative currentExpertId")
+        if (currentExpertEmail != null) {
+            checkEmail(currentExpertEmail)
         }
+    }
+
+    fun checkEmail(email: String){
+        if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
+            throw UnprocessableProfileException("Wrong email format")
     }
 }

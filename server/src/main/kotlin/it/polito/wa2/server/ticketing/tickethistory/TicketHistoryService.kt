@@ -7,10 +7,10 @@ interface TicketHistoryService {
 
     fun getTicketHistoryFiltered(
         ticketId: Long?,
-        userId: Long?,
+        userEmail: String?,
         updatedAfter: Timestamp?,
         updatedBefore: Timestamp?,
-        currentExpertId: Long?,
-        userEmail: String
+        currentExpertEmail: String?,
+        loggedUserEmail: String
     ): List<TicketHistoryDTO>
 }

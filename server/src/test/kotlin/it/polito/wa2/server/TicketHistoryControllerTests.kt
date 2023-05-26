@@ -465,16 +465,16 @@ class TicketHistoryControllerTests {
         Assertions.assertEquals(body[0]["ticketId"], history2ticket2.ticket!!.ticketId)
         Assertions.assertEquals(body[0]["newState"], history2ticket2.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history2ticket2.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertId"], history2ticket2.currentExpert!!.profileId)
-        Assertions.assertEquals(body[0]["userId"], history2ticket2.user!!.profileId)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history2ticket2.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history2ticket2.user!!.email)
         Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2ticket2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         Assertions.assertEquals(body[1]["historyId"], history3ticket2.historyId)
         Assertions.assertEquals(body[1]["ticketId"], history3ticket2.ticket!!.ticketId)
         Assertions.assertEquals(body[1]["newState"], history3ticket2.newState.name)
         Assertions.assertEquals(body[1]["oldState"], history3ticket2.oldState.name)
-        Assertions.assertEquals(body[1]["currentExpertId"], history3ticket2.currentExpert!!.profileId)
-        Assertions.assertEquals(body[1]["userId"], history3ticket2.user!!.profileId)
+        Assertions.assertEquals(body[1]["currentExpertEmail"], history3ticket2.currentExpert!!.email)
+        Assertions.assertEquals(body[1]["userEmail"], history3ticket2.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3ticket2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1ticket1)
@@ -629,11 +629,11 @@ class TicketHistoryControllerTests {
         profileRepository.delete(manager)
     }
 
-    // --------------------------- userId
+    // --------------------------- userEmail
 
     @Test
     @DirtiesContext
-    fun getExistingTicketHistoryByUserId() {
+    fun getExistingTicketHistoryByUserEmail() {
         val customer1 = Profile()
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
@@ -710,7 +710,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2customer2)
         ticketHistoryRepository.save(history3customer2)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?userId=3"
+        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=${customer2.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -735,16 +735,16 @@ class TicketHistoryControllerTests {
         Assertions.assertEquals(body[0]["ticketId"], history2customer2.ticket!!.ticketId)
         Assertions.assertEquals(body[0]["newState"], history2customer2.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history2customer2.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertId"], history2customer2.currentExpert!!.profileId)
-        Assertions.assertEquals(body[0]["userId"], history2customer2.user!!.profileId)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history2customer2.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history2customer2.user!!.email)
         Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2customer2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         Assertions.assertEquals(body[1]["historyId"], history3customer2.historyId)
         Assertions.assertEquals(body[1]["ticketId"], history3customer2.ticket!!.ticketId)
         Assertions.assertEquals(body[1]["newState"], history3customer2.newState.name)
         Assertions.assertEquals(body[1]["oldState"], history3customer2.oldState.name)
-        Assertions.assertEquals(body[1]["currentExpertId"], history3customer2.currentExpert!!.profileId)
-        Assertions.assertEquals(body[1]["userId"], history3customer2.user!!.profileId)
+        Assertions.assertEquals(body[1]["currentExpertEmail"], history3customer2.currentExpert!!.email)
+        Assertions.assertEquals(body[1]["userEmail"], history3customer2.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3customer2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1customer1)
@@ -760,7 +760,7 @@ class TicketHistoryControllerTests {
 
     @Test
     @DirtiesContext
-    fun getNonExistingTicketHistoryByUserId() {
+    fun getNonExistingTicketHistoryByUserEmail() {
         val customer1 = Profile()
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
@@ -812,7 +812,7 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?userId=4"
+        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=not.found@polito.it"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -841,7 +841,7 @@ class TicketHistoryControllerTests {
 
     @Test
     @DirtiesContext
-    fun getTicketHistoryByUserIdNegative() {
+    fun getTicketHistoryByUserEmailInvalid() {
         val manager = Profile()
         manager.email = "manager@polito.it"
         manager.name = "Manager"
@@ -849,7 +849,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?userId=-3"
+        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=invalidEmail"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -871,7 +871,7 @@ class TicketHistoryControllerTests {
 
     @Test
     @DirtiesContext
-    fun getTicketHistoryByUserIdAlphabetic() {
+    fun getTicketHistoryByUserEmailNumeric() {
         val manager = Profile()
         manager.email = "manager@polito.it"
         manager.name = "Manager"
@@ -879,7 +879,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?userId=a"
+        val url = "http://localhost:$port/API/ticketing/history/filter?userEmail=33"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -895,15 +895,15 @@ class TicketHistoryControllerTests {
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
     }
 
-    // --------------------------- currentExpertId
+    // --------------------------- currentExpertEmail
 
     @Test
     @DirtiesContext
-    fun getExistingTicketHistoryByCurrentExpertId() {
+    fun getExistingTicketHistoryByCurrentExpertEmail() {
         val customer1 = Profile()
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
@@ -981,7 +981,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history2expert3)
         ticketHistoryRepository.save(history3expert3)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=4"
+        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=${expert3.email}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1006,16 +1006,16 @@ class TicketHistoryControllerTests {
         Assertions.assertEquals(body[0]["ticketId"], history2expert3.ticket!!.ticketId)
         Assertions.assertEquals(body[0]["newState"], history2expert3.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history2expert3.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertId"], history2expert3.currentExpert!!.profileId)
-        Assertions.assertEquals(body[0]["userId"], history2expert3.user!!.profileId)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history2expert3.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history2expert3.user!!.email)
         Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2expert3.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         Assertions.assertEquals(body[1]["historyId"], history3expert3.historyId)
         Assertions.assertEquals(body[1]["ticketId"], history3expert3.ticket!!.ticketId)
         Assertions.assertEquals(body[1]["newState"], history3expert3.newState.name)
         Assertions.assertEquals(body[1]["oldState"], history3expert3.oldState.name)
-        Assertions.assertEquals(body[1]["currentExpertId"], history3expert3.currentExpert!!.profileId)
-        Assertions.assertEquals(body[1]["userId"], history3expert3.user!!.profileId)
+        Assertions.assertEquals(body[1]["currentExpertEmail"], history3expert3.currentExpert!!.email)
+        Assertions.assertEquals(body[1]["userEmail"], history3expert3.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3expert3.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1expert2)
@@ -1031,7 +1031,7 @@ class TicketHistoryControllerTests {
 
     @Test
     @DirtiesContext
-    fun getNonExistingTicketHistoryByCurrentExpertId() {
+    fun getNonExistingTicketHistoryByCurrentExpertEmail() {
         val customer1 = Profile()
         customer1.email = "mario.rossi@polito.it"
         customer1.name = "Mario"
@@ -1083,7 +1083,7 @@ class TicketHistoryControllerTests {
 
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=4"
+        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=not.found@polito.it"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1112,7 +1112,7 @@ class TicketHistoryControllerTests {
 
     @Test
     @DirtiesContext
-    fun getTicketHistoryByCurrentExpertIdNegative() {
+    fun getTicketHistoryByCurrentExpertEmailInvalid() {
         val manager = Profile()
         manager.email = "manager@polito.it"
         manager.name = "Manager"
@@ -1120,7 +1120,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=-3"
+        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=invalidEmail"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1142,7 +1142,7 @@ class TicketHistoryControllerTests {
 
     @Test
     @DirtiesContext
-    fun getTicketHistoryByCurrentExpertIdAlphabetic() {
+    fun getTicketHistoryByCurrentExpertEmailNumeric() {
         val manager = Profile()
         manager.email = "manager@polito.it"
         manager.name = "Manager"
@@ -1150,7 +1150,7 @@ class TicketHistoryControllerTests {
         manager.role = ProfileRole.MANAGER
 
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertId=a"
+        val url = "http://localhost:$port/API/ticketing/history/filter?currentExpertEmail=33"
         val uri = URI(url)
 
         val headers = HttpHeaders()
@@ -1166,7 +1166,7 @@ class TicketHistoryControllerTests {
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
     }
 
@@ -1269,16 +1269,16 @@ class TicketHistoryControllerTests {
         Assertions.assertEquals(body[0]["ticketId"], history2timestamp20.ticket!!.ticketId)
         Assertions.assertEquals(body[0]["newState"], history2timestamp20.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history2timestamp20.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertId"], history2timestamp20.currentExpert!!.profileId)
-        Assertions.assertEquals(body[0]["userId"], history2timestamp20.user!!.profileId)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history2timestamp20.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history2timestamp20.user!!.email)
         Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2timestamp20.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         Assertions.assertEquals(body[1]["historyId"], history3timestamp30.historyId)
         Assertions.assertEquals(body[1]["ticketId"], history3timestamp30.ticket!!.ticketId)
         Assertions.assertEquals(body[1]["newState"], history3timestamp30.newState.name)
         Assertions.assertEquals(body[1]["oldState"], history3timestamp30.oldState.name)
-        Assertions.assertEquals(body[1]["currentExpertId"], history3timestamp30.currentExpert!!.profileId)
-        Assertions.assertEquals(body[1]["userId"], history3timestamp30.user!!.profileId)
+        Assertions.assertEquals(body[1]["currentExpertEmail"], history3timestamp30.currentExpert!!.email)
+        Assertions.assertEquals(body[1]["userEmail"], history3timestamp30.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3timestamp30.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1timestamp10)
@@ -1388,8 +1388,8 @@ class TicketHistoryControllerTests {
         Assertions.assertEquals(body[0]["ticketId"], history1timestamp10.ticket!!.ticketId)
         Assertions.assertEquals(body[0]["newState"], history1timestamp10.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertId"], history1timestamp10.currentExpert!!.profileId)
-        Assertions.assertEquals(body[0]["userId"], history1timestamp10.user!!.profileId)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
         Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1timestamp10)
@@ -1499,8 +1499,8 @@ class TicketHistoryControllerTests {
         Assertions.assertEquals(body[0]["ticketId"], history1timestamp10.ticket!!.ticketId)
         Assertions.assertEquals(body[0]["newState"], history1timestamp10.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertId"], history1timestamp10.currentExpert!!.profileId)
-        Assertions.assertEquals(body[0]["userId"], history1timestamp10.user!!.profileId)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
         Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1timestamp10)
@@ -1792,7 +1792,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history4ticket1user1expert4timestamp34)
         ticketHistoryRepository.save(history5ticket1user1expert3timestamp43)
 
-        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=1&userId=2&currentExpertId=4&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}"
+        val url = "http://localhost:$port/API/ticketing/history/filter?ticketId=1&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}"
         val uri = URI(url)
         val json = BasicJsonParser()
 
@@ -1817,16 +1817,16 @@ class TicketHistoryControllerTests {
         Assertions.assertEquals(body[0]["ticketId"], history1ticket1user1expert3timestamp34.ticket!!.ticketId)
         Assertions.assertEquals(body[0]["newState"], history1ticket1user1expert3timestamp34.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history1ticket1user1expert3timestamp34.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertId"], history1ticket1user1expert3timestamp34.currentExpert!!.profileId)
-        Assertions.assertEquals(body[0]["userId"], history1ticket1user1expert3timestamp34.user!!.profileId)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history1ticket1user1expert3timestamp34.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history1ticket1user1expert3timestamp34.user!!.email)
         Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1ticket1user1expert3timestamp34.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         Assertions.assertEquals(body[1]["historyId"], history5ticket1user1expert3timestamp43.historyId)
         Assertions.assertEquals(body[1]["ticketId"], history5ticket1user1expert3timestamp43.ticket!!.ticketId)
         Assertions.assertEquals(body[1]["newState"], history5ticket1user1expert3timestamp43.newState.name)
         Assertions.assertEquals(body[1]["oldState"], history5ticket1user1expert3timestamp43.oldState.name)
-        Assertions.assertEquals(body[1]["currentExpertId"], history5ticket1user1expert3timestamp43.currentExpert!!.profileId)
-        Assertions.assertEquals(body[1]["userId"], history5ticket1user1expert3timestamp43.user!!.profileId)
+        Assertions.assertEquals(body[1]["currentExpertEmail"], history5ticket1user1expert3timestamp43.currentExpert!!.email)
+        Assertions.assertEquals(body[1]["userEmail"], history5ticket1user1expert3timestamp43.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history5ticket1user1expert3timestamp43.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1ticket1user1expert3timestamp34)
