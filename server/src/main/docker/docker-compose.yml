@@ -1,26 +1,59 @@
-version: '2'
-
+version: '3'
 services:
-  server:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    hostname: keycloak
+    restart: on-failure
+    ports:
+      - "8001:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KEYCLOAK_HOSTNAME=keycloak
+    volumes:
+      - ./keycloak/realms/SpringBootKeycloak-realm.json:/opt/keycloak/data/import/realm.json
+    command:
+      - start-dev
+      - --import-realm
+    networks:
+      - app-network
+
+  database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
+
+  springboot-app:
     image:
       'ticketing:latest'
     build:
       context: .
     container_name: server
-    depends_on:
-      - database
+    ports:
+      - 8081:8080
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-    ports:
-      - "8080:8080"
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+      - KEYCLOAK_AUTH-SERVER-URL=http://keycloak:8080/auth
+      - KEYCLOAK_REALM=SpringBootKeycloak
+      - KEYCLOAK_RESOURCE=springboot-keycloak-client
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/SpringBootKeycloak
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/auth/realms/SpringBootKeycloak/protocol/openid-connect/certs
+    depends_on:
+      - keycloak
+      - database
+    networks:
+      - app-network
 
+networks:
+  app-network:
 
-  database:
-    image: 'postgres:latest'
-    container_name: database
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+volumes:
+  postgres-data:
