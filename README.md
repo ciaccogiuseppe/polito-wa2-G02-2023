@@ -23,11 +23,11 @@
 ## Docker JIB deploy
 - Run gradle task ```jibDockerBuild``` to deploy locally
   - If Authorization Error rises, remove the ```"credsStore"``` entry in Docker ```config.json``` (found in ```<user>/.docker``` path)
+  -  A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
 
 ## Docker Compose (WIP, could not work)
 - Run ```docker-compose up``` in ```server/src/main/docker/``` directory
   - On first run, set ```SPRING_JPA_HIBERNATE_DDL_AUTO``` to ```create```, on following runs set it to ```validate```
-- A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
 
 ## Client
 
