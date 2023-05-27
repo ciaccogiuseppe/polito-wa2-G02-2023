@@ -1,5 +1,6 @@
 package it.polito.wa2.server
 
+import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRole
@@ -7,6 +8,9 @@ import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
+import org.keycloak.admin.client.KeycloakBuilder
+import org.keycloak.representations.idm.CredentialRepresentation
+import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -72,6 +76,102 @@ class TestUtils {
             headers.setBearerAuth(token)
 
             return HttpEntity(body, headers)
+        }
+
+        fun testKeycloakSetup(keycloak:KeycloakContainer) {
+
+            val realmName = "SpringBootKeycloak"
+
+            val manager = UserRepresentation()
+            manager.email = "manager@polito.it"
+            manager.username = "manager_01"
+            manager.isEnabled = true
+
+            val client = UserRepresentation()
+            client.email = "client@polito.it"
+            client.username = "client_01"
+            client.isEnabled = true
+
+            val expert = UserRepresentation()
+            expert.email = "expert@polito.it"
+            expert.username = "expert_01"
+            expert.isEnabled = true
+
+            val credential = CredentialRepresentation()
+            credential.isTemporary = false
+            credential.type = CredentialRepresentation.PASSWORD
+            credential.value = "password"
+
+            keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
+            keycloak.keycloakAdminClient.realm(realmName).users().create(client)
+            keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
+
+
+            val createdManager =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.email)[0]
+            val createdClient =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
+            val createdExpert =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
+
+            val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
+            val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
+            val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel().add(listOf(roleClient.toRepresentation()))
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
+
+        }
+
+        fun testKeycloakGetManagerToken (keycloak: KeycloakContainer) : String {
+            val realmName = "SpringBootKeycloak"
+            val clientId = "springboot-keycloak-client"
+            val kcManager = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username("manager@polito.it")
+                .password("password")
+                .build()
+            kcManager.tokenManager().grantToken().expiresIn = 50000
+            return kcManager.tokenManager().accessToken.token
+        }
+
+        fun testKeycloakGetClientToken (keycloak: KeycloakContainer) : String {
+            val realmName = "SpringBootKeycloak"
+            val clientId = "springboot-keycloak-client"
+            val kcClient = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username("client@polito.it")
+                .password("password")
+                .build()
+            kcClient.tokenManager().grantToken().expiresIn = 50000
+            return kcClient.tokenManager().accessToken.token
+        }
+
+        fun testKeycloakGetExpertToken (keycloak: KeycloakContainer) : String {
+            val realmName = "SpringBootKeycloak"
+            val clientId = "springboot-keycloak-client"
+            val kcExpert = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username("expert@polito.it")
+                .password("password")
+                .build()
+            kcExpert.tokenManager().grantToken().expiresIn = 50000
+            return kcExpert.tokenManager().accessToken.token
         }
     }
 }

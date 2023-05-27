@@ -42,60 +42,7 @@ class AuthControllerTest {
         @BeforeAll
         fun setup(){
             keycloak.start()
-
-            val realmName = "SpringBootKeycloak"
-            val clientId = "springboot-keycloak-client"
-
-            val manager = UserRepresentation()
-            manager.email = "manager@polito.it"
-            manager.username = "manager_01"
-            manager.isEnabled = true
-
-            val client = UserRepresentation()
-            client.email = "client@polito.it"
-            client.username = "client_01"
-            client.isEnabled = true
-
-            val expert = UserRepresentation()
-            expert.email = "expert@polito.it"
-            expert.username = "expert_01"
-            expert.isEnabled = true
-
-            val credential = CredentialRepresentation()
-            credential.isTemporary = false
-            credential.type = CredentialRepresentation.PASSWORD
-            credential.value = "password"
-
-            keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(client)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
-
-
-            val createdManager =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.email)[0]
-            val createdClient =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
-            val createdExpert =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
-
-            val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
-            val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
-            val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel().add(listOf(roleClient.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
-
-
-            keycloak.keycloakAdminClient.realm(realmName).clients().findByClientId(clientId)[0].clientAuthenticatorType = "client-secret"
-
-
-
+            TestUtils.testKeycloakSetup(keycloak)
         }
 
         @JvmStatic
