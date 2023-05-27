@@ -43,6 +43,9 @@ import java.util.*
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
 class MessageControllerTests {
+    val json = BasicJsonParser()
+    val imageArray = byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4e.toByte(), 0x47.toByte(), 0x0d.toByte(), 0x0a.toByte(), 0x1a.toByte(), 0x0a.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0d.toByte(), 0x49.toByte(), 0x48.toByte(), 0x44.toByte(), 0x52.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x64.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x64.toByte(), 0x04.toByte(), 0x03.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x82.toByte(), 0xcc.toByte(), 0x88.toByte(), 0x67.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte(), 0x73.toByte(), 0x52.toByte(), 0x47.toByte(), 0x42.toByte(), 0x00.toByte(), 0xae.toByte(), 0xce.toByte(), 0x1c.toByte(), 0xe9.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x04.toByte(), 0x67.toByte(), 0x41.toByte(), 0x4d.toByte(), 0x41.toByte(), 0x00.toByte(), 0x00.toByte(), 0xb1.toByte(), 0x8f.toByte(), 0x0b.toByte(), 0xfc.toByte(), 0x61.toByte(), 0x05.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x06.toByte(), 0x50.toByte(), 0x4c.toByte(), 0x54.toByte(), 0x45.toByte(), 0xff.toByte(), 0xff.toByte(), 0xff.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x55.toByte(), 0xc2.toByte(), 0xd3.toByte(), 0x7e.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x09.toByte(), 0x70.toByte(), 0x48.toByte(), 0x59.toByte(), 0x73.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0e.toByte(), 0xc3.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0e.toByte(), 0xc3.toByte(), 0x01.toByte(), 0xc7.toByte(), 0x6f.toByte(), 0xa8.toByte(), 0x64.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x54.toByte(), 0x49.toByte(), 0x44.toByte(), 0x41.toByte(), 0x54.toByte(), 0x58.toByte(), 0xc3.toByte(), 0xed.toByte(), 0xd3.toByte(), 0x41.toByte(), 0x0e.toByte(), 0x80.toByte(), 0x20.toByte(), 0x0c.toByte(), 0x44.toByte(), 0xd1.toByte(), 0xe9.toByte(), 0x0d.toByte(), 0xf0.toByte(), 0xfe.toByte(), 0x97.toByte(), 0x25.toByte(), 0xda.toByte(), 0xc2.toByte(), 0x42.toByte(), 0x8d.toByte(), 0x61.toByte(), 0x45.toByte(), 0x26.toByte(), 0xe6.toByte(), 0xbf.toByte(), 0x05.toByte(), 0x94.toByte(), 0x36.toByte(), 0xb3.toByte(), 0x02.toByte(), 0x04.toByte(), 0x00.toByte(), 0x00.toByte(), 0x8c.toByte(), 0x1c.toByte(), 0x45.toByte(), 0x51.toByte(), 0x45.toByte(), 0x53.toByte(), 0x96.toByte(), 0x63.toByte(), 0xcf.toByte(), 0x72.toByte(), 0x7f.toByte(), 0xe4.toByte(), 0x4a.toByte(), 0x9d.toByte(), 0x6b.toByte(), 0xcc.toByte(), 0x49.toByte(), 0x9e.toByte(), 0xef.toByte(), 0x5d.toByte(), 0x9b.toByte(), 0x48.toByte(), 0x22.toByte(), 0xf2.toByte(), 0x15.toByte(), 0x79.toByte(), 0xdc.toByte(), 0xbe.toByte(), 0x4b.toByte(), 0xa4.toByte(), 0x2d.toByte(), 0x74.toByte(), 0x89.toByte(), 0xbc.toByte(), 0x0d.toByte(), 0xed.toByte(), 0x7e.toByte(), 0xa5.toByte(), 0xdd.toByte(), 0x1b.toByte(), 0x03.toByte(), 0x00.toByte(), 0xe0.toByte(), 0xef.toByte(), 0xa4.toByte(), 0x0e.toByte(), 0x34.toByte(), 0x24.toByte(), 0x16.toByte(), 0xea.toByte(), 0x92.toByte(), 0x7e.toByte(), 0x66.toByte(), 0x58.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x49.toByte(), 0x45.toByte(), 0x4e.toByte(), 0x44.toByte(), 0xae.toByte(), 0x42.toByte(), 0x60)
+
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -174,110 +177,39 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getExistingMessagesManager() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-        val customer2 = Profile()
-        customer2.email = "client@polito.it"
-        customer2.name = "Mario"
-        customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer2)
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
+        profileRepository.save(customer2)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
-
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
-
-        val message4 = Message()
-        message4.text = "Test message 4"
-        message4.sentTimestamp = Timestamp(0)
-        message4.ticket = ticket2
-        message4.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message4 = TestUtils.testMessage("Test message", Timestamp(0), ticket2, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/manager/chat/${ticket.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
 
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -286,9 +218,9 @@ class MessageControllerTests {
             String::class.java
         )
 
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(3, body.size)
         Assertions.assertEquals(true, body.any{a -> a["text"] == message1.text})
         Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
@@ -319,105 +251,36 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getExistingMessagesAuthorizedClient() {
-        val customer = Profile()
-        customer.email = "client@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
-
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
-
-        val message4 = Message()
-        message4.text = "Test message 4"
-        message4.sentTimestamp = Timestamp(0)
-        message4.ticket = ticket2
-        message4.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message4 = TestUtils.testMessage("Test message", Timestamp(0), ticket2, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -426,9 +289,9 @@ class MessageControllerTests {
             String::class.java
         )
 
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(3, body.size)
         Assertions.assertEquals(true, body.any{a -> a["text"] == message1.text})
         Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
@@ -459,112 +322,38 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getExistingMessagesForbiddenClient() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-        val customer2 = Profile()
-        customer2.email = "client@polito.it"
-        customer2.name = "Mario"
-        customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer2)
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
+        profileRepository.save(customer2)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
-
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
-
-        val message4 = Message()
-        message4.text = "Test message 4"
-        message4.sentTimestamp = Timestamp(0)
-        message4.ticket = ticket2
-        message4.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message4 = TestUtils.testMessage("Test message", Timestamp(0), ticket2, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -591,96 +380,36 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getExistingMessagesAuthorizedExpert() {
-        val customer = Profile()
-        customer.email = "client@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "expert@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
 
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
 
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
-
-        val message4 = Message()
-        message4.text = "Test message 4"
-        message4.sentTimestamp = Timestamp(0)
-        message4.ticket = ticket2
-        message4.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message4 = TestUtils.testMessage("Test message", Timestamp(0), ticket2, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -689,9 +418,9 @@ class MessageControllerTests {
             String::class.java
         )
 
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(3, body.size)
         Assertions.assertEquals(true, body.any{a -> a["text"] == message1.text})
         Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
@@ -722,110 +451,38 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getExistingMessagesForbiddenExpert() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-        val customer2 = Profile()
-        customer2.email = "client@polito.it"
-        customer2.name = "Mario"
-        customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer2)
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
+        profileRepository.save(customer2)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
-
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
-
-        val message4 = Message()
-        message4.text = "Test message 4"
-        message4.sentTimestamp = Timestamp(0)
-        message4.ticket = ticket2
-        message4.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message4 = TestUtils.testMessage("Test message", Timestamp(0), ticket2, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -851,110 +508,38 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getExistingMessagesUnauthorized() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-        val customer2 = Profile()
-        customer2.email = "client@polito.it"
-        customer2.name = "Mario"
-        customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer2)
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
+        profileRepository.save(customer2)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
-
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
-
-        val message4 = Message()
-        message4.text = "Test message 4"
-        message4.sentTimestamp = Timestamp(0)
-        message4.ticket = ticket2
-        message4.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message4 = TestUtils.testMessage("Test message", Timestamp(0), ticket2, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth("")
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, "")
 
         val result = restTemplate.exchange(
             uri,
@@ -980,103 +565,36 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getEmptyChat() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-        val customer2 = Profile()
-        customer2.email = "client@polito.it"
-        customer2.name = "Mario"
-        customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer2)
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
+        profileRepository.save(customer2)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
-
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
 
-        val url = "http://localhost:$port/API/manager/chat/${ticket2.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/chat/${ticket2.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1085,9 +603,9 @@ class MessageControllerTests {
             String::class.java
         )
 
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(0, body.size)
         messageRepository.delete(message3)
         messageRepository.delete(message2)
@@ -1103,22 +621,12 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getNonExistingChat() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
 
-        val url = "http://localhost:$port/API/manager/chat/1"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/chat/1")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1134,22 +642,12 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getWrongIdChat() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
 
-        val url = "http://localhost:$port/API/manager/chat/abc"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/chat/abc")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1165,109 +663,41 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun getChatWithAttachments() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
 
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
-        val message1 = Message()
-        message1.text = "Test message"
-        message1.sentTimestamp = Timestamp(0)
-        message1.ticket = ticket
-        message1.sender = customer
 
-        val message2 = Message()
-        message2.text = "Test message 2"
-        message2.sentTimestamp = Timestamp(0)
-        message2.ticket = ticket
-        message2.sender = expert
-
-        val message3 = Message()
-        message3.text = "Test message 3"
-        message3.sentTimestamp = Timestamp(0)
-        message3.ticket = ticket
-        message3.sender = expert
-
-        val message4 = Message()
-        message4.text = "Test message 4"
-        message4.sentTimestamp = Timestamp(0)
-        message4.ticket = ticket2
-        message4.sender = expert
+        val message1 = TestUtils.testMessage("Test message", Timestamp(0), ticket, customer)
+        val message2 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message3 = TestUtils.testMessage("Test message", Timestamp(0), ticket, expert)
+        val message4 = TestUtils.testMessage("Test message", Timestamp(0), ticket2, expert)
 
         messageRepository.save(message1)
         messageRepository.save(message2)
         messageRepository.save(message3)
         messageRepository.save(message4)
 
-        val attachment1 = Attachment()
-        attachment1.name = "image01.jpg"
-        attachment1.message = message1
-
-        val attachment2 = Attachment()
-        attachment2.name = "image02.jpg"
-        attachment2.attachment = byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4e.toByte(), 0x47.toByte(), 0x0d.toByte(), 0x0a.toByte(), 0x1a.toByte(), 0x0a.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0d.toByte(), 0x49.toByte(), 0x48.toByte(), 0x44.toByte(), 0x52.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x64.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x64.toByte(), 0x04.toByte(), 0x03.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x82.toByte(), 0xcc.toByte(), 0x88.toByte(), 0x67.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte(), 0x73.toByte(), 0x52.toByte(), 0x47.toByte(), 0x42.toByte(), 0x00.toByte(), 0xae.toByte(), 0xce.toByte(), 0x1c.toByte(), 0xe9.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x04.toByte(), 0x67.toByte(), 0x41.toByte(), 0x4d.toByte(), 0x41.toByte(), 0x00.toByte(), 0x00.toByte(), 0xb1.toByte(), 0x8f.toByte(), 0x0b.toByte(), 0xfc.toByte(), 0x61.toByte(), 0x05.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x06.toByte(), 0x50.toByte(), 0x4c.toByte(), 0x54.toByte(), 0x45.toByte(), 0xff.toByte(), 0xff.toByte(), 0xff.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x55.toByte(), 0xc2.toByte(), 0xd3.toByte(), 0x7e.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x09.toByte(), 0x70.toByte(), 0x48.toByte(), 0x59.toByte(), 0x73.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0e.toByte(), 0xc3.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0e.toByte(), 0xc3.toByte(), 0x01.toByte(), 0xc7.toByte(), 0x6f.toByte(), 0xa8.toByte(), 0x64.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x54.toByte(), 0x49.toByte(), 0x44.toByte(), 0x41.toByte(), 0x54.toByte(), 0x58.toByte(), 0xc3.toByte(), 0xed.toByte(), 0xd3.toByte(), 0x41.toByte(), 0x0e.toByte(), 0x80.toByte(), 0x20.toByte(), 0x0c.toByte(), 0x44.toByte(), 0xd1.toByte(), 0xe9.toByte(), 0x0d.toByte(), 0xf0.toByte(), 0xfe.toByte(), 0x97.toByte(), 0x25.toByte(), 0xda.toByte(), 0xc2.toByte(), 0x42.toByte(), 0x8d.toByte(), 0x61.toByte(), 0x45.toByte(), 0x26.toByte(), 0xe6.toByte(), 0xbf.toByte(), 0x05.toByte(), 0x94.toByte(), 0x36.toByte(), 0xb3.toByte(), 0x02.toByte(), 0x04.toByte(), 0x00.toByte(), 0x00.toByte(), 0x8c.toByte(), 0x1c.toByte(), 0x45.toByte(), 0x51.toByte(), 0x45.toByte(), 0x53.toByte(), 0x96.toByte(), 0x63.toByte(), 0xcf.toByte(), 0x72.toByte(), 0x7f.toByte(), 0xe4.toByte(), 0x4a.toByte(), 0x9d.toByte(), 0x6b.toByte(), 0xcc.toByte(), 0x49.toByte(), 0x9e.toByte(), 0xef.toByte(), 0x5d.toByte(), 0x9b.toByte(), 0x48.toByte(), 0x22.toByte(), 0xf2.toByte(), 0x15.toByte(), 0x79.toByte(), 0xdc.toByte(), 0xbe.toByte(), 0x4b.toByte(), 0xa4.toByte(), 0x2d.toByte(), 0x74.toByte(), 0x89.toByte(), 0xbc.toByte(), 0x0d.toByte(), 0xed.toByte(), 0x7e.toByte(), 0xa5.toByte(), 0xdd.toByte(), 0x1b.toByte(), 0x03.toByte(), 0x00.toByte(), 0xe0.toByte(), 0xef.toByte(), 0xa4.toByte(), 0x0e.toByte(), 0x34.toByte(), 0x24.toByte(), 0x16.toByte(), 0xea.toByte(), 0x92.toByte(), 0x7e.toByte(), 0x66.toByte(), 0x58.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x49.toByte(), 0x45.toByte(), 0x4e.toByte(), 0x44.toByte(), 0xae.toByte(), 0x42.toByte(), 0x60)
-        attachment2.message = message4
-
+        val attachment1 = TestUtils.testAttachment("image01.jpg", imageArray, message1)
+        val attachment2 = TestUtils.testAttachment("image01.jpg", imageArray, message4)
         attachmentRepository.save(attachment1)
         attachmentRepository.save(attachment2)
 
-        val url = "http://localhost:$port/API/manager/chat/${ticket2.getId()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/chat/${ticket2.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1304,55 +734,18 @@ class MessageControllerTests {
     @DirtiesContext
     fun addMessageSuccessfulAuthorizedClient() {
 
-        val customer = Profile()
-        customer.email = "client@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -1366,19 +759,15 @@ class MessageControllerTests {
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
 
-        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message, headers)
+        val entity = TestUtils.testEntityHeader(message, clientToken)
 
         val result = restTemplate.exchange(
             uri,
             HttpMethod.POST,
-            requestEntity,
+            entity,
             String::class.java
         )
 
@@ -1402,96 +791,43 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun addMessageForbiddenClient() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-
-        val customer2 = Profile()
-        customer2.email = "client@polito.it"
-        customer2.name = "Mario"
-        customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer2)
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
+        profileRepository.save(customer2)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
         val message = MessageDTO(
             null,
             ticket.getId()!!,
-            customer.email!!,
+            customer.email,
             "message text",
             Timestamp(1),
             mutableSetOf()
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message, headers)
+        val entity = TestUtils.testEntityHeader(message, clientToken)
 
         val result = restTemplate.exchange(
             uri,
             HttpMethod.POST,
-            requestEntity,
+            entity,
             String::class.java
         )
 
@@ -1508,81 +844,39 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun addMessageSuccessfulAuthorizedExpert() {
-        val customer = Profile()
-        customer.email = "client@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "expert@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
         val message = MessageDTO(
             null,
             ticket.getId()!!,
-            customer.email!!,
+            customer.email,
             "message text",
             Timestamp(1),
             mutableSetOf()
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message, headers)
+        val entity = TestUtils.testEntityHeader(message, expertToken)
 
         val result = restTemplate.exchange(
             uri,
             HttpMethod.POST,
-            requestEntity,
+            entity,
             String::class.java
         )
 
@@ -1606,95 +900,43 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun addMessageForbiddenExpert() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
-        val customer2 = Profile()
-        customer2.email = "client@polito.it"
-        customer2.name = "Mario"
-        customer2.surname = "Rossi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "expert@polito.it"
-        expert2.name = "Mario"
-        expert2.surname = "Bianchi"
-        expert2.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer2)
-        profileRepository.save(expert2)
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
+        profileRepository.save(customer2)
         profileRepository.save(expert)
+        profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(1)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(1), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
         val message = MessageDTO(
             null,
             ticket.getId()!!,
-            customer.email!!,
+            customer.email,
             "message text",
             Timestamp(1),
             mutableSetOf()
         )
 
 
-        val url = "http://localhost:$port/API/chat/${ticket.getId()}"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/chat/${ticket.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message, headers)
+        val entity = TestUtils.testEntityHeader(message, expertToken)
 
         val result = restTemplate.exchange(
             uri,
             HttpMethod.POST,
-            requestEntity,
+            entity,
             String::class.java
         )
 
@@ -1711,57 +953,34 @@ class MessageControllerTests {
     @Test
     @DirtiesContext
     fun addMessageNonExistingTicket() {
-        val customer = Profile()
-        customer.email = "client@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
 
         val message = MessageDTO(
             null,
             25,
-            customer.email!!,
+            customer.email,
             "message text",
             Timestamp(0),
             mutableSetOf()
         )
 
-        val url = "http://localhost:$port/API/chat/25"
-        val uri = URI(url)
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
+        val uri = URI("http://localhost:$port/API/chat/25")
 
-        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message, headers)
+        val entity = TestUtils.testEntityHeader(message, clientToken)
 
         val result = restTemplate.exchange(
             uri,
             HttpMethod.POST,
-            requestEntity,
+            entity,
             String::class.java
         )
 
@@ -1772,65 +991,5 @@ class MessageControllerTests {
         productRepository.delete(product)
         profileRepository.delete(manager)
     }
-
-    /*@Test
-    @DirtiesContext
-    fun addMessageNonExistingProfile() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CUSTOMER
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        profileRepository.save(customer)
-        profileRepository.save(expert)
-
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
-        productRepository.save(product)
-
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
-
-        ticketRepository.save(ticket)
-
-        val message = MessageDTO(
-            null,
-            ticket.ticketId!!,
-            123456,
-            "message text",
-            Timestamp(0),
-            mutableSetOf()
-        )
-
-        val url = "http://localhost:$port/API/chat/${ticket.ticketId}"
-        val uri = URI(url)
-        val requestEntity : HttpEntity<MessageDTO> = HttpEntity(message)
-        val result = restTemplate.postForEntity(uri, requestEntity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
-        ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-    }*/
 }
 
