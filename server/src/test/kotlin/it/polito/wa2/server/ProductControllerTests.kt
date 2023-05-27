@@ -29,6 +29,7 @@ import java.net.URI
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
 class ProductControllerTests {
+    val json = BasicJsonParser()
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -72,33 +73,17 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsUnauthorized() {
-        val url = "http://localhost:$port/API/public/products/"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
 
-        val entity = HttpEntity(null, headers)
+        val entity = HttpEntity(null, null)
 
         val result = restTemplate.exchange(
             uri,
@@ -107,9 +92,9 @@ class ProductControllerTests {
             String::class.java
         )
 
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 3)
 
         Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
@@ -132,34 +117,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsManager() {
-        val url = "http://localhost:$port/API/public/products/"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -167,9 +134,9 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 3)
 
         Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
@@ -193,34 +160,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsClient() {
-        val url = "http://localhost:$port/API/public/products/"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -228,9 +177,9 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 3)
 
         Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
@@ -254,34 +203,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductsExpert() {
-        val url = "http://localhost:$port/API/public/products/"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -289,9 +220,9 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 3)
 
         Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
@@ -316,34 +247,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductManager() {
-        val url = "http://localhost:$port/API/public/products/0000000000000"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -351,9 +264,9 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
         Assertions.assertEquals(product1.productId, body["productId"])
         Assertions.assertEquals(product1.name, body["name"])
         Assertions.assertEquals(product1.brand, body["brand"])
@@ -367,34 +280,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductClient() {
-        val url = "http://localhost:$port/API/public/products/0000000000000"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -402,9 +297,9 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
         Assertions.assertEquals(product1.productId, body["productId"])
         Assertions.assertEquals(product1.name, body["name"])
         Assertions.assertEquals(product1.brand, body["brand"])
@@ -418,34 +313,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getExistingProductExpert() {
-        val url = "http://localhost:$port/API/public/products/0000000000000"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -453,9 +330,9 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
         Assertions.assertEquals(product1.productId, body["productId"])
         Assertions.assertEquals(product1.name, body["name"])
         Assertions.assertEquals(product1.brand, body["brand"])
@@ -469,32 +346,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductUnauthorized() {
-        val url = "http://localhost:$port/API/public/products/0000000000000"
-        val uri = URI(url)
-        val json = BasicJsonParser()
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
+        val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-
-        val entity = HttpEntity(null, headers)
+        val entity = HttpEntity(null, null)
 
         val result = restTemplate.exchange(
             uri,
@@ -502,9 +363,9 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
         Assertions.assertEquals(product1.productId, body["productId"])
         Assertions.assertEquals(product1.name, body["name"])
         Assertions.assertEquals(product1.brand, body["brand"])
@@ -517,33 +378,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getNonExistingProductManager() {
-        val url = "http://localhost:$port/API/public/products/0000000000003"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/public/products/0000000000003")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -562,33 +406,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getNonExistingProductClient() {
-        val url = "http://localhost:$port/API/public/products/0000000000003"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/public/products/0000000000003")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -607,33 +434,16 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getNonExistingProductExpert() {
-        val url = "http://localhost:$port/API/public/products/0000000000003"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/public/products/0000000000003")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
-        val product2 = Product()
-        product2.productId = "0000000000001"
-        product2.name = "iPad 7th Generation"
-        product2.brand = "Apple"
-
-        val product3 = Product()
-        product3.productId = "0000000000002"
-        product3.name = "Surface Pro 10 inches"
-        product3.brand = "Microsoft"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", "Apple")
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", "Microsoft")
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -652,22 +462,12 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductWrongIdManager() {
-        val url = "http://localhost:$port/API/public/products/000000000000"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/000000000000")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product1)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -684,22 +484,12 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductWrongIdClient() {
-        val url = "http://localhost:$port/API/public/products/000000000000"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/000000000000")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product1)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -716,22 +506,12 @@ class ProductControllerTests {
     @Test
     @DirtiesContext
     fun getProductWrongIdExpert() {
-        val url = "http://localhost:$port/API/public/products/000000000000"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/public/products/000000000000")
 
-        val product1 = Product()
-        product1.productId = "0000000000000"
-        product1.name = "PC Omen Intel i7"
-        product1.brand = "HP"
-
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product1)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
