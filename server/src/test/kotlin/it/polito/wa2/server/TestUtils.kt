@@ -8,6 +8,7 @@ import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
+import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
@@ -15,6 +16,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import java.sql.Timestamp
+import kotlin.math.exp
 
 class TestUtils {
     companion object {
@@ -69,6 +71,18 @@ class TestUtils {
 
             return attachment
         }
+
+        fun testTicketHistory(ticket:Ticket, expert:Profile, newStatus: TicketStatus, oldStatus: TicketStatus, updatedTimestamp: Timestamp, user:Profile) : TicketHistory{
+            val ticketHistory = TicketHistory()
+            ticketHistory.ticket = ticket
+            ticketHistory.currentExpert = expert
+            ticketHistory.newState = newStatus
+            ticketHistory.oldState = oldStatus
+            ticketHistory.updatedTimestamp = updatedTimestamp
+            ticketHistory.user = user
+            return ticketHistory
+        }
+
 
         fun <T> testEntityHeader(body: T?, token: String): HttpEntity<T> {
             val headers = HttpHeaders()
