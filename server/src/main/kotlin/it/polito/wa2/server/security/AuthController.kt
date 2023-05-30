@@ -23,11 +23,13 @@ class AuthController(
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
         val body = "grant_type=password&username=${loginRequest.username}&password=${loginRequest.password}" +
-                "&client_id=$clientId&client_secret=$clientSecret"
+                "&client_id=$clientId"
 
         val entity = HttpEntity(body, headers)
 
         val tokenUrl = "$authServerUrl/realms/$realm/protocol/openid-connect/token"
+        println(tokenUrl)
+        println(body)
         val json = BasicJsonParser()
         try {
             val response = restTemplate.exchange(
@@ -35,6 +37,7 @@ class AuthController(
                 HttpMethod.POST,
                 entity,
                 String::class.java)
+            println(response)
             val responseBody = response.body ?: throw IllegalStateException("Unable to retrieve access token")
             val tokenResponse = TokenResponse(
                 json.parseMap(responseBody)["access_token"]!!.toString(),
@@ -43,6 +46,7 @@ class AuthController(
             return LoginResponse(tokenResponse.accessToken, tokenResponse.expiresIn)
 
         } catch(e: RuntimeException){
+            println(e)
             throw LoginFailedException("Login failed")
         }
     }
