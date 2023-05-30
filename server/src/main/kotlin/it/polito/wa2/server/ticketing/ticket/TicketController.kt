@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.ticket
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestFilterException
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.UnprocessableProfileException
@@ -14,6 +15,7 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 
 @RestController
+@Observed
 class TicketController(private val ticketService: TicketService) {
     @GetMapping("/API/manager/ticketing/{ticketId}")
     fun managerGetTicket(principal: Principal, @PathVariable ticketId: Long): TicketDTO {

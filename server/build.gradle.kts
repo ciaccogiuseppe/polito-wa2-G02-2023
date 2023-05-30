@@ -34,6 +34,7 @@ dependencies {
 	// implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.keycloak:keycloak-admin-client:11.0.3")
 	// implementation("org.keycloak:keycloak-spring-boot-starter")
 	// compileOnly("org.projectlombok:lombok")
 	// annotationProcessor("org.projectlombok:lombok")
@@ -45,6 +46,12 @@ dependencies {
 	testImplementation("org.testcontainers:postgresql:1.16.3")
 	testImplementation("com.github.dasniko:testcontainers-keycloak:2.5.0")
 	// annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor")
+	implementation("org.springframework.boot:spring-boot-starter-aop")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("io.micrometer:micrometer-registry-prometheus")
+	implementation("io.micrometer:micrometer-tracing-bridge-brave")
+	implementation("io.zipkin.reporter2:zipkin-reporter-brave")
+	implementation("com.github.loki4j:loki-logback-appender:1.4.0-rc2")
 }
 
 tasks.withType<KotlinCompile> {

@@ -30,6 +30,7 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.GET, "/API/public/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/API/public/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/API/login/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/attachment/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers(HttpMethod.GET, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers(HttpMethod.POST, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)
