@@ -20,6 +20,9 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
     @Bean
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain{
         httpSecurity.authorizeHttpRequests()
+            .requestMatchers(HttpMethod.GET, "").permitAll()
+            .requestMatchers(HttpMethod.GET, "/*").permitAll()
+            .requestMatchers(HttpMethod.GET, "/static/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/manager/**").hasRole(MANAGER)
             .requestMatchers(HttpMethod.PUT, "/API/manager/**").hasRole(MANAGER)
             .requestMatchers(HttpMethod.GET, "/API/client/**").hasRole(CLIENT)
