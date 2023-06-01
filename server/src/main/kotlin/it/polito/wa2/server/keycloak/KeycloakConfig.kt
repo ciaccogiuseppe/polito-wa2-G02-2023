@@ -14,16 +14,19 @@ import org.springframework.validation.annotation.Validated
 class KeycloakConfig(
     @Value("\${keycloak.auth-server-url}") private val serverUrl: String,
     @Value("\${keycloak.realm}") private val realm: String,
-    @Value("\${keycloak.resource}") private val clientId: String,
+    @Value("\${keycloak.admin.realm}") private val admin_realm: String,
+    @Value("\${keycloak.admin.client}") private val clientId: String,
+    @Value("\${keycloak.credentials.username}") private val adminUsername:String,
+    @Value("\${keycloak.credentials.password}") private val adminPassword:String,
     @Value("\${keycloak.credentials.secret}") private val clientSecret: String
 ) {
     val keycloak: Keycloak = KeycloakBuilder.builder()
         .serverUrl(serverUrl)
-        .realm(realm)
-        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+        .realm(admin_realm)
+        .grantType(OAuth2Constants.PASSWORD)
         .clientId(clientId)
-        .clientSecret(clientSecret)
-        .resteasyClient(ResteasyClientBuilder().connectionPoolSize(10).build())
+        .username(adminUsername)
+        .password(adminPassword)
         .build()
 
     fun getRealm(): RealmResource{
