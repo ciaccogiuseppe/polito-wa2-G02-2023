@@ -1,5 +1,6 @@
 package it.polito.wa2.server.keycloak
 
+import it.polito.wa2.server.profiles.ProfileDTO
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 
@@ -21,3 +22,7 @@ data class UserDTO (
         message="surname must be valid")
     val lastName: String
 )
+
+fun UserDTO.toProfileDTO(): ProfileDTO {
+    return ProfileDTO (this.email, this.firstName, this.lastName, null)
+}

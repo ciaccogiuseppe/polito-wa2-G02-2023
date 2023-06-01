@@ -1,31 +1,56 @@
 package it.polito.wa2.server.keycloak
 
+import it.polito.wa2.server.BadRequestProfileException
+import it.polito.wa2.server.ProfileNotFoundException
+import it.polito.wa2.server.profiles.ProfileService
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import javax.ws.rs.core.Response
 
-@Service
-class KeycloakServiceImpl(private val keycloakConfig: KeycloakConfig): KeycloakService {
+@Service @Transactional
+class KeycloakServiceImpl(
+    private val keycloakConfig: KeycloakConfig,
+    private val profileService: ProfileService
+): KeycloakService {
     companion object {
         const val CLIENT = "app_client"
         const val EXPERT = "app_expert"
-        const val MANAGER = "app_manager"
+        //const val MANAGER = "app_manager"
     }
+
     override fun addClient(userDTO: UserDTO) {
         val user = createUser(userDTO)
         user.realmRoles = Collections.singletonList(CLIENT)
         addUser(user)
+        profileService.addProfile(userDTO.toProfileDTO())
     }
 
     override fun addExpert(userDTO: UserDTO) {
         val user = createUser(userDTO)
         user.realmRoles = Collections.singletonList(EXPERT)
         addUser(user)
+        profileService.addProfile(userDTO.toProfileDTO())
     }
 
-    private fun createUser(userDTO: UserDTO): UserRepresentation{
+    override fun updateUser(email: String, userDTO: UserDTO) {
+        if (email != userDTO.email)
+            throw BadRequestProfileException("Email in path doesn't match the email in the body")
+        // An email is associated with, at most, one user
+        val user = keycloakConfig.getRealm().users().searchByEmail(email, true).firstOrNull()
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
+
+        user.email = userDTO.email
+        user.firstName = userDTO.firstName
+        user.lastName = userDTO.lastName
+
+        keycloakConfig.getRealm().users().get(user.id).update(user)
+        profileService.updateProfile(email, userDTO.toProfileDTO())
+    }
+
+
+    private fun createUser(userDTO: UserDTO): UserRepresentation {
         val credentials: CredentialRepresentation =
             Credentials.createPasswordCredentials(userDTO.password)
         val user = UserRepresentation()
@@ -41,5 +66,4 @@ class KeycloakServiceImpl(private val keycloakConfig: KeycloakConfig): KeycloakS
     private fun addUser(user: UserRepresentation){
         keycloakConfig.getRealm().users().create(user)
     }
-
 }

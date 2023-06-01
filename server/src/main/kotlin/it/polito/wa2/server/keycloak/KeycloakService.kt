@@ -4,4 +4,6 @@ interface KeycloakService {
     fun addClient(userDTO: UserDTO)
 
     fun addExpert(userDTO: UserDTO)
+
+    fun updateUser(email: String, userDTO: UserDTO)
 }
