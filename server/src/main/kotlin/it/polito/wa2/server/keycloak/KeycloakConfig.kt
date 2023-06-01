@@ -15,17 +15,14 @@ class KeycloakConfig(
     @Value("\${keycloak.auth-server-url}") private val serverUrl: String,
     @Value("\${keycloak.realm}") private val realm: String,
     @Value("\${keycloak.resource}") private val clientId: String,
-    @Value("\${keycloak.credentials.username}") private val userName: String,
-    @Value("\${keycloak.credentials.password}") private val password: String
+    @Value("\${keycloak.credentials.secret}") private val clientSecret: String
 ) {
-
     val keycloak: Keycloak = KeycloakBuilder.builder()
         .serverUrl(serverUrl)
         .realm(realm)
-        .grantType(OAuth2Constants.PASSWORD)
-        .username(userName)
-        .password(password)
+        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
         .clientId(clientId)
+        .clientSecret(clientSecret)
         .resteasyClient(ResteasyClientBuilder().connectionPoolSize(10).build())
         .build()
 
