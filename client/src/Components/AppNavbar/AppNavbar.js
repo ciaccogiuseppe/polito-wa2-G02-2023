@@ -16,8 +16,9 @@ function AppNavbar(props){
                 <Navbar.Collapse id="basic-navbar-nav" style={{justifyContent:"center"}}>
                     <Nav>
                         <NavbarLink href={"/"} text={"HOME"} selected={selected==="home"}/>
-                        {props.loggedIn && <><NavbarLink href={"/"} text={"TICKETS"}  selected={selected==="tickets"}/>
-                        <NavbarLink href={"/"} text={"PROFILE"}  selected={selected==="profile"}/>
+                        {props.loggedIn && <>
+                            <NavbarLink href={"/tickets"} text={"TICKETS"}  selected={selected==="tickets"}/>
+                            <NavbarLink href={"/"} text={"PROFILE"}  selected={selected==="profile"}/>
                         </>}
                         {/*<NavbarLink href={"/"} text={"CONTACTS"}  selected={selected==="contacts"}/>*/}
                         <NavbarLink href={"/aboutus"} text={"ABOUT US"}  selected={selected==="aboutus"}/>
