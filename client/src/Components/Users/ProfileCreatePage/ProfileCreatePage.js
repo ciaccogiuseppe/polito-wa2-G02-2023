@@ -27,8 +27,8 @@ function ProfileCreatePage(props){
                 <Form className="form" style={{marginTop:"30px"}}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label style={{color:"#DDDDDD"}}>Personal Info</Form.Label>
-                        <Form.Control value={name} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto"}} type="input" placeholder="Name" onChange={e => setName(e.target.value)}/>
-                        <Form.Control value={surname} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="input" placeholder="Surname" onChange={e => setSurname(e.target.value)}/>
+                        <Form.Control value={name} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto"}} type="input" placeholder="First Name" onChange={e => setName(e.target.value)}/>
+                        <Form.Control value={surname} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="input" placeholder="Last Name" onChange={e => setSurname(e.target.value)}/>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label style={{color:"#DDDDDD"}}>Email address</Form.Label>
