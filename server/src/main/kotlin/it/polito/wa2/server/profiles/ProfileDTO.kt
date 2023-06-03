@@ -25,11 +25,11 @@ fun Profile.toDTO(): ProfileDTO {
     return ProfileDTO(email, name, surname, this.getId())
 }
 
-fun ProfileDTO.toNewProfile(): Profile {
+fun ProfileDTO.toNewProfile(profileRole: ProfileRole): Profile {
     val profile = Profile()
     profile.email = email
     profile.name = name
     profile.surname = surname
-    profile.role = ProfileRole.CLIENT
+    profile.role = profileRole
     return profile
 }

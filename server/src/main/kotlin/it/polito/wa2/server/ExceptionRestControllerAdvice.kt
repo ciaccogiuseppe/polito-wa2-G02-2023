@@ -11,6 +11,12 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     @ExceptionHandler(ForbiddenException::class)
     fun handleUnauthorized(e: ForbiddenException) = ProblemDetail.forStatusAndDetail( HttpStatus.FORBIDDEN, e.message!! )
 
+    @ExceptionHandler(UnprocessableUserException::class)
+    fun handleUnprocessableProfile(e: UnprocessableUserException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+
+    @ExceptionHandler(BadRequestUserException::class)
+    fun handleProfileBadRequest(e: BadRequestUserException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
+
     /************** Product exception handlers **************/
     @ExceptionHandler(ProductNotFoundException::class)
     fun handleProductNotFound(e: ProductNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
@@ -82,3 +88,5 @@ class UnauthorizedMessageException(message: String): RuntimeException(message)
 class BadRequestFilterException(message: String): RuntimeException(message)
 class LoginFailedException(message: String): RuntimeException(message)
 class ForbiddenException(message: String): RuntimeException(message)
+class UnprocessableUserException(message: String): RuntimeException(message)
+class BadRequestUserException(message: String): RuntimeException(message)
