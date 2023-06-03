@@ -20,6 +20,9 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
     @Bean
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain{
         httpSecurity.authorizeHttpRequests()
+            .requestMatchers(HttpMethod.GET, "").permitAll()
+            .requestMatchers(HttpMethod.GET, "/*").permitAll()
+            .requestMatchers(HttpMethod.GET, "/static/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/manager/**").hasRole(MANAGER)
             .requestMatchers(HttpMethod.POST, "/API/manager/**").hasRole(MANAGER)
             .requestMatchers(HttpMethod.PUT, "/API/manager/**").hasRole(MANAGER)
@@ -31,6 +34,7 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.GET, "/API/public/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/API/public/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/API/login/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/attachment/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers(HttpMethod.GET, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers(HttpMethod.POST, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)

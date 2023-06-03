@@ -1,5 +1,6 @@
 package it.polito.wa2.server.security
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.LoginFailedException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.json.BasicJsonParser
@@ -9,6 +10,7 @@ import org.springframework.web.client.RestTemplate
 
 
 @RestController
+@Observed
 class AuthController(
     @Value("\${keycloak.auth-server-url}") private val authServerUrl: String,
     @Value("\${keycloak.realm}") private val realm: String,

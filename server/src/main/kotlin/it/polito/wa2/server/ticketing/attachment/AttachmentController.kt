@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.attachment
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.UnprocessableAttachmentException
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import java.security.Principal
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
+@Observed
 class AttachmentController (private val attachmentService : AttachmentService) {
     @GetMapping("/API/attachment/{attachmentId}")
     fun getAttachment(principal: Principal, @PathVariable attachmentId: Long) : AttachmentDTO {
