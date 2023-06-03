@@ -25,8 +25,14 @@ class ProfileServiceImpl(private val profileRepository: ProfileRepository): Prof
     override fun addProfile(profileDTO: ProfileDTO) {
         if (profileRepository.findByEmail(profileDTO.email) != null)
             throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
-        profileRepository.save(profileDTO.toNewProfile())
+        profileRepository.save(profileDTO.toNewProfile(ProfileRole.CLIENT))
    }
+
+    override fun addProfileWithRole(profileDTO: ProfileDTO, profileRole: ProfileRole) {
+        if (profileRepository.findByEmail(profileDTO.email) != null)
+            throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
+        profileRepository.save(profileDTO.toNewProfile(profileRole))
+    }
 
     override fun updateProfile(email: String, newProfileDTO: ProfileDTO) {
         val profile = profileRepository.findByEmail(email)

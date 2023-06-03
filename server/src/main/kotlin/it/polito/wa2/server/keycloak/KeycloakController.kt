@@ -13,14 +13,14 @@ import java.security.Principal
 
 @RestController
 class KeycloakController(private val keycloakService: KeycloakService) {
-    @PostMapping("/API/public/clients")
+    @PostMapping("/API/signup")
     @ResponseStatus(HttpStatus.CREATED)
     fun addClient(@Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
         checkInputUser(userDTO, br)
         keycloakService.addClient(userDTO!!)
     }
 
-    @PostMapping("/API/manager/experts")
+    @PostMapping("/API/createExpert")
     @ResponseStatus(HttpStatus.CREATED)
     fun addExpert(@Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
         checkInputUser(userDTO, br)

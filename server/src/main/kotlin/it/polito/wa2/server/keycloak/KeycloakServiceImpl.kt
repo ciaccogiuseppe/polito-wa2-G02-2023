@@ -2,6 +2,7 @@ package it.polito.wa2.server.keycloak
 
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.ProfileNotFoundException
+import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
@@ -24,14 +25,14 @@ class KeycloakServiceImpl(
         val user = createUser(userDTO)
         addUser(user)
         keycloakConfig.assignRoles(user.username, listOf(CLIENT))
-        profileService.addProfile(userDTO.toProfileDTO())
+        profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.CLIENT)
     }
 
     override fun addExpert(userDTO: UserDTO) {
         val user = createUser(userDTO)
         addUser(user)
         keycloakConfig.assignRoles(user.username, listOf(EXPERT))
-        profileService.addProfile(userDTO.toProfileDTO())
+        profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.EXPERT)
     }
 
     override fun updateUser(email: String, userDTO: UserDTO) {
