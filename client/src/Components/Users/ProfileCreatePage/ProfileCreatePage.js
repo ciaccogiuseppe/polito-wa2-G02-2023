@@ -27,17 +27,17 @@ function ProfileCreatePage(props){
                 <Form className="form" style={{marginTop:"30px"}}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label style={{color:"#DDDDDD"}}>Personal Info</Form.Label>
-                        <Form.Control value={name} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto"}} type="input" placeholder="First Name" onChange={e => setName(e.target.value)}/>
-                        <Form.Control value={surname} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="input" placeholder="Last Name" onChange={e => setSurname(e.target.value)}/>
+                        <Form.Control value={name} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto"}} type="input" placeholder="First Name" onChange={e => setName(e.target.value)}/>
+                        <Form.Control value={surname} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="input" placeholder="Last Name" onChange={e => setSurname(e.target.value)}/>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label style={{color:"#DDDDDD"}}>Email address</Form.Label>
-                        <Form.Control value={email} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto"}} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
+                        <Form.Control value={email} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto"}} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label style={{color:"#DDDDDD"}}>Password</Form.Label>
-                        <Form.Control value={password} style={{width: "350px", alignSelf:"center", margin:"auto"}} type="password" placeholder="Password" onChange={e => setPassword(e.target.value)}/>
-                        <Form.Control value={password2} style={{width: "350px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="password" placeholder="Password" onChange={e => setPassword2(e.target.value)}/>
+                        <Form.Control value={password} style={{width: "300px", alignSelf:"center", margin:"auto"}} type="password" placeholder="Password" onChange={e => setPassword(e.target.value)}/>
+                        <Form.Control value={password2} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="password" placeholder="Confirm Password" onChange={e => setPassword2(e.target.value)}/>
                     </Form.Group>
                     <NavigationButton text={"Sign up"} onClick={e => e.preventDefault()}/>
                 </Form>

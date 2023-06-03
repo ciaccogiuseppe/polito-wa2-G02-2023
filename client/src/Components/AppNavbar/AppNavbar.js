@@ -9,7 +9,7 @@ function AppNavbar(props){
     const selected = props.selected
     return <>
         <>
-            <Navbar className="fixed-top" style={{backgroundColor:"#FDE0BE", padding:0, boxShadow:"0px 10px 20px -10px rgba(0,0,0,0.8)", justifyContent:"center"}} expand="lg">
+            <Navbar className="fixed-top" style={{backgroundColor:"#FDE0BE", padding:0, boxShadow:"0px 10px 20px -10px rgba(0,0,0,0.8)", justifyContent:"center"}}>
                 {/*<Navbar.Brand href="/" onClick={(e)=>{e.preventDefault(); navigate("/");}}>TICKETING</Navbar.Brand>*/}
 
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />

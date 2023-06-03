@@ -20,11 +20,11 @@ function LoginPage(props) {
                 <Form className="form" style={{marginTop:"30px"}}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label style={{color:"#DDDDDD"}}>Email address</Form.Label>
-                        <Form.Control value={email} className={"form-control:focus"} style={{width: "350px", alignSelf:"center", margin:"auto"}} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
+                        <Form.Control value={email} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto"}} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label style={{color:"#DDDDDD"}}>Password</Form.Label>
-                        <Form.Control value={password} style={{width: "350px", alignSelf:"center", margin:"auto"}} type="password" placeholder="Password" onChange={e => setPassword(e.target.value)}/>
+                        <Form.Control value={password} style={{width: "300px", alignSelf:"center", margin:"auto"}} type="password" placeholder="Password" onChange={e => setPassword(e.target.value)}/>
                     </Form.Group>
                     <NavigationButton text={"Login"} onClick={e => e.preventDefault()}/>
                 </Form>
