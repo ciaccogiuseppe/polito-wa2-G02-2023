@@ -10,15 +10,17 @@ import ProfileCreatePage from "./Components/Users/ProfileCreatePage/ProfileCreat
 import ProfileUpdatePage from "./Components/Users/ProfileUpdatePage/ProfileUpdatePage";
 import LoginPage from "./Components/Users/LoginPage/LoginPage";
 import {useState} from "react";
+import AboutUsPage from "./Components/Public/AboutUsPage/AboutUsPage";
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false)
   return (
-      <div style={{backgroundColor: '#537188'}}>
       <Router>
         <Routes>
           <Route path='/' element= {<HomePage loggedIn={loggedIn}/>}/>
           <Route path='/login' element= {<LoginPage loggedIn={loggedIn}/>}/>
+          <Route path='/signup' element= {<ProfileCreatePage loggedIn={loggedIn}/>}/>
+          <Route path='/aboutus' element= {<AboutUsPage loggedIn={loggedIn}/>}/>
           <Route path='/products' element= {<ProductsPage/>}/>
           <Route path='/productid' element= {<ProductIdPage/>}/>
           <Route path='/userinfo' element= {<ProfileInfoPage/>}/>
@@ -27,7 +29,6 @@ function App() {
           <Route path="*" element={<RedirectToHome/>} />
         </Routes>
       </Router>
-      </div>
   );
 }
 

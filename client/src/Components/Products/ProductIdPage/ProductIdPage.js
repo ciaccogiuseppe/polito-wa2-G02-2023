@@ -31,11 +31,6 @@ function ProductIdPage(props){
     }
 
     return <>
-        <div style={{
-            position: 'absolute',
-            backgroundColor: '#537188',
-            width: '100%',
-            height: '100%'}}>
             <AppNavbar/>
 
             <div className="CenteredButton">
@@ -58,7 +53,6 @@ function ProductIdPage(props){
                 {errMessage?<h5 className="text-danger" style={{marginTop:"10px"}}>{errMessage}</h5>:<></>}
 
             </div>
-        </div>
     </>
 }
 

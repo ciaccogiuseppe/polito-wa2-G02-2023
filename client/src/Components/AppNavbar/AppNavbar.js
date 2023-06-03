@@ -6,20 +6,21 @@ import NavbarLink from "./NavbarLink";
 
 function AppNavbar(props){
     const navigate = useNavigate();
+    const selected = props.selected
     return <>
         <>
-            <Navbar style={{backgroundColor:"#FDE0BE", padding:0, boxShadow:"0px 10px 20px -10px rgba(0,0,0,0.8)", justifyContent:"center"}} expand="lg">
+            <Navbar className="fixed-top" style={{backgroundColor:"#FDE0BE", padding:0, boxShadow:"0px 10px 20px -10px rgba(0,0,0,0.8)", justifyContent:"center"}} expand="lg">
                 {/*<Navbar.Brand href="/" onClick={(e)=>{e.preventDefault(); navigate("/");}}>TICKETING</Navbar.Brand>*/}
 
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav" style={{justifyContent:"center"}}>
                     <Nav>
-                        <NavbarLink href={"/"} text={"HOME"}/>
-                        {props.loggedIn && <><NavbarLink href={"/"} text={"TICKETS"}/>
-                        <NavbarLink href={"/"} text={"PROFILE"}/>
+                        <NavbarLink href={"/"} text={"HOME"} selected={selected==="home"}/>
+                        {props.loggedIn && <><NavbarLink href={"/"} text={"TICKETS"}  selected={selected==="tickets"}/>
+                        <NavbarLink href={"/"} text={"PROFILE"}  selected={selected==="profile"}/>
                         </>}
-                        <NavbarLink href={"/"} text={"CONTACTS"}/>
-                        <NavbarLink href={"/"} text={"ABOUT US"}/>
+                        {/*<NavbarLink href={"/"} text={"CONTACTS"}  selected={selected==="contacts"}/>*/}
+                        <NavbarLink href={"/aboutus"} text={"ABOUT US"}  selected={selected==="aboutus"}/>
                         {/*<NavDropdown
                         style={{backgroundColor:color2, height:"100%", fontWeight:"bold", color:textColor2}}
                         title="PRODUCTS"
