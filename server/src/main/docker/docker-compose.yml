@@ -44,6 +44,10 @@ services:
       - KEYCLOAK_AUTH-SERVER-URL=http://keycloak:8080
       - KEYCLOAK_REALM=SpringBootKeycloak
       - KEYCLOAK_RESOURCE=springboot-keycloak-client
+      - KEYCLOAK_CREDENTIALS_USERNAME=admin
+      - KEYCLOAK_CREDENTIALS_PASSWORD=admin
+      - KEYCLOAK_ADMIN_CLIENT=admin-cli
+      - KEYCLOAK_ADMIN_REALM=master
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/SpringBootKeycloak
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/SpringBootKeycloak/protocol/openid-connect/certs
     depends_on:

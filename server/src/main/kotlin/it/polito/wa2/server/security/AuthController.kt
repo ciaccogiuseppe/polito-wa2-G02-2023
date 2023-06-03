@@ -14,8 +14,7 @@ import org.springframework.web.client.RestTemplate
 class AuthController(
     @Value("\${keycloak.auth-server-url}") private val authServerUrl: String,
     @Value("\${keycloak.realm}") private val realm: String,
-    @Value("\${keycloak.resource}") private val clientId: String,
-    @Value("\${keycloak.credentials.secret}") private val clientSecret: String
+    @Value("\${keycloak.resource}") private val clientId: String
 ) {
     private val restTemplate = RestTemplate()
 

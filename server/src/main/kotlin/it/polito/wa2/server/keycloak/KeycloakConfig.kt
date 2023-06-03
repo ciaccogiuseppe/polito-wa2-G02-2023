@@ -19,8 +19,7 @@ class KeycloakConfig(
     @Value("\${keycloak.admin.realm}") private val admin_realm: String,
     @Value("\${keycloak.admin.client}") private val clientId: String,
     @Value("\${keycloak.credentials.username}") private val adminUsername:String,
-    @Value("\${keycloak.credentials.password}") private val adminPassword:String,
-    @Value("\${keycloak.credentials.secret}") private val clientSecret: String
+    @Value("\${keycloak.credentials.password}") private val adminPassword:String
 ) {
     val keycloak: Keycloak = KeycloakBuilder.builder()
         .serverUrl(serverUrl)
