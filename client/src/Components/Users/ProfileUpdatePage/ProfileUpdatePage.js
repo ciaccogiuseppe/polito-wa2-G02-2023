@@ -76,7 +76,7 @@ function ProfileUpdatePage(props){
     return <>
         <div style={{
             position: 'absolute',
-            backgroundColor: '#222222',
+            backgroundColor: '#537188',
             width: '100%',
             height: '100%'}}>
             <AppNavbar/>

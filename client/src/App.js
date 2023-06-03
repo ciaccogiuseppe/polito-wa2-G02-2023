@@ -8,13 +8,17 @@ import ProfileInfoPage from "./Components/Users/ProfileInfoPage/ProfileInfoPage"
 import RedirectToHome from "./Components/HomePage/RedirectToHome";
 import ProfileCreatePage from "./Components/Users/ProfileCreatePage/ProfileCreatePage";
 import ProfileUpdatePage from "./Components/Users/ProfileUpdatePage/ProfileUpdatePage";
+import LoginPage from "./Components/Users/LoginPage/LoginPage";
+import {useState} from "react";
 
 function App() {
+    const [loggedIn, setLoggedIn] = useState(false)
   return (
-      <div style={{backgroundColor: '#222222'}}>
+      <div style={{backgroundColor: '#537188'}}>
       <Router>
         <Routes>
-          <Route path='/' element= {<HomePage/>}/>
+          <Route path='/' element= {<HomePage loggedIn={loggedIn}/>}/>
+          <Route path='/login' element= {<LoginPage loggedIn={loggedIn}/>}/>
           <Route path='/products' element= {<ProductsPage/>}/>
           <Route path='/productid' element= {<ProductIdPage/>}/>
           <Route path='/userinfo' element= {<ProfileInfoPage/>}/>
