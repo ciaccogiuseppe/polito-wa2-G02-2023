@@ -12,6 +12,7 @@ import LoginPage from "./Components/Users/LoginPage/LoginPage";
 import {useState} from "react";
 import AboutUsPage from "./Components/Public/AboutUsPage/AboutUsPage";
 import TicketListPage from "./Components/Ticketing/TicketListPage/TicketListPage";
+import TicketCreatePage from "./Components/Ticketing/TicketCreatePage/TicketCreatePage";
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(true)
@@ -22,6 +23,7 @@ function App() {
           <Route path='/login' element= {<LoginPage loggedIn={loggedIn}/>}/>
           <Route path='/signup' element= {<ProfileCreatePage loggedIn={loggedIn}/>}/>
           <Route path='/tickets' element= {<TicketListPage loggedIn={loggedIn}/>}/>
+          <Route path='/newticket' element= {<TicketCreatePage loggedIn={loggedIn}/>}/>
           <Route path='/aboutus' element= {<AboutUsPage loggedIn={loggedIn}/>}/>
           <Route path='/products' element= {<ProductsPage/>}/>
           <Route path='/productid' element= {<ProductIdPage/>}/>

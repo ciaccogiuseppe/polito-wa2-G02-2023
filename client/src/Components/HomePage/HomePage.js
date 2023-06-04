@@ -22,7 +22,7 @@ function HomePage(props) {
         {loggedIn &&
         <>
             <div className="CenteredButton" style={{marginTop:"70px"}}>
-                <NavigationButton text={"Open a ticket"} onClick={(e) => { e.preventDefault(); navigate("/") }}/>
+                <NavigationButton text={"Open a ticket"} onClick={(e) => { e.preventDefault(); navigate("/newticket") }}/>
             </div>
         </>
         }
