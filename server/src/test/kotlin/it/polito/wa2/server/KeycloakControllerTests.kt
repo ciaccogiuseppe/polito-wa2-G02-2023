@@ -103,6 +103,49 @@ class KeycloakControllerTests {
 
     @Test
     @DirtiesContext
+    fun postClientBadRequest() {
+        val uri = URI("http://localhost:$port/API/signup")
+
+        val user : UserDTO? = null
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+    }
+
+    @Test
+    @DirtiesContext
+    fun postClientDuplicate() {
+        val uri = URI("http://localhost:$port/API/signup")
+
+        val profile = TestUtils.testProfile("mario.rossi@polito.it", "Profile", "Polito", ProfileRole.CLIENT)
+        profileRepository.save(profile)
+
+        val user = UserDTO(
+            "MarioR_99",
+            "mario.rossi@polito.it",
+            "password",
+            "Mario",
+            "Rossi"
+        )
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
+
+        profileRepository.delete(profile)
+    }
+
+    @Test
+    @DirtiesContext
     fun postExpert() {
         val uri = URI("http://localhost:$port/API/createExpert")
 
@@ -132,6 +175,49 @@ class KeycloakControllerTests {
         //TODO: check that user is also saved on Keycloak side (?)
 
         profileRepository.delete(createdProfile!!)
+    }
+
+    @Test
+    @DirtiesContext
+    fun postExpertBadRequest() {
+        val uri = URI("http://localhost:$port/API/createExpert")
+
+        val user : UserDTO? = null
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+    }
+
+    @Test
+    @DirtiesContext
+    fun postExpertDuplicate() {
+        val uri = URI("http://localhost:$port/API/createExpert")
+
+        val profile = TestUtils.testProfile("luigi.verdi@polito.it", "Profile", "Polito", ProfileRole.EXPERT)
+        profileRepository.save(profile)
+
+        val user = UserDTO(
+            "LuigiV_99",
+            "luigi.verdi@polito.it",
+            "password",
+            "Luigi",
+            "Verdi"
+        )
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
+
+        profileRepository.delete(profile)
     }
 
 }
