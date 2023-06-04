@@ -16,7 +16,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import java.sql.Timestamp
-import kotlin.math.exp
 
 class TestUtils {
     companion object {
