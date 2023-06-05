@@ -36,12 +36,14 @@ class KeycloakControllerTests {
         @Container
         val keycloak = KeycloakContainer().withRealmImportFile("keycloak/realm-test.json")
 
+        var managerToken = ""
 
         @JvmStatic
         @BeforeAll
         fun setup(){
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
+            managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
         }
 
         @JvmStatic
@@ -157,11 +159,8 @@ class KeycloakControllerTests {
             "Verdi"
         )
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-
-        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
-        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+        val entity = TestUtils.testEntityHeader(user, managerToken)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
 
@@ -184,11 +183,8 @@ class KeycloakControllerTests {
 
         val user : UserDTO? = null
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-
-        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
-        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+        val entity = TestUtils.testEntityHeader(user, managerToken)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
     }
@@ -209,11 +205,9 @@ class KeycloakControllerTests {
             "Verdi"
         )
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
+        val entity = TestUtils.testEntityHeader(user, managerToken)
 
-        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
-        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
 
