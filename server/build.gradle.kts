@@ -25,6 +25,8 @@ repositories {
 	mavenCentral()
 }
 
+
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -64,6 +66,7 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	systemProperty("logging.config", "./src/test/resources/logback-test.xml")
 }
 
 tasks.named("jibDockerBuild"){

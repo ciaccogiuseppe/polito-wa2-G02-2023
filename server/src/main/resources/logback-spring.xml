@@ -16,6 +16,7 @@
             </message>
             <sortByTime>true</sortByTime>
         </format>
+        <ignoreExceptions>true</ignoreExceptions>
     </appender>
 
     <root level="INFO">
