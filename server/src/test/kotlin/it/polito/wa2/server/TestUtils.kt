@@ -186,5 +186,12 @@ class TestUtils {
             kcExpert.tokenManager().grantToken().expiresIn = 50000
             return kcExpert.tokenManager().accessToken.token
         }
+
+        fun testKeycloakGetUser (keycloak: KeycloakContainer, email:String) : UserRepresentation? {
+            val realmName = "SpringBootKeycloak"
+            val clientId = "springboot-keycloak-client"
+
+            return keycloak.keycloakAdminClient.realm(realmName).users().search(email)[0]
+        }
     }
 }

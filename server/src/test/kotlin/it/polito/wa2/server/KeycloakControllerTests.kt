@@ -98,7 +98,12 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdProfile?.name)
         Assertions.assertEquals(user.lastName, createdProfile?.surname)
 
-        //TODO: check that user is also saved on Keycloak side (?)
+
+        val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
+        Assertions.assertNotNull(createdUser)
+        Assertions.assertEquals(user.email, createdUser?.email)
+        Assertions.assertEquals(user.firstName, createdUser?.firstName)
+        Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
         profileRepository.delete(createdProfile!!)
     }
@@ -171,7 +176,12 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdProfile?.name)
         Assertions.assertEquals(user.lastName, createdProfile?.surname)
 
-        //TODO: check that user is also saved on Keycloak side (?)
+
+        val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
+        Assertions.assertNotNull(createdUser)
+        Assertions.assertEquals(user.email, createdUser?.email)
+        Assertions.assertEquals(user.firstName, createdUser?.firstName)
+        Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
         profileRepository.delete(createdProfile!!)
     }
