@@ -24,7 +24,7 @@ function TicketTableTR(props){
     const title = props.title
     const createdTime = props.createdTime
     const status = StatusIndicator(props.status)
-    return <tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")} onClick={()=>navigate(`/ticket/${ticketId}`)}>
+    return <tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")} onClick={()=>navigate(`/tickets/${ticketId}`)}>
         <td className="text-light">{title}</td>
         <td style={{verticalAlign:"middle"}}>{status}</td>
         <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{createdTime}</td></tr>
