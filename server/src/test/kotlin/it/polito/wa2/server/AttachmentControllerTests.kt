@@ -73,7 +73,8 @@ class AttachmentControllerTests {
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
             registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-
+            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
+            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
             {keycloak.authServerUrl + "realms/SpringBootKeycloak"}
         }
