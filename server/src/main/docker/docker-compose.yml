@@ -25,6 +25,8 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+    volumes:
+      - ./postgres/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     networks:
       - app-network
 
@@ -35,12 +37,12 @@ services:
       context: .
     container_name: server
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       - KEYCLOAK_AUTH-SERVER-URL=http://keycloak:8080
       - KEYCLOAK_REALM=SpringBootKeycloak
       - KEYCLOAK_RESOURCE=springboot-keycloak-client
