@@ -9,6 +9,8 @@ import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
 import it.polito.wa2.server.ticketing.message.MessageRepository
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -56,6 +58,14 @@ class AttachmentControllerTests {
             clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -133,7 +143,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingAttachmentManager() {
 
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -182,7 +192,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    // @DirtiesContext
     fun getExistingAttachmentAuthorizedClient() {
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -232,7 +242,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingAttachmentForbiddenClient() {
 
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -278,7 +288,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingAttachmentAuthorizedExpert() {
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -329,7 +339,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingAttachmentForbiddenExpert() {
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -375,7 +385,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getWrongIdAttachment() {
 
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -398,7 +408,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNegativeIdAttachment() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -421,7 +431,7 @@ class AttachmentControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingAttachment() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)

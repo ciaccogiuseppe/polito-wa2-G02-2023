@@ -7,6 +7,7 @@ import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryRepository
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -52,6 +53,14 @@ class TicketHistoryControllerTests {
             clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -80,7 +89,7 @@ class TicketHistoryControllerTests {
     // --------------------------- no filters
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryWithNoFiltersAtAll() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -99,7 +108,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryWithNoFiltersAtAllForbiddenClient() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -119,7 +128,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryWithNoFiltersAtAllForbiddenExpert() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -142,7 +151,7 @@ class TicketHistoryControllerTests {
     // --------------------------- ticketId
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByTicketIdEmpty() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -162,7 +171,7 @@ class TicketHistoryControllerTests {
         val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
         ticketHistoryRepository.save(history1ticket1)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2")
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket2.getId()}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -187,7 +196,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByTicketId() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -212,7 +221,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history3ticket2)
 
 
-        val uri= URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2")
+        val uri= URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket2.getId()}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -222,10 +231,12 @@ class TicketHistoryControllerTests {
             entity,
             String::class.java
         )
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
 
         Assertions.assertEquals(body[0]["historyId"], history2ticket2.getId())
         Assertions.assertEquals(body[0]["ticketId"], history2ticket2.ticket!!.getId())
@@ -255,7 +266,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingTicketHistoryByTicketId() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -296,7 +307,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByTicketIdNegative() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -316,7 +327,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByTicketIdAlphabetic() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -338,7 +349,7 @@ class TicketHistoryControllerTests {
     // --------------------------- userEmail
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByUserEmail() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -405,7 +416,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingTicketHistoryByUserEmail() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -446,7 +457,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUserEmailInvalid() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -466,7 +477,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUserEmailNumeric() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -488,7 +499,7 @@ class TicketHistoryControllerTests {
     // --------------------------- currentExpertEmail
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByCurrentExpertEmail() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -555,7 +566,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingTicketHistoryByCurrentExpertEmail() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -596,7 +607,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByCurrentExpertEmailInvalid() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -616,7 +627,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByCurrentExpertEmailNumeric() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -638,7 +649,7 @@ class TicketHistoryControllerTests {
     // --------------------------- updatedAfter & updatedBefore
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfter() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -702,7 +713,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedBefore() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -758,7 +769,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBefore() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -814,7 +825,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeEmpty() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -863,7 +874,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeUnprocessable() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -883,7 +894,7 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeEqual() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -899,12 +910,13 @@ class TicketHistoryControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     // --------------------------- all filters
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryAllFilters() {
         val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("luigi.verdi@polito.it", "Luigi", "Verdi", ProfileRole.CLIENT)
@@ -937,7 +949,7 @@ class TicketHistoryControllerTests {
         ticketHistoryRepository.save(history5ticket1user1expert3timestamp43)
 
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=1&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}")
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket1.getId()}&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 

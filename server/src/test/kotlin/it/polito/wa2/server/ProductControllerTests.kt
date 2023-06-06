@@ -2,6 +2,7 @@ package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.products.ProductRepository
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -47,6 +48,14 @@ class ProductControllerTests {
             clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -67,7 +76,7 @@ class ProductControllerTests {
     lateinit var productRepository: ProductRepository
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProductsUnauthorized() {
         val uri = URI("http://localhost:$port/API/public/products/")
 
@@ -111,7 +120,7 @@ class ProductControllerTests {
 
     }
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProductsManager() {
         val uri = URI("http://localhost:$port/API/public/products/")
 
@@ -154,7 +163,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProductsClient() {
         val uri = URI("http://localhost:$port/API/public/products/")
 
@@ -197,7 +206,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProductsExpert() {
         val uri = URI("http://localhost:$port/API/public/products/")
 
@@ -241,7 +250,7 @@ class ProductControllerTests {
 
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProductManager() {
         val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
@@ -274,7 +283,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProductClient() {
         val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
@@ -307,7 +316,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProductExpert() {
         val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
@@ -340,7 +349,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getProductUnauthorized() {
         val uri = URI("http://localhost:$port/API/public/products/0000000000000")
 
@@ -372,7 +381,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingProductManager() {
         val uri = URI("http://localhost:$port/API/public/products/0000000000003")
 
@@ -400,7 +409,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingProductClient() {
         val uri = URI("http://localhost:$port/API/public/products/0000000000003")
 
@@ -428,7 +437,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingProductExpert() {
         val uri = URI("http://localhost:$port/API/public/products/0000000000003")
 
@@ -456,7 +465,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getProductWrongIdManager() {
         val uri = URI("http://localhost:$port/API/public/products/000000000000")
 
@@ -478,7 +487,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getProductWrongIdClient() {
         val uri = URI("http://localhost:$port/API/public/products/000000000000")
 
@@ -500,7 +509,7 @@ class ProductControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getProductWrongIdExpert() {
         val uri = URI("http://localhost:$port/API/public/products/000000000000")
 

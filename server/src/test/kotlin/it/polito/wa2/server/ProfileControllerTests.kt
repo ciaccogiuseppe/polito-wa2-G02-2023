@@ -3,6 +3,7 @@ package it.polito.wa2.server
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.profiles.*
 import jakarta.validation.constraints.NotBlank
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -52,6 +53,14 @@ class ProfileControllerTests {
             clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -71,7 +80,7 @@ class ProfileControllerTests {
     @Autowired
     lateinit var profileRepository: ProfileRepository
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProfile() {
         val email = "mario.rossi@polito.it"
         val uri = URI("http://localhost:$port/API/manager/profiles/$email")
@@ -102,7 +111,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProfileForbiddenClient() {
         val email = "mario.rossi@polito.it"
         val uri = URI("http://localhost:$port/API/manager/profiles/$email")
@@ -128,7 +137,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProfileForbiddenExpert() {
 
 
@@ -156,7 +165,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingProfile() {
         val email = "mario.bianchi@polito.it"
         val uri = URI("http://localhost:$port/API/manager/profiles/$email")
@@ -186,7 +195,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getProfileWrongFormats() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -243,7 +252,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileSuccess() {
         val uri = URI("http://localhost:$port/API/public/profiles")
 
@@ -270,7 +279,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileRepeatedMail() {
         val uri = URI("http://localhost:$port/API/public/profiles")
 
@@ -297,7 +306,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileWrongFormat() {
         val uri = URI("http://localhost:$port/API/public/profiles")
 
@@ -353,7 +362,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileMissingFields() {
         val uri = URI("http://localhost:$port/API/public/profiles")
 
@@ -404,7 +413,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun putProfileSuccessClient() {
         val email = "client@polito.it"
         val uri = URI("http://localhost:$port/API/client/profiles/$email")
@@ -436,7 +445,7 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun putProfileForbiddenClientEmail() {
         val email = "client2@polito.it"
         val uri = URI("http://localhost:$port/API/client/profiles/$email")

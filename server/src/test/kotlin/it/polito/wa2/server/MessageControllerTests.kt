@@ -10,6 +10,7 @@ import it.polito.wa2.server.ticketing.message.MessageDTO
 import it.polito.wa2.server.ticketing.message.MessageRepository
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -59,6 +60,14 @@ class MessageControllerTests {
             clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -86,7 +95,7 @@ class MessageControllerTests {
     @Autowired
     lateinit var messageRepository: MessageRepository
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingMessagesManager() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -153,14 +162,16 @@ class MessageControllerTests {
         messageRepository.delete(message1)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
         profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingMessagesAuthorizedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -224,14 +235,15 @@ class MessageControllerTests {
         messageRepository.delete(message1)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
+        profileRepository.delete(manager)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
-        profileRepository.delete(manager)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingMessagesForbiddenClient() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -282,14 +294,16 @@ class MessageControllerTests {
         messageRepository.delete(message1)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
         profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingMessagesAuthorizedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -360,7 +374,7 @@ class MessageControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingMessagesForbiddenExpert() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -410,14 +424,16 @@ class MessageControllerTests {
         messageRepository.delete(message1)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
         profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingMessagesUnauthorized() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -467,14 +483,16 @@ class MessageControllerTests {
         messageRepository.delete(message1)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
         profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getEmptyChat() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -523,14 +541,16 @@ class MessageControllerTests {
         messageRepository.delete(message1)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
         profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
+        productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingChat() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -551,7 +571,7 @@ class MessageControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getWrongIdChat() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -572,7 +592,7 @@ class MessageControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getChatWithAttachments() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -642,7 +662,7 @@ class MessageControllerTests {
 
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addMessageSuccessfulAuthorizedClient() {
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -688,7 +708,6 @@ class MessageControllerTests {
 
         Assertions.assertEquals(1, addedMessage.size)
         Assertions.assertEquals(message.text, addedMessage[0].text)
-        Assertions.assertEquals(1, addedMessage[0].getId())
 
         messageRepository.delete(addedMessage[0])
         ticketRepository.delete(ticket2)
@@ -700,7 +719,7 @@ class MessageControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addMessageForbiddenClient() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -746,14 +765,16 @@ class MessageControllerTests {
 
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
         profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
         profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addMessageSuccessfulAuthorizedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -809,7 +830,7 @@ class MessageControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addMessageForbiddenExpert() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -855,14 +876,16 @@ class MessageControllerTests {
 
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
         profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
         profileRepository.delete(expert)
+        profileRepository.delete(expert2)
         productRepository.delete(product)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addMessageNonExistingTicket() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)

@@ -3,6 +3,7 @@ package it.polito.wa2.server
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.keycloak.UserDTO
 import it.polito.wa2.server.profiles.*
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -47,6 +48,13 @@ class KeycloakControllerTests {
         }
 
         @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
+        @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
@@ -71,7 +79,7 @@ class KeycloakControllerTests {
     lateinit var profileRepository: ProfileRepository
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postClient() {
         val uri = URI("http://localhost:$port/API/signup")
 
@@ -109,7 +117,7 @@ class KeycloakControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postClientBadRequest() {
         val uri = URI("http://localhost:$port/API/signup")
 
@@ -125,7 +133,7 @@ class KeycloakControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postClientDuplicate() {
         val uri = URI("http://localhost:$port/API/signup")
 
@@ -152,7 +160,7 @@ class KeycloakControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postExpert() {
         val uri = URI("http://localhost:$port/API/createExpert")
 
@@ -187,7 +195,7 @@ class KeycloakControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postExpertBadRequest() {
         val uri = URI("http://localhost:$port/API/createExpert")
 
@@ -200,7 +208,7 @@ class KeycloakControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postExpertDuplicate() {
         val uri = URI("http://localhost:$port/API/createExpert")
 

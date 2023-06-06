@@ -2,6 +2,7 @@ package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.security.LoginRequest
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -44,6 +45,13 @@ class AuthControllerTest {
         }
 
         @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
+        @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
@@ -70,7 +78,7 @@ class AuthControllerTest {
 
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginManagerSuccessful() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -89,7 +97,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginManagerWrongPassword() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -124,7 +132,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginClientSuccessful() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -141,7 +149,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginClientWrongPassword() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -178,7 +186,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginExpertSuccessful() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -195,7 +203,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginExpertWrongPassword() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)

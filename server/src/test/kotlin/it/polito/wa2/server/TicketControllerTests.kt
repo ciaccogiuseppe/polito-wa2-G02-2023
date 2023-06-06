@@ -7,6 +7,7 @@ import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.ticketing.ticket.*
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryRepository
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -54,6 +55,15 @@ class TicketControllerTests {
             clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        @JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }
+
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -79,7 +89,7 @@ class TicketControllerTests {
     @Autowired
     lateinit var ticketHistoryRepository: TicketHistoryRepository
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketManager() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -124,7 +134,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketAuthorizedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -169,7 +179,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketAuthorizedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -214,7 +224,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketForbiddenClient() {
         val customer = TestUtils.testProfile("client1@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -249,7 +259,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketForbiddenExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert1@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -283,7 +293,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingTicket() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -302,7 +312,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getWrongIdTicket() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
@@ -321,7 +331,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsSingleCustomerFilter(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -371,7 +381,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsSingleCustomerFilterAuthorizedClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -422,7 +432,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsSingleCustomerFilterOtherClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -471,7 +481,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsMultipleUserFilter(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -522,7 +532,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsMultipleUserFilterOneClientOnly(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -573,7 +583,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsTimeRange(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -624,7 +634,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsPriorityRange(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -675,7 +685,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsProduct(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -728,7 +738,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsStatus(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -780,7 +790,7 @@ class TicketControllerTests {
         profileRepository.delete(manager)
     }
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getFilteredTicketsAllFilters(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -834,7 +844,7 @@ class TicketControllerTests {
 
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addTicketSuccessfulClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -896,7 +906,7 @@ class TicketControllerTests {
 
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addTicketByExpertError(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -941,7 +951,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addTicketByManagerError(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -987,7 +997,7 @@ class TicketControllerTests {
 
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addTicketProductNotFound(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1032,7 +1042,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addTicketProductWrongFormat(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1077,7 +1087,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun addTicketWithStatus(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1136,7 +1146,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun assignTicketSuccessfulManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1185,7 +1195,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun assignTicketForbiddenClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1223,7 +1233,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun assignTicketForbiddenExpert(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1261,7 +1271,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun assignReopenedTicketSuccessfulManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1310,7 +1320,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun assignTicketToCustomer(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1347,7 +1357,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun wrongReassignTicket(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1388,7 +1398,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun assignToClosedTicket(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1425,7 +1435,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulInProgressToClosedClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1469,7 +1479,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulInProgressToClosedManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1513,7 +1523,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulInProgressToOpenManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1557,7 +1567,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketForbiddenInProgressToOpenClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1592,7 +1602,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketForbiddenInProgressToOpenExpert(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1628,7 +1638,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulOpenToClosedClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1672,7 +1682,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulOpenToClosedManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1716,7 +1726,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulOpenToClosedExpert(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1759,7 +1769,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulResolvedToClosedClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1803,7 +1813,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulResolvedToClosedManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1847,7 +1857,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulResolvedToClosedExpert(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1891,7 +1901,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketForbiddenResolvedToClosedOtherClient(){
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
@@ -1930,7 +1940,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketForbiddenResolvedToClosedOtherExpert(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1969,7 +1979,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulReopenedToClosedClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2013,7 +2023,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulReopenedToClosedExpert(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2057,7 +2067,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulReopenedToClosedManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2101,7 +2111,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulOpenToResolvedClient(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2145,7 +2155,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulOpenToResolvedManager(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2189,7 +2199,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulOpenToResolvedExpert(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2233,7 +2243,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulInProgressToResolved(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2277,7 +2287,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulReopenedToResolved(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2321,7 +2331,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongReopenedToInProgress(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2357,7 +2367,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulClosedToReopen(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2401,7 +2411,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketSuccessfulResolvedToReopen(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2445,7 +2455,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongOpenToReopened(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2481,7 +2491,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongClosedToOpen(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2517,7 +2527,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongClosedToInProgress(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2553,7 +2563,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongClosedToResolved(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2589,7 +2599,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongInProgressToReopened(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2625,7 +2635,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongReopenedToOpen(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2661,7 +2671,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongResolvedToInProgress(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2697,7 +2707,7 @@ class TicketControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun updateTicketWrongResolvedToOpen(){
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
