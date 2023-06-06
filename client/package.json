@@ -10,9 +10,13 @@
     "bootstrap-icons": "^1.10.3",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
+    "react-bootstrap-4-pagination": "^1.0.4",
+    "react-bootstrap-pagination-control": "^1.0.5",
     "react-dom": "^18.2.0",
+    "react-paginate": "^8.2.0",
     "react-router-dom": "^6.10.0",
     "react-scripts": "5.0.1",
+    "sweetpagination": "^1.0.15",
     "validator": "^13.9.0",
     "web-vitals": "^2.1.4"
   },

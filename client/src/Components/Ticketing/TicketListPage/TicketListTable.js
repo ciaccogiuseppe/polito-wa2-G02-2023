@@ -1,23 +1,57 @@
+import "./TicketListPage.css"
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
+
+function StatusIndicator(type){
+    switch(type){
+        case "OPEN":
+            return <div className="text-bg-light" style={{borderRadius:"25px", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>OPEN</div>
+        case "CLOSED":
+            return <div  className="text-bg-dark" style={{borderRadius:"25px", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>CLOSED</div>
+        case "REOPENED":
+            return <div className="text-bg-light" style={{borderRadius:"25px", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>REOPENED</div>
+        case "INPROGRESS":
+            return <div  style={{borderRadius:"25px", color:"white", backgroundColor:"#dc8429", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>IN PROGRESS</div>
+        case "RESOLVED":
+            return <div  style={{borderRadius:"25px", color:"white", backgroundColor:"#53b02f", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>RESOLVED</div>
+    }
+}
+
+function TicketTableTR(props){
+    const [BGcolor, setBGcolor] = useState("");
+    const navigate = useNavigate()
+    const ticketId = props.id
+    const title = props.title
+    const createdTime = props.createdTime
+    const status = StatusIndicator(props.status)
+    return <tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")} onClick={()=>navigate(`/ticket/${ticketId}`)}>
+        <td className="text-light">{title}</td>
+        <td style={{verticalAlign:"middle"}}>{status}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{createdTime}</td></tr>
+}
 
 function TicketListTable(props){
     const ticketList = props.ticketList
+
     return <>
         {ticketList.length >= 0  &&
-        <div>
-            <table className="table table-striped table-bordered table-dark"  style={{ alignContent: "center", width: "70%", margin: "auto", marginTop:"20px" }}>
+        <div style={{alignItems:"center", alignSelf:"center"}}>
+            <table className="table  roundedTable"  style={{alignContent: "center", width: "70%", margin: "auto", marginTop:"20px"}}>
                 <thead>
                 <tr className="text-light">
-                    <th><h5>Title</h5></th>
-                    <th width={"15%"}><h5>Status</h5></th>
-                    <th width={"15%"}><h5>Created</h5></th>
+                    <th><h5>TITLE</h5></th>
+                    <th width={"15%"}><h5>STATUS</h5></th>
+                    <th width={"15%"}><h5>CREATED</h5></th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr className="text-light"><td className="text-light">Can't use touchscreen on my phone</td><td className="text-warning">IN PROGRESS</td><td className="text-light">05/02/2022</td></tr>
-                <tr className="text-light"><td className="text-light">Tablet camera not working</td><td className="text-success">RESOLVED</td><td className="text-light">b</td></tr>
-                <tr className="text-light"><td className="text-light">Broke phone screen</td><td className="text-danger">CLOSED</td><td className="text-light">b</td></tr>
-                <tr className="text-light"><td className="text-light">a</td><td className="text-light">a</td><td className="text-light">b</td></tr>
-                <tr className="text-light"><td className="text-light">a</td><td className="text-light">a</td><td className="text-light">b</td></tr>
+                {/*<tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")}><td className="text-light">Can't use touchscreen on my phone</td><td style={{verticalAlign:"middle"}}><div  style={{borderRadius:"25px", color:"white", backgroundColor:"#dc8429", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>IN PROGRESS</div></td><td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>05/02/2022</td></tr>*/}
+                <TicketTableTR id={1} title = "Can't use touchscreen on my phone" createdTime="05/03/2022" status="INPROGRESS"/>
+                <TicketTableTR id={2} title = "Tablet camera not working" createdTime="05/02/2022" status="RESOLVED"/>
+                <TicketTableTR id={3} title = "Smartphone camera not working" createdTime="15/02/2022" status="OPEN"/>
+                <TicketTableTR id={4} title = "Broke phone screen" createdTime="05/02/2022" status="CLOSED"/>
+                <TicketTableTR id={5} title = "Tablet screen not working" createdTime="15/02/2022" status="REOPENED"/>
+
                 </tbody>
             </table>
         </div>}
