@@ -31,7 +31,47 @@ function TicketChatPage(props) {
             <h5 style={{color:"#EEEEEE", marginTop:"14px", marginBottom:"15px"}}>PRODUCT: Apple - iPhone 13 Pro 128GB</h5>
             <hr style={{color:"white", width:"75%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
             <h1 style={{color:"#EEEEEE", marginTop:"30px"}}>CHAT</h1>
-            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
+            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"22px", marginTop:"2px"}}/>
+
+            <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+
+                <div style={{display:"inline-block", backgroundColor:"rgba(0,0,0,0.1)", borderRadius:"20px", padding:"15px", width:"100%", alignSelf:"left", textAlign:"left", marginLeft:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+                    <div style={{display:"inline-block"}}>
+                        {TextNewLine(`Could you provide additional information on xyz?`)}
+                    </div>
+
+                    <div style={{display:"inline-block", float:"right", backgroundColor:"rgba(0,0,0,0.1)", borderRadius:"20px", padding:"15px", width:"155px", alignSelf:"right", textAlign:"left", marginLeft:"20px", marginRight:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+                        <h5 style={{fontSize:"15px", textAlign:"center"}}>Mario Rossi</h5>
+                        <h5 style={{fontSize:"15px", fontWeight:"bold", textAlign:"center"}}>Expert</h5>
+                        <h5 style={{fontSize:"12px", textAlign:"center"}}>05/03/2023 - 10:12</h5>
+                    </div>
+                </div>
+
+                <div style={{display:"inline-block", backgroundColor:"rgba(255,255,255,0.1)", borderRadius:"20px", padding:"15px", width:"100%", alignSelf:"left", textAlign:"left", marginLeft:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+                    <div style={{display:"inline-block"}}>
+                        {TextNewLine(`Could you provide additional information on xyz?`)}
+                    </div>
+
+                    <div style={{display:"inline-block", float:"right", backgroundColor:"rgba(0,0,0,0.1)", borderRadius:"20px", padding:"15px", width:"155px", alignSelf:"right", textAlign:"left", marginLeft:"20px", marginRight:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+                        <h5 style={{fontSize:"15px", textAlign:"center"}}>Luigi Bianchi</h5>
+                        <h5 style={{fontSize:"15px", fontWeight:"bold", textAlign:"center"}}>Client</h5>
+                        <h5 style={{fontSize:"12px", textAlign:"center"}}>05/03/2023 - 10:22</h5>
+                    </div>
+                </div>
+
+                <div style={{display:"inline-block", backgroundColor:"rgba(255,255,255,0.1)", borderRadius:"20px", padding:"15px", width:"100%", alignSelf:"left", textAlign:"left", marginLeft:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+                    <div style={{display:"inline-block"}}>
+                        {TextNewLine(`Could you provide additional information on xyz?`)}
+                    </div>
+
+                    <div style={{display:"inline-block", float:"right", backgroundColor:"rgba(0,0,0,0.1)", borderRadius:"20px", padding:"15px", width:"155px", alignSelf:"right", textAlign:"left", marginLeft:"20px", marginRight:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+                        <h5 style={{fontSize:"15px", textAlign:"center"}}>Luigi Bianchi</h5>
+                        <h5 style={{fontSize:"15px", fontWeight:"bold", textAlign:"center"}}>Client</h5>
+                        <h5 style={{fontSize:"12px", textAlign:"center"}}>05/03/2023 - 10:22</h5>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </>
 }
