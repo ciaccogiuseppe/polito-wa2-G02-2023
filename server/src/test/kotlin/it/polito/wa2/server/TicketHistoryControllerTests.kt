@@ -54,12 +54,12 @@ class TicketHistoryControllerTests {
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
 
-        @JvmStatic
+        /*@JvmStatic
         @AfterAll
         fun clean(){
             keycloak.stop()
             postgres.close()
-        }
+        }*/
 
         @JvmStatic
         @DynamicPropertySource
