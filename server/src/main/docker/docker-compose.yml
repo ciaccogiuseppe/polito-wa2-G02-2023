@@ -38,6 +38,8 @@ services:
     container_name: server
     ports:
       - "8081:8081"
+    volumes:
+      - ./docker/logback-spring.xml:/data/logback_config/logback.xml
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -52,9 +54,13 @@ services:
       - KEYCLOAK_ADMIN_REALM=master
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/SpringBootKeycloak
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/SpringBootKeycloak/protocol/openid-connect/certs
+      - LOGGING_CONFIG=/data/logback_config/logback.xml
+      - LOKI_HOST=loki
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
     depends_on:
       - keycloak
       - database
+      - tempo
     networks:
       - app-network
 
@@ -62,6 +68,7 @@ services:
 
   tempo:
     image: grafana/tempo
+    hostname: tempo
     container_name: tempo
     extra_hosts: [ 'host.docker.internal:host-gateway' ]
     command: [ "-config.file=/etc/tempo.yaml" ]
@@ -71,12 +78,17 @@ services:
     ports:
       - "14268"  # jaeger ingest
       - "9411:9411" # zipkin
+    networks:
+      - app-network
 
   loki:
     image: grafana/loki
     container_name: loki
+    hostname: loki
     extra_hosts: [ 'host.docker.internal:host-gateway' ]
     command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    volumes:
+      - ./docker/loki/loki.yml:/etc/loki/local-config.yaml:ro
     ports:
       - "3100:3100"                                   # loki needs to be exposed so it receives logs
     environment:
@@ -84,6 +96,9 @@ services:
       - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
       - JAEGER_SAMPLER_TYPE=const
       - JAEGER_SAMPLER_PARAM=1
+    networks:
+      - app-network
+
 
   prometheus:
     image: prom/prometheus
@@ -96,6 +111,8 @@ services:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
+    networks:
+      - app-network
 
   grafana:
     image: grafana/grafana
@@ -110,6 +127,8 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     ports:
       - "3000:3000"
+    networks:
+      - app-network
   # Prometheus: http://localhost:9090/
   # Grafana: http://localhost:3000/
 
