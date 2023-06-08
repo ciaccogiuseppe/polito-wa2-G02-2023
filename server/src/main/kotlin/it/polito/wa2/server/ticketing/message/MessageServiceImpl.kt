@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.message
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestMessageException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnauthorizedMessageException
@@ -17,7 +18,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Service @Transactional
+@Service @Transactional @Observed
 class MessageServiceImpl(
     private val messageRepository: MessageRepository,
     private val ticketRepository: TicketRepository,
@@ -92,11 +93,6 @@ class MessageServiceImpl(
             attachmentId = attachmentService.addAttachment(attachmentDTO)
         val newAttachmentDTO = attachmentService.getAttachment(attachmentId, userEmail)
         return attachmentRepository.findByIdOrNull(newAttachmentDTO.attachmentId)!!
-    }
-
-    private fun getProfile(profileId: Long): Profile {
-        val profileDTO = profileService.getProfileById(profileId)
-        return profileRepository.findByEmail(profileDTO.email)!!
     }
 
     private fun getProfileByEmail(email: String): Profile {

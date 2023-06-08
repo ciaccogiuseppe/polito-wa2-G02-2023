@@ -1,6 +1,7 @@
 package it.polito.wa2.server.ticketing.attachment
 
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.AttachmentNotFoundException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.profiles.ProfileRepository
@@ -8,7 +9,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Service @Transactional
+@Service @Transactional @Observed
 class AttachmentServiceImpl(
     private val attachmentRepository: AttachmentRepository, private val profileRepository: ProfileRepository
 ): AttachmentService {

@@ -1,5 +1,6 @@
 package it.polito.wa2.server.keycloak
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import it.polito.wa2.server.profiles.ProfileRole
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
-@Service @Transactional
+@Service @Transactional @Observed
 class KeycloakServiceImpl(
     private val keycloakConfig: KeycloakConfig,
     private val profileService: ProfileService

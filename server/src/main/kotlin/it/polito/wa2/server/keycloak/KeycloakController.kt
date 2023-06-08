@@ -1,5 +1,6 @@
 package it.polito.wa2.server.keycloak
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestUserException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnprocessableProfileException
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
 @RestController
+@Observed
 class KeycloakController(private val keycloakService: KeycloakService) {
     @PostMapping("/API/signup")
     @ResponseStatus(HttpStatus.CREATED)

@@ -1,5 +1,6 @@
 package it.polito.wa2.server.profiles
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.DuplicateProfileException
 import it.polito.wa2.server.ProfileNotFoundException
@@ -7,7 +8,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Service @Transactional
+@Service @Transactional @Observed
 class ProfileServiceImpl(private val profileRepository: ProfileRepository): ProfileService {
 
     @Transactional(readOnly = true)
