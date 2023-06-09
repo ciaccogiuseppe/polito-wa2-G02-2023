@@ -25,14 +25,14 @@ class KeycloakServiceImpl(
     override fun addClient(userDTO: UserDTO) {
         val user = createUser(userDTO)
         addUser(user)
-        keycloakConfig.assignRoles(user.username, listOf(CLIENT))
+        keycloakConfig.assignRoles(user.email, listOf(CLIENT))
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.CLIENT)
     }
 
     override fun addExpert(userDTO: UserDTO) {
         val user = createUser(userDTO)
         addUser(user)
-        keycloakConfig.assignRoles(user.username, listOf(EXPERT))
+        keycloakConfig.assignRoles(user.email, listOf(EXPERT))
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.EXPERT)
     }
 
