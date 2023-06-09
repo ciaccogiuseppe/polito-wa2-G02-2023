@@ -28,12 +28,6 @@ class ProfileController(private val profileService: ProfileService) {
         return profileService.getProfileById(profileId)
     }
 
-    @PostMapping("/API/public/profiles")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun addProfile(@RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
-        checkInputProfile(profileDTO, br)
-        profileService.addProfile(profileDTO!!)
-    }
 
     @PutMapping("/API/manager/profiles/{email}")
     fun managerUpdateProfile(@PathVariable email: String, @RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {

@@ -40,15 +40,6 @@ class MessageController(private val messageService: MessageService) {
         messageService.addMessage(ticketId, messageDTO!!, userEmail)
     }
 
-    @PostMapping("/API/manager/chat/{ticketId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun addMessageManager(principal: Principal, @PathVariable ticketId: Long, @RequestBody @Valid messageDTO: MessageDTO?, br: BindingResult) {
-        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
-        val userEmail = token.tokenAttributes["email"] as String
-        checkTicketId(ticketId)
-        checkInputMessage(messageDTO, br)
-        messageService.addMessageManager(ticketId, messageDTO!!, userEmail)
-    }
 
     fun checkTicketId(ticketId: Long){
         if(ticketId <= 0)

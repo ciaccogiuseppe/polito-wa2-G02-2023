@@ -20,10 +20,6 @@ class TicketHistoryServiceImpl(
     private val profileService: ProfileService,
     private val profileRepository: ProfileRepository
 ): TicketHistoryService {
-    @Transactional(readOnly = true)
-    override fun getAllTicketHistory(): List<TicketHistoryDTO> {
-        return ticketHistoryRepository.findAll().map {it.toDTO()}
-    }
 
     @Transactional(readOnly = true)
     override fun getTicketHistoryFiltered(
