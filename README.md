@@ -26,9 +26,12 @@
   -  A working build can be found on [DockerHub](https://hub.docker.com/repository/docker/ciaccogiuseppe/polito_wa2_g02_2023/general)
 
 ## Docker Compose
+### Using local JIB image
 - Build local JIB image
 - Run ```docker-compose up``` in ```server/src/main/docker/``` directory
-  - On first run, set ```SPRING_JPA_HIBERNATE_DDL_AUTO``` to ```create```, on following runs set it to ```validate```
+### Using remote docker image
+- Run ```docker-compose -f docker-remote.yml up``` in ```server/src/main/docker/``` directory
+
 
 ## Client
 

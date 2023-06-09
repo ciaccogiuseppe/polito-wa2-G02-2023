@@ -69,8 +69,11 @@ tasks.withType<Test> {
 	systemProperty("logging.config", "./src/test/resources/logback-test.xml")
 }
 
+
+
 tasks.named("jibDockerBuild"){
 	jib.container.ports = listOf("8080")
+	jib.container.creationTime.set("USE_CURRENT_TIMESTAMP")
 	jib.to.image = "ticketing"
 }
 
