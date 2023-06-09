@@ -1,5 +1,6 @@
 package it.polito.wa2.server.security
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.LoginFailedException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.json.BasicJsonParser
@@ -9,11 +10,11 @@ import org.springframework.web.client.RestTemplate
 
 
 @RestController
+@Observed
 class AuthController(
     @Value("\${keycloak.auth-server-url}") private val authServerUrl: String,
     @Value("\${keycloak.realm}") private val realm: String,
-    @Value("\${keycloak.resource}") private val clientId: String,
-    @Value("\${keycloak.credentials.secret}") private val clientSecret: String
+    @Value("\${keycloak.resource}") private val clientId: String
 ) {
     private val restTemplate = RestTemplate()
 
@@ -23,11 +24,13 @@ class AuthController(
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
         val body = "grant_type=password&username=${loginRequest.username}&password=${loginRequest.password}" +
-                "&client_id=$clientId&client_secret=$clientSecret"
+                "&client_id=$clientId"
 
         val entity = HttpEntity(body, headers)
 
         val tokenUrl = "$authServerUrl/realms/$realm/protocol/openid-connect/token"
+        println(tokenUrl)
+        println(body)
         val json = BasicJsonParser()
         try {
             val response = restTemplate.exchange(
@@ -35,6 +38,7 @@ class AuthController(
                 HttpMethod.POST,
                 entity,
                 String::class.java)
+            println(response)
             val responseBody = response.body ?: throw IllegalStateException("Unable to retrieve access token")
             val tokenResponse = TokenResponse(
                 json.parseMap(responseBody)["access_token"]!!.toString(),
@@ -43,6 +47,7 @@ class AuthController(
             return LoginResponse(tokenResponse.accessToken, tokenResponse.expiresIn)
 
         } catch(e: RuntimeException){
+            println(e)
             throw LoginFailedException("Login failed")
         }
     }

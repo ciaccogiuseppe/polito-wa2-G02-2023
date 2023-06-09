@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.message
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestMessageException
 import it.polito.wa2.server.UnprocessableMessageException
 import it.polito.wa2.server.UnprocessableTicketException
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
 @RestController
+@Observed
 class MessageController(private val messageService: MessageService) {
     @GetMapping("/API/chat/{ticketId}")
     fun getMessage(principal: Principal, @PathVariable ticketId: Long) : List<MessageDTO> {

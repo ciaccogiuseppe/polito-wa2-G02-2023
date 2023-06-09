@@ -1,5 +1,6 @@
 package it.polito.wa2.server.profiles
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnprocessableProfileException
@@ -12,6 +13,7 @@ import java.security.Principal
 
 @CrossOrigin(origins =["http://localhost:3000"])
 @RestController
+@Observed
 class ProfileController(private val profileService: ProfileService) {
     @GetMapping("/API/manager/profiles/{email}")
     fun getProfile(@PathVariable email: String): ProfileDTO {

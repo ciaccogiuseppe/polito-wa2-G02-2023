@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.tickethistory
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestFilterException
 import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableTicketException
@@ -12,6 +13,7 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 
 @RestController
+@Observed
 class TicketHistoryController(private val ticketHistoryService: TicketHistoryService) {
 
     @GetMapping("/API/manager/ticketing/history/filter")

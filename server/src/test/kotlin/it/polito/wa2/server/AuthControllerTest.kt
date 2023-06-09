@@ -2,11 +2,10 @@ package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.security.LoginRequest
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.keycloak.representations.idm.CredentialRepresentation
-import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
@@ -42,61 +41,15 @@ class AuthControllerTest {
         @BeforeAll
         fun setup(){
             keycloak.start()
-
-            val realmName = "SpringBootKeycloak"
-            val clientId = "springboot-keycloak-client"
-
-            val manager = UserRepresentation()
-            manager.email = "manager@polito.it"
-            manager.username = "manager_01"
-            manager.isEnabled = true
-
-            val client = UserRepresentation()
-            client.email = "client@polito.it"
-            client.username = "client_01"
-            client.isEnabled = true
-
-            val expert = UserRepresentation()
-            expert.email = "expert@polito.it"
-            expert.username = "expert_01"
-            expert.isEnabled = true
-
-            val credential = CredentialRepresentation()
-            credential.isTemporary = false
-            credential.type = CredentialRepresentation.PASSWORD
-            credential.value = "password"
-
-            keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(client)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
-
-
-            val createdManager =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.email)[0]
-            val createdClient =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
-            val createdExpert =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
-
-            val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
-            val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
-            val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel().add(listOf(roleClient.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
-
-
-            keycloak.keycloakAdminClient.realm(realmName).clients().findByClientId(clientId)[0].clientAuthenticatorType = "client-secret"
-
-
-
+            TestUtils.testKeycloakSetup(keycloak)
         }
+
+        /*@JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }*/
 
         @JvmStatic
         @DynamicPropertySource
@@ -105,7 +58,8 @@ class AuthControllerTest {
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
             registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-
+            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
+            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
             { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
             registry.add("keycloak.auth-server-url"){keycloak.authServerUrl}
@@ -125,7 +79,7 @@ class AuthControllerTest {
 
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginManagerSuccessful() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -144,7 +98,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginManagerWrongPassword() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -179,7 +133,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginClientSuccessful() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -196,7 +150,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginClientWrongPassword() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -233,7 +187,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginExpertSuccessful() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)
@@ -250,7 +204,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun loginExpertWrongPassword() {
         val url = "http://localhost:$port/API/login"
         val uri = URI(url)

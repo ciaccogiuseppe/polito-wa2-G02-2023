@@ -1,22 +1,16 @@
 package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
-import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
-import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
-import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
-import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistoryRepository
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.keycloak.admin.client.KeycloakBuilder
-import org.keycloak.representations.idm.CredentialRepresentation
-import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -37,6 +31,7 @@ import java.sql.Timestamp
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
 class TicketHistoryControllerTests {
+    val json = BasicJsonParser()
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -53,92 +48,19 @@ class TicketHistoryControllerTests {
         @BeforeAll
         fun setup(){
             keycloak.start()
-
-            val realmName = "SpringBootKeycloak"
-            val clientId = "springboot-keycloak-client"
-
-            val manager = UserRepresentation()
-            manager.email = "manager@polito.it"
-            manager.username = "manager_01"
-            manager.isEnabled = true
-
-            val client = UserRepresentation()
-            client.email = "client@polito.it"
-            client.username = "client_01"
-            client.isEnabled = true
-
-            val expert = UserRepresentation()
-            expert.email = "expert@polito.it"
-            expert.username = "expert_01"
-            expert.isEnabled = true
-
-            val credential = CredentialRepresentation()
-            credential.isTemporary = false
-            credential.type = CredentialRepresentation.PASSWORD
-            credential.value = "password"
-
-            keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(client)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
-
-
-            val createdManager =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.email)[0]
-            val createdClient =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
-            val createdExpert =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
-
-            val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
-            val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
-            val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel().add(listOf(roleClient.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
-
-
-            val kcManager = KeycloakBuilder
-                .builder()
-                .serverUrl(keycloak.authServerUrl)
-                .realm(realmName)
-                .clientId(clientId)
-                .username(manager.email)
-                .password("password")
-                .build()
-
-            val kcClient = KeycloakBuilder
-                .builder()
-                .serverUrl(keycloak.authServerUrl)
-                .realm(realmName)
-                .clientId(clientId)
-                .username(client.email)
-                .password("password")
-                .build()
-
-            val kcExpert = KeycloakBuilder
-                .builder()
-                .serverUrl(keycloak.authServerUrl)
-                .realm(realmName)
-                .clientId(clientId)
-                .username(expert.email)
-                .password("password")
-                .build()
-
-            kcManager.tokenManager().grantToken().expiresIn = 3600
-            kcClient.tokenManager().grantToken().expiresIn = 3600
-            kcExpert.tokenManager().grantToken().expiresIn = 3600
-
-
-            managerToken = kcManager.tokenManager().accessToken.token
-            clientToken = kcClient.tokenManager().accessToken.token
-            expertToken = kcExpert.tokenManager().accessToken.token
+            TestUtils.testKeycloakSetup(keycloak)
+            managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
+            clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
+            expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        /*@JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }*/
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -146,7 +68,8 @@ class TicketHistoryControllerTests {
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
             registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-
+            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
+            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
             { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
         }
@@ -167,54 +90,32 @@ class TicketHistoryControllerTests {
     // --------------------------- no filters
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryWithNoFiltersAtAll() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
-
+        val entity = TestUtils.testEntityHeader(null, managerToken)
         val result = restTemplate.exchange(
             uri,
             HttpMethod.GET,
             entity,
             String::class.java
         )
-
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
         profileRepository.delete(manager)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryWithNoFiltersAtAllForbiddenClient() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -223,29 +124,18 @@ class TicketHistoryControllerTests {
             String::class.java
         )
 
-
         Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         profileRepository.delete(manager)
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryWithNoFiltersAtAllForbiddenExpert() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -262,80 +152,29 @@ class TicketHistoryControllerTests {
     // --------------------------- ticketId
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByTicketIdEmpty() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket1 = Ticket()
-        ticket1.createdTimestamp = Timestamp(0)
-        ticket1.product = product
-        ticket1.customer = customer
-        ticket1.status = TicketStatus.IN_PROGRESS
-        ticket1.expert = expert
-        ticket1.priority = 2
-        ticket1.title = "Ticket sample"
-        ticket1.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(0)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
-        val history1ticket1 = TicketHistory()
-        history1ticket1.ticket = ticket1
-        history1ticket1.currentExpert = expert
-        history1ticket1.newState = TicketStatus.CLOSED
-        history1ticket1.oldState = TicketStatus.IN_PROGRESS
-        history1ticket1.updatedTimestamp = Timestamp(34)
-        history1ticket1.user = customer
-
+        val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
         ticketHistoryRepository.save(history1ticket1)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket2.getId()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -358,97 +197,34 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByTicketId() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket1 = Ticket()
-        ticket1.createdTimestamp = Timestamp(0)
-        ticket1.product = product
-        ticket1.customer = customer
-        ticket1.status = TicketStatus.IN_PROGRESS
-        ticket1.expert = expert
-        ticket1.priority = 2
-        ticket1.title = "Ticket sample"
-        ticket1.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(0)
-        ticket2.product = product
-        ticket2.customer = customer
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
-        val history1ticket1 = TicketHistory()
-        history1ticket1.ticket = ticket1
-        history1ticket1.currentExpert = expert
-        history1ticket1.newState = TicketStatus.CLOSED
-        history1ticket1.oldState = TicketStatus.IN_PROGRESS
-        history1ticket1.updatedTimestamp = Timestamp(34)
-        history1ticket1.user = customer
-
-        val history2ticket2 = TicketHistory()
-        history2ticket2.ticket = ticket2
-        history2ticket2.currentExpert = expert
-        history2ticket2.newState = TicketStatus.RESOLVED
-        history2ticket2.oldState = TicketStatus.OPEN
-        history2ticket2.updatedTimestamp = Timestamp(19)
-        history2ticket2.user = customer
-
-        val history3ticket2 = TicketHistory()
-        history3ticket2.ticket = ticket2
-        history3ticket2.currentExpert = expert
-        history3ticket2.newState = TicketStatus.REOPENED
-        history3ticket2.oldState = TicketStatus.RESOLVED
-        history3ticket2.updatedTimestamp = Timestamp(122)
-        history3ticket2.user = customer
-
+        val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
+        val history2ticket2 = TestUtils.testTicketHistory(ticket2, expert, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(19), customer)
+        val history3ticket2 = TestUtils.testTicketHistory(ticket2, expert, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(122), customer)
         ticketHistoryRepository.save(history1ticket1)
         ticketHistoryRepository.save(history2ticket2)
         ticketHistoryRepository.save(history3ticket2)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2"
-        val uri = URI(url)
-        val json = BasicJsonParser()
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
+        val uri= URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket2.getId()}")
 
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -456,10 +232,12 @@ class TicketHistoryControllerTests {
             entity,
             String::class.java
         )
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
 
         Assertions.assertEquals(body[0]["historyId"], history2ticket2.getId())
         Assertions.assertEquals(body[0]["ticketId"], history2ticket2.ticket!!.getId())
@@ -489,68 +267,28 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingTicketHistoryByTicketId() {
-        val customer = Profile()
-        customer.email = "mario.rossi@polito.it"
-        customer.name = "Mario"
-        customer.surname = "Rossi"
-        customer.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket1 = Ticket()
-        ticket1.createdTimestamp = Timestamp(0)
-        ticket1.product = product
-        ticket1.customer = customer
-        ticket1.status = TicketStatus.IN_PROGRESS
-        ticket1.expert = expert
-        ticket1.priority = 2
-        ticket1.title = "Ticket sample"
-        ticket1.description = "Ticket description sample"
-
+        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
 
-        val history1ticket1 = TicketHistory()
-        history1ticket1.ticket = ticket1
-        history1ticket1.currentExpert = expert
-        history1ticket1.newState = TicketStatus.CLOSED
-        history1ticket1.oldState = TicketStatus.IN_PROGRESS
-        history1ticket1.updatedTimestamp = Timestamp(34)
-        history1ticket1.user = customer
-
+        val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
         ticketHistoryRepository.save(history1ticket1)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2"
-        val uri = URI(url)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=2")
 
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -570,23 +308,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByTicketIdNegative() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=-3"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=-3")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -600,23 +328,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByTicketIdAlphabetic() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=a"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=a")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -632,93 +350,33 @@ class TicketHistoryControllerTests {
     // --------------------------- userEmail
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByUserEmail() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val customer2 = Profile()
-        customer2.email = "luigi.verdi@polito.it"
-        customer2.name = "Luigi"
-        customer2.surname = "Verdi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(customer2)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1customer1 = TicketHistory()
-        history1customer1.ticket = ticket
-        history1customer1.currentExpert = expert
-        history1customer1.newState = TicketStatus.CLOSED
-        history1customer1.oldState = TicketStatus.IN_PROGRESS
-        history1customer1.updatedTimestamp = Timestamp(34)
-        history1customer1.user = customer1
-
-        val history2customer2 = TicketHistory()
-        history2customer2.ticket = ticket
-        history2customer2.currentExpert = expert
-        history2customer2.newState = TicketStatus.RESOLVED
-        history2customer2.oldState = TicketStatus.OPEN
-        history2customer2.updatedTimestamp = Timestamp(19)
-        history2customer2.user = customer2
-
-        val history3customer2 = TicketHistory()
-        history3customer2.ticket = ticket
-        history3customer2.currentExpert = expert
-        history3customer2.newState = TicketStatus.REOPENED
-        history3customer2.oldState = TicketStatus.RESOLVED
-        history3customer2.updatedTimestamp = Timestamp(122)
-        history3customer2.user = customer2
-
+        val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
+        val history2customer2 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(19), customer2)
+        val history3customer2 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(122), customer2)
         ticketHistoryRepository.save(history1customer1)
         ticketHistoryRepository.save(history2customer2)
         ticketHistoryRepository.save(history3customer2)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=${customer2.email}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?userEmail=${customer2.email}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -759,67 +417,27 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingTicketHistoryByUserEmail() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1customer1 = TicketHistory()
-        history1customer1.ticket = ticket
-        history1customer1.currentExpert = expert
-        history1customer1.newState = TicketStatus.CLOSED
-        history1customer1.oldState = TicketStatus.IN_PROGRESS
-        history1customer1.updatedTimestamp = Timestamp(34)
-        history1customer1.user = customer1
-
+        val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=not.found@polito.it"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?userEmail=not.found@polito.it")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -840,23 +458,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUserEmailInvalid() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=invalidEmail"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?userEmail=invalidEmail")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -870,23 +478,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUserEmailNumeric() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?userEmail=33"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?userEmail=33")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -902,94 +500,33 @@ class TicketHistoryControllerTests {
     // --------------------------- currentExpertEmail
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingTicketHistoryByCurrentExpertEmail() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "luigi.verdi@polito.it"
-        expert2.name = "Luigi"
-        expert2.surname = "Verdi"
-        expert2.role = ProfileRole.EXPERT
-
-        val expert3 = Profile()
-        expert3.email = "mario.bianchi@polito.it"
-        expert3.name = "Mario"
-        expert3.surname = "Bianchi"
-        expert3.role = ProfileRole.EXPERT
-
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert3 = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
         profileRepository.save(expert3)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert3
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1expert2 = TicketHistory()
-        history1expert2.ticket = ticket
-        history1expert2.currentExpert = expert2
-        history1expert2.newState = TicketStatus.CLOSED
-        history1expert2.oldState = TicketStatus.IN_PROGRESS
-        history1expert2.updatedTimestamp = Timestamp(34)
-        history1expert2.user = customer1
-
-        val history2expert3 = TicketHistory()
-        history2expert3.ticket = ticket
-        history2expert3.currentExpert = expert3
-        history2expert3.newState = TicketStatus.RESOLVED
-        history2expert3.oldState = TicketStatus.OPEN
-        history2expert3.updatedTimestamp = Timestamp(19)
-        history2expert3.user = customer1
-
-        val history3expert3 = TicketHistory()
-        history3expert3.ticket = ticket
-        history3expert3.currentExpert = expert3
-        history3expert3.newState = TicketStatus.REOPENED
-        history3expert3.oldState = TicketStatus.RESOLVED
-        history3expert3.updatedTimestamp = Timestamp(122)
-        history3expert3.user = customer1
-
+        val history1expert2 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
+        val history2expert3 = TestUtils.testTicketHistory(ticket, expert3, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(19), customer1)
+        val history3expert3 = TestUtils.testTicketHistory(ticket, expert3, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(122), customer1)
         ticketHistoryRepository.save(history1expert2)
         ticketHistoryRepository.save(history2expert3)
         ticketHistoryRepository.save(history3expert3)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=${expert3.email}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=${expert3.email}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1030,67 +567,27 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingTicketHistoryByCurrentExpertEmail() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val expert = Profile()
-        expert.email = "mario.bianchi@polito.it"
-        expert.name = "Mario"
-        expert.surname = "Bianchi"
-        expert.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1customer1 = TicketHistory()
-        history1customer1.ticket = ticket
-        history1customer1.currentExpert = expert
-        history1customer1.newState = TicketStatus.CLOSED
-        history1customer1.oldState = TicketStatus.IN_PROGRESS
-        history1customer1.updatedTimestamp = Timestamp(34)
-        history1customer1.user = customer1
-
+        val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
         ticketHistoryRepository.save(history1customer1)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=not.found@polito.it"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=not.found@polito.it")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1111,23 +608,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByCurrentExpertEmailInvalid() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=invalidEmail"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=invalidEmail")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1141,23 +628,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByCurrentExpertEmailNumeric() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=33"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=33")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1173,86 +650,31 @@ class TicketHistoryControllerTests {
     // --------------------------- updatedAfter & updatedBefore
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfter() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "luigi.verdi@polito.it"
-        expert2.name = "Luigi"
-        expert2.surname = "Verdi"
-        expert2.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert2
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TicketHistory()
-        history1timestamp10.ticket = ticket
-        history1timestamp10.currentExpert = expert2
-        history1timestamp10.newState = TicketStatus.CLOSED
-        history1timestamp10.oldState = TicketStatus.IN_PROGRESS
-        history1timestamp10.updatedTimestamp = Timestamp(10)
-        history1timestamp10.user = customer1
-
-        val history2timestamp20 = TicketHistory()
-        history2timestamp20.ticket = ticket
-        history2timestamp20.currentExpert = expert2
-        history2timestamp20.newState = TicketStatus.RESOLVED
-        history2timestamp20.oldState = TicketStatus.OPEN
-        history2timestamp20.updatedTimestamp = Timestamp(20)
-        history2timestamp20.user = customer1
-
-        val history3timestamp30 = TicketHistory()
-        history3timestamp30.ticket = ticket
-        history3timestamp30.currentExpert = expert2
-        history3timestamp30.newState = TicketStatus.REOPENED
-        history3timestamp30.oldState = TicketStatus.RESOLVED
-        history3timestamp30.updatedTimestamp = Timestamp(30)
-        history3timestamp30.user = customer1
-
+        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
+        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
+        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(20).toLocalDateTime()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(20).toLocalDateTime()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1292,86 +714,31 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedBefore() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "luigi.verdi@polito.it"
-        expert2.name = "Luigi"
-        expert2.surname = "Verdi"
-        expert2.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert2
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TicketHistory()
-        history1timestamp10.ticket = ticket
-        history1timestamp10.currentExpert = expert2
-        history1timestamp10.newState = TicketStatus.CLOSED
-        history1timestamp10.oldState = TicketStatus.IN_PROGRESS
-        history1timestamp10.updatedTimestamp = Timestamp(10)
-        history1timestamp10.user = customer1
-
-        val history2timestamp20 = TicketHistory()
-        history2timestamp20.ticket = ticket
-        history2timestamp20.currentExpert = expert2
-        history2timestamp20.newState = TicketStatus.RESOLVED
-        history2timestamp20.oldState = TicketStatus.OPEN
-        history2timestamp20.updatedTimestamp = Timestamp(20)
-        history2timestamp20.user = customer1
-
-        val history3timestamp30 = TicketHistory()
-        history3timestamp30.ticket = ticket
-        history3timestamp30.currentExpert = expert2
-        history3timestamp30.newState = TicketStatus.REOPENED
-        history3timestamp30.oldState = TicketStatus.RESOLVED
-        history3timestamp30.updatedTimestamp = Timestamp(30)
-        history3timestamp30.user = customer1
-
+        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
+        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
+        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedBefore=${Timestamp(19).toLocalDateTime()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedBefore=${Timestamp(19).toLocalDateTime()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1403,86 +770,31 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBefore() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "luigi.verdi@polito.it"
-        expert2.name = "Luigi"
-        expert2.surname = "Verdi"
-        expert2.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert2
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TicketHistory()
-        history1timestamp10.ticket = ticket
-        history1timestamp10.currentExpert = expert2
-        history1timestamp10.newState = TicketStatus.CLOSED
-        history1timestamp10.oldState = TicketStatus.IN_PROGRESS
-        history1timestamp10.updatedTimestamp = Timestamp(10)
-        history1timestamp10.user = customer1
-
-        val history2timestamp20 = TicketHistory()
-        history2timestamp20.ticket = ticket
-        history2timestamp20.currentExpert = expert2
-        history2timestamp20.newState = TicketStatus.RESOLVED
-        history2timestamp20.oldState = TicketStatus.OPEN
-        history2timestamp20.updatedTimestamp = Timestamp(20)
-        history2timestamp20.user = customer1
-
-        val history3timestamp30 = TicketHistory()
-        history3timestamp30.ticket = ticket
-        history3timestamp30.currentExpert = expert2
-        history3timestamp30.newState = TicketStatus.REOPENED
-        history3timestamp30.oldState = TicketStatus.RESOLVED
-        history3timestamp30.updatedTimestamp = Timestamp(30)
-        history3timestamp30.user = customer1
-
+        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
+        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
+        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(9).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(9).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1514,86 +826,32 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeEmpty() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val expert2 = Profile()
-        expert2.email = "luigi.verdi@polito.it"
-        expert2.name = "Luigi"
-        expert2.surname = "Verdi"
-        expert2.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val expert2 = TestUtils.testProfile("luigi.verdi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket = Ticket()
-        ticket.createdTimestamp = Timestamp(0)
-        ticket.product = product
-        ticket.customer = customer1
-        ticket.status = TicketStatus.IN_PROGRESS
-        ticket.expert = expert2
-        ticket.priority = 2
-        ticket.title = "Ticket sample"
-        ticket.description = "Ticket description sample"
-
+        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TicketHistory()
-        history1timestamp10.ticket = ticket
-        history1timestamp10.currentExpert = expert2
-        history1timestamp10.newState = TicketStatus.CLOSED
-        history1timestamp10.oldState = TicketStatus.IN_PROGRESS
-        history1timestamp10.updatedTimestamp = Timestamp(10)
-        history1timestamp10.user = customer1
-
-        val history2timestamp20 = TicketHistory()
-        history2timestamp20.ticket = ticket
-        history2timestamp20.currentExpert = expert2
-        history2timestamp20.newState = TicketStatus.RESOLVED
-        history2timestamp20.oldState = TicketStatus.OPEN
-        history2timestamp20.updatedTimestamp = Timestamp(20)
-        history2timestamp20.user = customer1
-
-        val history3timestamp30 = TicketHistory()
-        history3timestamp30.ticket = ticket
-        history3timestamp30.currentExpert = expert2
-        history3timestamp30.newState = TicketStatus.REOPENED
-        history3timestamp30.oldState = TicketStatus.RESOLVED
-        history3timestamp30.updatedTimestamp = Timestamp(30)
-        history3timestamp30.user = customer1
-
+        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
+        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
+        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(19).toLocalDateTime()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(19).toLocalDateTime()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
 
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1617,23 +875,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeUnprocessable() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(9).toLocalDateTime()}"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(9).toLocalDateTime()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1647,23 +895,13 @@ class TicketHistoryControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeEqual() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(10).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(10).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}")
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -1673,134 +911,48 @@ class TicketHistoryControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        profileRepository.delete(manager)
     }
 
     // --------------------------- all filters
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getTicketHistoryAllFilters() {
-        val customer1 = Profile()
-        customer1.email = "mario.rossi@polito.it"
-        customer1.name = "Mario"
-        customer1.surname = "Rossi"
-        customer1.role = ProfileRole.CLIENT
-
-        val customer2 = Profile()
-        customer2.email = "luigi.verdi@polito.it"
-        customer2.name = "Luigi"
-        customer2.surname = "Verdi"
-        customer2.role = ProfileRole.CLIENT
-
-        val expert3 = Profile()
-        expert3.email = "mario.bianchi@polito.it"
-        expert3.name = "Mario"
-        expert3.surname = "Bianchi"
-        expert3.role = ProfileRole.EXPERT
-
-        val expert4 = Profile()
-        expert4.email = "luigi.viola@polito.it"
-        expert4.name = "Luigi"
-        expert4.surname = "Viola"
-        expert4.role = ProfileRole.EXPERT
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val customer1 = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
+        val customer2 = TestUtils.testProfile("luigi.verdi@polito.it", "Luigi", "Verdi", ProfileRole.CLIENT)
+        val expert3 = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
+        val expert4 = TestUtils.testProfile("luigi.viola@polito.it", "Luigi", "Viola", ProfileRole.EXPERT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(customer1)
         profileRepository.save(customer2)
         profileRepository.save(expert3)
         profileRepository.save(expert4)
 
-        val product = Product()
-        product.productId = "0000000000000"
-        product.name = "PC Omen Intel i7"
-        product.brand = "HP"
-
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
         productRepository.save(product)
 
-        val ticket1 = Ticket()
-        ticket1.createdTimestamp = Timestamp(0)
-        ticket1.product = product
-        ticket1.customer = customer1
-        ticket1.status = TicketStatus.IN_PROGRESS
-        ticket1.expert = expert3
-        ticket1.priority = 2
-        ticket1.title = "Ticket sample"
-        ticket1.description = "Ticket description sample"
-
-        val ticket2 = Ticket()
-        ticket2.createdTimestamp = Timestamp(0)
-        ticket2.product = product
-        ticket2.customer = customer2
-        ticket2.status = TicketStatus.IN_PROGRESS
-        ticket2.expert = expert4
-        ticket2.priority = 2
-        ticket2.title = "Ticket sample"
-        ticket2.description = "Ticket description sample"
-
+        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert4, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
-        val history1ticket1user1expert3timestamp34 = TicketHistory()
-        history1ticket1user1expert3timestamp34.ticket = ticket1
-        history1ticket1user1expert3timestamp34.currentExpert = expert3
-        history1ticket1user1expert3timestamp34.newState = TicketStatus.CLOSED
-        history1ticket1user1expert3timestamp34.oldState = TicketStatus.IN_PROGRESS
-        history1ticket1user1expert3timestamp34.updatedTimestamp = Timestamp(34)
-        history1ticket1user1expert3timestamp34.user = customer1
-
-        val history2ticket1user2expert3timestamp34 = TicketHistory()
-        history2ticket1user2expert3timestamp34.ticket = ticket1
-        history2ticket1user2expert3timestamp34.currentExpert = expert3
-        history2ticket1user2expert3timestamp34.newState = TicketStatus.RESOLVED
-        history2ticket1user2expert3timestamp34.oldState = TicketStatus.OPEN
-        history2ticket1user2expert3timestamp34.updatedTimestamp = Timestamp(34)
-        history2ticket1user2expert3timestamp34.user = customer2
-
-        val history3ticket2user1expert3timestamp34 = TicketHistory()
-        history3ticket2user1expert3timestamp34.ticket = ticket2
-        history3ticket2user1expert3timestamp34.currentExpert = expert3
-        history3ticket2user1expert3timestamp34.newState = TicketStatus.CLOSED
-        history3ticket2user1expert3timestamp34.oldState = TicketStatus.IN_PROGRESS
-        history3ticket2user1expert3timestamp34.updatedTimestamp = Timestamp(34)
-        history3ticket2user1expert3timestamp34.user = customer1
-
-        val history4ticket1user1expert4timestamp34 = TicketHistory()
-        history4ticket1user1expert4timestamp34.ticket = ticket1
-        history4ticket1user1expert4timestamp34.currentExpert = expert4
-        history4ticket1user1expert4timestamp34.newState = TicketStatus.CLOSED
-        history4ticket1user1expert4timestamp34.oldState = TicketStatus.IN_PROGRESS
-        history4ticket1user1expert4timestamp34.updatedTimestamp = Timestamp(34)
-        history4ticket1user1expert4timestamp34.user = customer1
-
-        val history5ticket1user1expert3timestamp43 = TicketHistory()
-        history5ticket1user1expert3timestamp43.ticket = ticket1
-        history5ticket1user1expert3timestamp43.currentExpert = expert3
-        history5ticket1user1expert3timestamp43.newState = TicketStatus.CLOSED
-        history5ticket1user1expert3timestamp43.oldState = TicketStatus.IN_PROGRESS
-        history5ticket1user1expert3timestamp43.updatedTimestamp = Timestamp(43)
-        history5ticket1user1expert3timestamp43.user = customer1
-
+        val history1ticket1user1expert3timestamp34 = TestUtils.testTicketHistory(ticket1, expert3, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
+        val history2ticket1user2expert3timestamp34 = TestUtils.testTicketHistory(ticket1, expert3, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(34), customer2)
+        val history3ticket2user1expert3timestamp34 = TestUtils.testTicketHistory(ticket2, expert3, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
+        val history4ticket1user1expert4timestamp34 = TestUtils.testTicketHistory(ticket1, expert4, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
+        val history5ticket1user1expert3timestamp43 = TestUtils.testTicketHistory(ticket1, expert3, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(43), customer1)
         ticketHistoryRepository.save(history1ticket1user1expert3timestamp34)
         ticketHistoryRepository.save(history2ticket1user2expert3timestamp34)
         ticketHistoryRepository.save(history3ticket2user1expert3timestamp34)
         ticketHistoryRepository.save(history4ticket1user1expert4timestamp34)
         ticketHistoryRepository.save(history5ticket1user1expert3timestamp43)
 
-        val url = "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=1&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}"
-        val uri = URI(url)
-        val json = BasicJsonParser()
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket1.getId()}&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}")
 
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,

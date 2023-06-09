@@ -1,5 +1,6 @@
 package it.polito.wa2.server.ticketing.ticket
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.*
 import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 
-@Service @Transactional
+@Service @Transactional @Observed
 class TicketServiceImpl(
     private val ticketRepository: TicketRepository,
     private val profileRepository: ProfileRepository,

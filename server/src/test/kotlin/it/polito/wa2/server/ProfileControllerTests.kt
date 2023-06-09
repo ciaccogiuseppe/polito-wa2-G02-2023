@@ -3,12 +3,10 @@ package it.polito.wa2.server
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.profiles.*
 import jakarta.validation.constraints.NotBlank
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.keycloak.admin.client.KeycloakBuilder
-import org.keycloak.representations.idm.CredentialRepresentation
-import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -33,6 +31,7 @@ import java.net.URI
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
 class ProfileControllerTests {
+    val json = BasicJsonParser()
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -49,92 +48,19 @@ class ProfileControllerTests {
         @BeforeAll
         fun setup(){
             keycloak.start()
-
-            val realmName = "SpringBootKeycloak"
-            val clientId = "springboot-keycloak-client"
-
-            val manager = UserRepresentation()
-            manager.email = "manager@polito.it"
-            manager.username = "manager_01"
-            manager.isEnabled = true
-
-            val client = UserRepresentation()
-            client.email = "client@polito.it"
-            client.username = "client_01"
-            client.isEnabled = true
-
-            val expert = UserRepresentation()
-            expert.email = "expert@polito.it"
-            expert.username = "expert_01"
-            expert.isEnabled = true
-
-            val credential = CredentialRepresentation()
-            credential.isTemporary = false
-            credential.type = CredentialRepresentation.PASSWORD
-            credential.value = "password"
-
-            keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(client)
-            keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
-
-
-            val createdManager =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(manager.email)[0]
-            val createdClient =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
-            val createdExpert =
-                keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
-
-            val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
-            val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
-            val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel().add(listOf(roleClient.toRepresentation()))
-
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
-
-
-            val kcManager = KeycloakBuilder
-                .builder()
-                .serverUrl(keycloak.authServerUrl)
-                .realm(realmName)
-                .clientId(clientId)
-                .username(manager.email)
-                .password("password")
-                .build()
-
-            val kcClient = KeycloakBuilder
-                .builder()
-                .serverUrl(keycloak.authServerUrl)
-                .realm(realmName)
-                .clientId(clientId)
-                .username(client.email)
-                .password("password")
-                .build()
-
-            val kcExpert = KeycloakBuilder
-                .builder()
-                .serverUrl(keycloak.authServerUrl)
-                .realm(realmName)
-                .clientId(clientId)
-                .username(expert.email)
-                .password("password")
-                .build()
-
-            kcManager.tokenManager().grantToken().expiresIn = 3600
-            kcClient.tokenManager().grantToken().expiresIn = 3600
-            kcExpert.tokenManager().grantToken().expiresIn = 3600
-
-
-            managerToken = kcManager.tokenManager().accessToken.token
-            clientToken = kcClient.tokenManager().accessToken.token
-            expertToken = kcExpert.tokenManager().accessToken.token
+            TestUtils.testKeycloakSetup(keycloak)
+            managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
+            clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
+            expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
+
+        /*@JvmStatic
+        @AfterAll
+        fun clean(){
+            keycloak.stop()
+            postgres.close()
+        }*/
+
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -142,7 +68,8 @@ class ProfileControllerTests {
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
             registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-
+            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
+            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
             { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
         }
@@ -154,36 +81,17 @@ class ProfileControllerTests {
     @Autowired
     lateinit var profileRepository: ProfileRepository
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProfile() {
-
-
         val email = "mario.rossi@polito.it"
-        val url = "http://localhost:$port/API/manager/profiles/$email"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/profiles/$email")
 
-        val profile = ProfileDTO(
-            "mario.rossi@polito.it",
-            "mario",
-            "rossi",
-            null
-        ).toNewProfile()
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.CLIENT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(profile)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -191,9 +99,10 @@ class ProfileControllerTests {
             entity,
             String::class.java
         )
-        val body = json.parseMap(result.body)
+
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
         Assertions.assertEquals(profile.email, body["email"])
         Assertions.assertEquals(profile.name, body["name"])
         Assertions.assertEquals(profile.surname, body["surname"])
@@ -203,36 +112,17 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProfileForbiddenClient() {
-
-
         val email = "mario.rossi@polito.it"
-        val url = "http://localhost:$port/API/manager/profiles/$email"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/profiles/$email")
 
-        val profile = ProfileDTO(
-            "mario.rossi@polito.it",
-            "mario",
-            "rossi",
-            null
-        ).toNewProfile()
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.CLIENT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(profile)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, clientToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -248,36 +138,19 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getExistingProfileForbiddenExpert() {
 
 
         val email = "mario.rossi@polito.it"
-        val url = "http://localhost:$port/API/manager/profiles/$email"
-        val uri = URI(url)
-        val json = BasicJsonParser()
+        val uri = URI("http://localhost:$port/API/manager/profiles/$email")
 
-        val profile = ProfileDTO(
-            "mario.rossi@polito.it",
-            "mario",
-            "rossi",
-            null
-        ).toNewProfile()
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.CLIENT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(profile)
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(expertToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, expertToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -293,25 +166,13 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getNonExistingProfile() {
         val email = "mario.bianchi@polito.it"
-        val url = "http://localhost:$port/API/manager/profiles/$email"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/manager/profiles/$email")
 
-        val profile = ProfileDTO(
-            "mario.rossi@polito.it",
-            "mario",
-            "rossi",
-            null
-        ).toNewProfile()
-
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val profile = TestUtils.testProfile("mario.rossi@polito.it", "Profile", "Polito", ProfileRole.CLIENT)
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
         profileRepository.save(profile)
 
@@ -319,7 +180,7 @@ class ProfileControllerTests {
         headers.contentType = MediaType.APPLICATION_JSON
         headers.setBearerAuth(managerToken)
 
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -335,36 +196,23 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun getProfileWrongFormats() {
-        val manager = Profile()
-        manager.email = "manager@polito.it"
-        manager.name = "Manager"
-        manager.surname = "Polito"
-        manager.role = ProfileRole.MANAGER
-
+        val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
+
         val email1 = "@polito.it"
         val email2 = "abcpolito.it"
         val email3 = "abc@polito"
         val email4 = "abc@polito.i"
 
-        val url1 = "http://localhost:$port/API/manager/profiles/$email1"
-        val url2 = "http://localhost:$port/API/manager/profiles/$email2"
-        val url3 = "http://localhost:$port/API/manager/profiles/$email3"
-        val url4 = "http://localhost:$port/API/manager/profiles/$email4"
-
-        val uri1 = URI(url1)
-        val uri2 = URI(url2)
-        val uri3 = URI(url3)
-        val uri4 = URI(url4)
+        val uri1 = URI("http://localhost:$port/API/manager/profiles/$email1")
+        val uri2 = URI("http://localhost:$port/API/manager/profiles/$email2")
+        val uri3 = URI("http://localhost:$port/API/manager/profiles/$email3")
+        val uri4 = URI("http://localhost:$port/API/manager/profiles/$email4")
 
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(managerToken)
-
-        val entity = HttpEntity(null, headers)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result1 = restTemplate.exchange(
             uri1,
@@ -405,10 +253,9 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileSuccess() {
-        val url = "http://localhost:$port/API/public/profiles"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/public/profiles")
 
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
@@ -433,10 +280,9 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileRepeatedMail() {
-        val url = "http://localhost:$port/API/public/profiles"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/public/profiles")
 
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
@@ -446,7 +292,9 @@ class ProfileControllerTests {
         )
 
         val requestEntity : HttpEntity<ProfileDTO> = HttpEntity(profile)
-        restTemplate.postForEntity(uri, requestEntity, profile.javaClass)
+        val resultPre = restTemplate.postForEntity(uri, requestEntity, profile.javaClass)
+        Assertions.assertEquals(HttpStatus.CREATED, resultPre.statusCode)
+
         val result = restTemplate.postForEntity(uri, requestEntity, String.Companion::class.java)
 
         Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
@@ -459,10 +307,9 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileWrongFormat() {
-        val url = "http://localhost:$port/API/public/profiles"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/public/profiles")
 
         val profile1 = ProfileDTO(
             "mario.rossipolito.it",
@@ -516,10 +363,9 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun postProfileMissingFields() {
-        val url = "http://localhost:$port/API/public/profiles"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/public/profiles")
 
         data class WrongProfileDTO(
             val email: Any?,
@@ -568,18 +414,14 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun putProfileSuccessClient() {
         val email = "client@polito.it"
-        val url = "http://localhost:$port/API/client/profiles/$email"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/client/profiles/$email")
 
-        val profile = ProfileDTO(
-            "client@polito.it",
-            "mario",
-            "rossi",
-            null
-        ).toNewProfile()
+        val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.CLIENT)
+        profileRepository.save(profile)
+
 
         val newProfile = ProfileDTO(
             "client@polito.it",
@@ -588,15 +430,8 @@ class ProfileControllerTests {
             null
         )
 
-        profileRepository.save(profile)
-
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-
-        val requestEntity : HttpEntity<ProfileDTO> = HttpEntity(newProfile, headers)
-        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+        val entity = TestUtils.testEntityHeader(newProfile, clientToken)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
@@ -611,18 +446,13 @@ class ProfileControllerTests {
     }
 
     @Test
-    @DirtiesContext
+    //@DirtiesContext
     fun putProfileForbiddenClientEmail() {
         val email = "client2@polito.it"
-        val url = "http://localhost:$port/API/client/profiles/$email"
-        val uri = URI(url)
+        val uri = URI("http://localhost:$port/API/client/profiles/$email")
 
-        val profile = ProfileDTO(
-            "client@polito.it",
-            "mario",
-            "rossi",
-            null
-        ).toNewProfile()
+        val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.CLIENT)
+        profileRepository.save(profile)
 
         val newProfile = ProfileDTO(
             "client@polito.it",
@@ -631,57 +461,14 @@ class ProfileControllerTests {
             null
         )
 
-        profileRepository.save(profile)
 
 
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-
-        val requestEntity : HttpEntity<ProfileDTO> = HttpEntity(newProfile, headers)
-        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
+        val entity = TestUtils.testEntityHeader(newProfile, clientToken)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
         Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
 
         profileRepository.delete(profile)
     }
 
-    /*@Test
-    @DirtiesContext
-    fun putProfileWrongFormat() {
-        val email = "client@polito.it"
-        val url = "http://localhost:$port/API/profiles/$email"
-        val uri = URI(url)
-
-        val profile = ProfileDTO(
-            "client@polito.it",
-            "mario",
-            "rossi",
-            null,
-        ).toNewProfile()
-
-
-        val newProfile = ProfileDTO(
-            "client@polimi.it",
-            "Mario",
-            "Bianchi",
-            null
-        )
-
-        profileRepository.save(profile)
-
-
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(clientToken)
-
-
-        val requestEntity : HttpEntity<ProfileDTO> = HttpEntity(newProfile, headers)
-        val result = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
-        profileRepository.delete(profile)
-    }*/
 }
 
