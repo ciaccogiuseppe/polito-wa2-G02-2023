@@ -1,0 +1,10 @@
+.CenteredButton{
+    text-align: center;
+    flex-flow: column;
+    flex: auto;
+    margin: 15px;
+}
+
+.HomeButton{
+    width: 200px;
+}
