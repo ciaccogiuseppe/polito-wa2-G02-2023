@@ -5,7 +5,7 @@ interface MessageService {
 
     fun getChatManager(ticketId: Long, userEmail: String): List<MessageDTO>
 
-    fun addMessage(ticketId: Long, messageDTO: MessageDTO, userEmail: String)
+    fun addMessageSender(ticketId: Long, messageDTO: MessageDTO, userEmail: String)
 
     fun addMessageManager(ticketId: Long, messageDTO: MessageDTO, userEmail: String)
 }

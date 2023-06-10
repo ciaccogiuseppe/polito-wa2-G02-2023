@@ -5,7 +5,6 @@ import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnprocessableProfileException
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*

@@ -37,7 +37,7 @@ class MessageController(private val messageService: MessageService) {
         val userEmail = token.tokenAttributes["email"] as String
         checkTicketId(ticketId)
         checkInputMessage(messageDTO, br)
-        messageService.addMessage(ticketId, messageDTO!!, userEmail)
+        messageService.addMessageSender(ticketId, messageDTO!!, userEmail)
     }
 
 

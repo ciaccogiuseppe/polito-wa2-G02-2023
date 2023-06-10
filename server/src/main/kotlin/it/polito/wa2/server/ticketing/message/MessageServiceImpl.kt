@@ -30,12 +30,7 @@ class MessageServiceImpl(
     @Transactional(readOnly = true)
     override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
         val ticket = getTicket(ticketId, userEmail)
-        val user = profileRepository.findByEmail(userEmail)?:
-            throw ForbiddenException("It's not possible to get a chat if user is not registered")
-        val customerOfTicket = ticket.customer!!
-        val expertOfTicket = ticket.expert!!
-        if(user != customerOfTicket && user != expertOfTicket)
-            throw ForbiddenException("It's not possible to get a chat of a ticket in which you are not participating")
+        checkSender(userEmail, ticket)
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
@@ -45,41 +40,19 @@ class MessageServiceImpl(
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
-    override fun addMessage(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
+    override fun addMessageSender(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
         val ticket = getTicket(ticketId, userEmail)
-
-        val user = profileRepository.findByEmail(userEmail)?:
-            throw ForbiddenException("It's not possible to get a chat if user is not registered")
-        val customerOfTicket = ticket.customer!!
-        val expertOfTicket = ticket.expert!!
-        if(user != customerOfTicket && user != expertOfTicket)
-            throw ForbiddenException("It's not possible to get a chat of a ticket in which you are not participating")
-
-        val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
-        val sender = getProfileByEmail(messageDTO.senderEmail)
-        if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
-            throw UnauthorizedMessageException("Sender is not related to ticket")
-        val message = messageDTO.toNewMessage(attachments, sender, ticket)
-        messageRepository.save(message)
-        ticket.messages.add(message)
-        ticketRepository.save(ticket)
+        checkSender(userEmail, ticket)
+        addMessage(messageDTO, userEmail, ticket)
     }
 
     override fun addMessageManager(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
         val ticket = getTicket(ticketId, userEmail)
-
-        val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
-        val sender = getProfileByEmail(messageDTO.senderEmail)
-        if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
-            throw UnauthorizedMessageException("Sender is not related to ticket")
-        val message = messageDTO.toNewMessage(attachments, sender, ticket)
-        messageRepository.save(message)
-        ticket.messages.add(message)
-        ticketRepository.save(ticket)
+       addMessage(messageDTO, userEmail, ticket)
     }
 
     private fun getTicket(ticketId: Long, userEmail: String): Ticket {
@@ -98,5 +71,25 @@ class MessageServiceImpl(
     private fun getProfileByEmail(email: String): Profile {
         val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
+    }
+
+    private fun addMessage(messageDTO: MessageDTO, userEmail: String, ticket: Ticket){
+        val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
+        val sender = getProfileByEmail(messageDTO.senderEmail)
+        if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
+            throw UnauthorizedMessageException("Sender is not related to ticket")
+        val message = messageDTO.toNewMessage(attachments, sender, ticket)
+        messageRepository.save(message)
+        ticket.messages.add(message)
+        ticketRepository.save(ticket)
+    }
+
+    private fun checkSender(userEmail: String, ticket: Ticket) {
+        val user = profileRepository.findByEmail(userEmail)?:
+        throw ForbiddenException("The user is not registered")
+        val customerOfTicket = ticket.customer!!
+        val expertOfTicket = ticket.expert!!
+        if(user != customerOfTicket && user != expertOfTicket)
+            throw ForbiddenException("User is not related to ticket")
     }
 }
