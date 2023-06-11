@@ -20,7 +20,7 @@ function ChatMessage(props){
         <div style={{display:"inline-block", marginLeft:"20px", marginTop:"15px"}}>
             {TextNewLine(text)}
             <div style={{flex:"true"}}>
-                <img style={{boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginLeft:"15px", marginRight:"15px", marginTop:"15px", height:"75px", width:"75px", objectFit:"cover"}} src={"https://media.istockphoto.com/id/500430432/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=Eopt1H8m3N6h_1luxq-u76dKXHcY5t_WA2zMqvGsJ14="} />
+                <img onClick={() => {props.setOverlayShown(true)}} style={{cursor:"pointer", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginLeft:"15px", marginRight:"15px", marginTop:"15px", height:"75px", width:"75px", objectFit:"cover"}} src={"https://media.istockphoto.com/id/500430432/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=Eopt1H8m3N6h_1luxq-u76dKXHcY5t_WA2zMqvGsJ14="} />
                 <img style={{boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginLeft:"15px", marginRight:"15px", marginTop:"15px", height:"75px", width:"75px", objectFit:"cover"}} src={"https://media.istockphoto.com/id/500431088/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=TwYYyEs-Plul9pe55A792htJJveexY0sdaXAaKpIhpE="} />
 
             </div>
