@@ -18,7 +18,7 @@ function TicketChatPage(props) {
     const ticketID = params.id
     return <>
         <AppNavbar loggedIn={loggedIn} selected={"tickets"}/>
-        {overlayShown &&<AttachmentOverlay/>}
+        {overlayShown &&<AttachmentOverlay closeModal={() => setOverlayShown(false)}/>}
         <div className="CenteredButton" style={{marginTop:"50px"}}>
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>TICKET</h1>
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
