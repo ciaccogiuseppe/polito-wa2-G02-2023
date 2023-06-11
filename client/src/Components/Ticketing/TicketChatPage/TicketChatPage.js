@@ -8,17 +8,24 @@ import {Button, Form} from "react-bootstrap";
 import AddButton from "../../Common/AddButton";
 import AttachmentOverlay from "./AttachmentOverlay";
 import {useState} from "react";
+import DeleteButton from "../../Common/DeleteButton";
+import SendButton from "../../Common/SendButton";
 
 
-
+const imageList = [
+    "https://media.istockphoto.com/id/500430432/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=Eopt1H8m3N6h_1luxq-u76dKXHcY5t_WA2zMqvGsJ14=",
+    "https://media.istockphoto.com/id/500431088/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=TwYYyEs-Plul9pe55A792htJJveexY0sdaXAaKpIhpE="
+]
 function TicketChatPage(props) {
     const loggedIn=props.loggedIn
     const params = useParams()
     const [overlayShown, setOverlayShown] = useState(false)
+    const [startPos, setStartPos] = useState(0)
+    const [addingMessage, setAddingMessage] = useState(false)
     const ticketID = params.id
     return <>
         <AppNavbar loggedIn={loggedIn} selected={"tickets"}/>
-        {overlayShown &&<AttachmentOverlay closeModal={() => setOverlayShown(false)}/>}
+        {overlayShown &&<AttachmentOverlay startPos={startPos} imageList={imageList} closeModal={() => setOverlayShown(false)}/>}
         <div className="CenteredButton" style={{marginTop:"50px"}}>
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>TICKET</h1>
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
@@ -53,10 +60,12 @@ function TicketChatPage(props) {
 
             <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
 
-                <ChatMessage setOverlayShown={setOverlayShown} isExpert={true} timestamp={"05/03/2023 - 10:12"} name={"Mario Rossi"} text={`Could you provide additional information on xyz?`}/>
-                <ChatMessage setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:13"} name={"Luigi Bianchi"}  text={`Here there are some info\n test test`}/>
-                <ChatMessage setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:23"} name={"Luigi Bianchi"}  text={`Could you provide additional information on xyz?`}/>
-                <Form.Control style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
+                <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={true} timestamp={"05/03/2023 - 10:12"} name={"Mario Rossi"} text={`Could you provide additional information on xyz?`}/>
+                <ChatMessage imageList={imageList} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:13"} name={"Luigi Bianchi"}  text={`Here there are some info\n test test`}/>
+                <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:23"} name={"Luigi Bianchi"}  text={`Could you provide additional information on xyz?`}/>
+
+
+                {addingMessage && <><Form.Control style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
 
                 <div style={{flex:"true"}}>
                     <input style={{maxWidth:"230px", marginTop:"10px", marginLeft:"10px"}} type="file" className="filestyle" data-icon="false"/>
@@ -66,10 +75,17 @@ function TicketChatPage(props) {
                 <div style={{flex:"true"}}>
                     <input style={{maxWidth:"230px", marginTop:"10px", marginLeft:"10px"}} type="file" className="filestyle" data-icon="false"/>
                     {xIcon("#d98080", "20")}
-                </div>
+                </div></>}
 
                 <div style={{width:"100%", height:"60px"}}>
-                    <AddButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => {}}/>
+                    {!addingMessage ?
+                        <>
+                            <AddButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(true)}/>
+                        </> :
+                        <>
+                            <SendButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
+                            <DeleteButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
+                        </>}
                 </div>
             </div>
 
