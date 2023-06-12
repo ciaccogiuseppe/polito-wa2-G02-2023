@@ -10,6 +10,7 @@ import AttachmentOverlay from "./AttachmentOverlay";
 import {useEffect, useState} from "react";
 import DeleteButton from "../../Common/DeleteButton";
 import SendButton from "../../Common/SendButton";
+import PriorityIndicator from "../TicketCommon/PriorityIndicator";
 
 
 const imageList = [
@@ -57,6 +58,12 @@ function TicketChatPage(props) {
             <div style={{width: "250px", alignSelf:"center", margin:"auto"}}>
                 <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
                     {StatusIndicator("INPROGRESS")}
+                </div>
+                <div style={{display:"inline-block", float:"right"}}>
+                    {editIcon("white", 20)}
+                </div>
+                <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
+                    {PriorityIndicator("LOW")}
                 </div>
                 <div style={{display:"inline-block", float:"right"}}>
                     {editIcon("white", 20)}
