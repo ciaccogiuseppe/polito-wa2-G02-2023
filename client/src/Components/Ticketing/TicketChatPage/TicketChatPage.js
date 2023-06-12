@@ -7,7 +7,7 @@ import ChatMessage from "./ChatMessage";
 import {Button, Form} from "react-bootstrap";
 import AddButton from "../../Common/AddButton";
 import AttachmentOverlay from "./AttachmentOverlay";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import DeleteButton from "../../Common/DeleteButton";
 import SendButton from "../../Common/SendButton";
 
@@ -15,13 +15,37 @@ import SendButton from "../../Common/SendButton";
 const imageList = [
     "https://media.istockphoto.com/id/500430432/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=Eopt1H8m3N6h_1luxq-u76dKXHcY5t_WA2zMqvGsJ14=",
     "https://media.istockphoto.com/id/500431088/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=TwYYyEs-Plul9pe55A792htJJveexY0sdaXAaKpIhpE="
+
 ]
+
+function AddAttachment(props) {
+    const [color, setColor] = useState("#d98080")
+    const [attachment, setAttachment] = useState("")
+    const setNewAttachment=props.setAttachment;
+
+    useEffect(() => {
+        setNewAttachment(attachment)
+    }, [attachment])
+    return <>
+        <div style={{flex:"true"}}>
+            <input style={{maxWidth:"230px", marginTop:"10px", marginLeft:"10px"}} onChange={(e)=> {setColor("#d98080"); setAttachment(e.target.value)}} type="file" className="filestyle" value={attachment} data-icon="false"/>
+            {attachment !== "" && <a style={{cursor:"pointer"}} onClick={(e)=>{e.preventDefault(); setAttachment("")}} onMouseOver={()=>setColor("#a63030")} onMouseLeave={()=>setColor("#d98080")}>
+                {xIcon(color, "20")}
+            </a>}
+        </div>
+    </>
+}
+
 function TicketChatPage(props) {
-    const loggedIn=props.loggedIn
+    const loggedIn = props.loggedIn
+    const maxAttachments = 5
+    const [curAttachments, setCurAttachments] = useState(0)
     const params = useParams()
     const [overlayShown, setOverlayShown] = useState(false)
     const [startPos, setStartPos] = useState(0)
     const [addingMessage, setAddingMessage] = useState(false)
+    //const [attachments, setAttachments] = useState([])
+    let attachments = []
     const ticketID = params.id
     return <>
         <AppNavbar loggedIn={loggedIn} selected={"tickets"}/>
@@ -66,16 +90,12 @@ function TicketChatPage(props) {
 
 
                 {addingMessage && <><Form.Control style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
+                {[...Array(maxAttachments)].map( (a, index) =>
+                    <>
+                        <AddAttachment setAttachment={att => attachments[index] = att} />
+                    </>)}
 
-                <div style={{flex:"true"}}>
-                    <input style={{maxWidth:"230px", marginTop:"10px", marginLeft:"10px"}} type="file" className="filestyle" data-icon="false"/>
-                    {xIcon("#d98080", "20")}
-                </div>
-
-                <div style={{flex:"true"}}>
-                    <input style={{maxWidth:"230px", marginTop:"10px", marginLeft:"10px"}} type="file" className="filestyle" data-icon="false"/>
-                    {xIcon("#d98080", "20")}
-                </div></>}
+                </>}
 
                 <div style={{width:"100%", height:"60px"}}>
                     {!addingMessage ?
