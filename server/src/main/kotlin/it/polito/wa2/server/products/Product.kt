@@ -1,5 +1,6 @@
 package it.polito.wa2.server.products
 
+import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import jakarta.persistence.*
 
@@ -16,4 +17,8 @@ class Product {
 
     @OneToMany(mappedBy = "product")
     val tickets = mutableSetOf<Ticket>()
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    val category: Category? = null
 }

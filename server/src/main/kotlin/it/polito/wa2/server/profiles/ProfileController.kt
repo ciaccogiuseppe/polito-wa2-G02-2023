@@ -27,7 +27,6 @@ class ProfileController(private val profileService: ProfileService) {
         return profileService.getProfileById(profileId)
     }
 
-
     @PutMapping("/API/manager/profiles/{email}")
     fun managerUpdateProfile(@PathVariable email: String, @RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
         checkEmail(email)

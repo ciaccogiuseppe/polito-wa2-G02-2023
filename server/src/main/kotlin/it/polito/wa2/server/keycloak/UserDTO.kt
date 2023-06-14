@@ -1,5 +1,6 @@
 package it.polito.wa2.server.keycloak
 
+import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.profiles.ProfileDTO
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
@@ -20,9 +21,10 @@ data class UserDTO (
     @field:NotBlank(message="last name is mandatory")
     @field:Pattern(regexp = "([a-zA-Z]+'?\\s?)+",
         message="surname must be valid")
-    val lastName: String
+    val lastName: String,
+    val expertCategories: Set<ProductCategory>
 )
 
 fun UserDTO.toProfileDTO(): ProfileDTO {
-    return ProfileDTO (this.email, this.firstName, this.lastName, null)
+    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories)
 }

@@ -1,5 +1,6 @@
 package it.polito.wa2.server.products
 
+import it.polito.wa2.server.categories.ProductCategory
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
@@ -9,9 +10,11 @@ data class ProductDTO(
     @field:NotBlank
     val name: String,
     @field:NotBlank
-    val brand: String
+    val brand: String,
+    @field:NotBlank
+    val category: ProductCategory
 )
 
 fun Product.toDTO(): ProductDTO {
-    return ProductDTO(productId, name, brand)
+    return ProductDTO(productId, name, brand, category!!.name)
 }

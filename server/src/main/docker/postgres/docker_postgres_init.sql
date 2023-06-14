@@ -1,9 +1,20 @@
+create table if not exists categories
+(
+    id bigserial primary key,
+    name varchar (255) not null
+);
+
+alter table categories
+    owner to postgres;
+
 create table if not exists products
 (
     product_id varchar(255) not null
         primary key,
     brand      varchar(255) not null,
-    name       varchar(255) not null
+    name       varchar(255) not null,
+    category   bigint
+        references categories
 );
 
 alter table products

@@ -69,6 +69,10 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(UnauthorizedMessageException::class)
     fun handleMessageBadRequest(e: UnauthorizedMessageException) = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.message!! )
+
+    /************** Category exception handlers **************/
+    @ExceptionHandler(CategoryNotFoundException::class)
+    fun handleTicketNotFound(e: CategoryNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message)
@@ -90,3 +94,4 @@ class LoginFailedException(message: String): RuntimeException(message)
 class ForbiddenException(message: String): RuntimeException(message)
 class UnprocessableUserException(message: String): RuntimeException(message)
 class BadRequestUserException(message: String): RuntimeException(message)
+class CategoryNotFoundException(message: String): RuntimeException(message)

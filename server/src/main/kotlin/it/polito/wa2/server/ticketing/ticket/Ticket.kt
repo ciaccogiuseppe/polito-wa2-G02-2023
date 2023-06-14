@@ -41,10 +41,6 @@ class Ticket:EntityBase<Long>() {
 
     @OneToMany(mappedBy = "ticket")
     var history = mutableListOf<TicketHistory>()
-
-
-
-
 }
 
 enum class TicketStatus{
