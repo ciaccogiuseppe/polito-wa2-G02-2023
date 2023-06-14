@@ -1,16 +1,17 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import {useParams} from "react-router-dom";
-import {editIcon, xIcon} from "../../Common/Icons.js"
+import {closeIcon, editIcon, xIcon} from "../../Common/Icons.js"
 import StatusIndicator from "../TicketCommon/StatusIndicator";
 import TextNewLine from "../../Common/TextNewLine";
 import ChatMessage from "./ChatMessage";
-import {Button, Form} from "react-bootstrap";
+import {Button, CloseButton, Form} from "react-bootstrap";
 import AddButton from "../../Common/AddButton";
 import AttachmentOverlay from "./AttachmentOverlay";
 import {useEffect, useState} from "react";
 import DeleteButton from "../../Common/DeleteButton";
 import SendButton from "../../Common/SendButton";
 import PriorityIndicator from "../TicketCommon/PriorityIndicator";
+import NavigationButton from "../../Common/NavigationButton";
 
 
 const imageList = [
@@ -37,6 +38,69 @@ function AddAttachment(props) {
     </>
 }
 
+function EditButton(props){
+    const [color, setColor] = useState("white")
+    const onClick = props.onClick
+    const disabled = props.disabled
+    return <>
+        <a style={{pointerEvents:disabled?"none":"", cursor:"pointer"}} onClick={(e)=>{e.preventDefault(); onClick()}} onMouseOver={()=>setColor("#a0c1d9")} onMouseLeave={()=>setColor("white")}>
+            {editIcon(disabled?"rgba(0,0,0,0.4)":color, 20)}
+        </a>
+    </>
+}
+
+function CloseEditButton(props){
+    const [color, setColor] = useState("#d98080")
+    const onClick = props.onClick
+    const disabled = props.disabled
+    return <>
+        <a style={{pointerEvents:disabled?"none":"", cursor:"pointer"}} onClick={(e)=>{e.preventDefault(); onClick()}} onMouseOver={()=>setColor("#a63030")} onMouseLeave={()=>setColor("#d98080")}>
+            {closeIcon(disabled?"rgba(0,0,0,0.4)":color, 20)}
+        </a>
+    </>
+}
+
+function StatusEdit(props){
+    const onClick = props.onClick();
+    const [opacity, setOpacity] = useState("1")
+    const type = props.type
+    return <div onMouseOver={()=>{setOpacity("0.6")}} onMouseLeave={()=>{setOpacity("1")}} style={{margin:"7px", cursor:"pointer", borderRadius:"25px", opacity:opacity}} >
+        {StatusIndicator(type)}
+    </div>
+}
+
+function StatusEditList(props){
+    const type = props.type
+    let types=[]
+    switch(type){
+        case("INPROGRESS"):
+            types=["OPEN", "CLOSED", "RESOLVED"]
+            break;
+        case("OPEN"):
+            types=["CLOSED", "RESOLVED"]
+            break;
+        case("REOPENED"):
+            types=["CLOSED", "RESOLVED"]
+            break;
+        case("CLOSED"):
+            types=["REOPENED"]
+            break;
+        case("RESOLVED"):
+            types=["REOPENED", "CLOSED"]
+            break;
+    }
+    return types.map(t => <StatusEdit type={t} onClick={()=>{}}/>)
+}
+
+function PriorityEdit(props){
+    const onClick = props.onClick();
+    const [opacity, setOpacity] = useState("1")
+    const type = props.type
+    return <div onMouseOver={()=>{setOpacity("0.6")}} onMouseLeave={()=>{setOpacity("1")}} style={{margin:"7px", cursor:"pointer", borderRadius:"25px", opacity:opacity}} >
+        {PriorityIndicator(type)}
+    </div>
+}
+
 function TicketChatPage(props) {
     const loggedIn = props.loggedIn
     const maxAttachments = 5
@@ -45,6 +109,8 @@ function TicketChatPage(props) {
     const [overlayShown, setOverlayShown] = useState(false)
     const [startPos, setStartPos] = useState(0)
     const [addingMessage, setAddingMessage] = useState(false)
+    const [editingStatus, setEditingStatus] = useState(false)
+    const [editingPriority, setEditingPriority] = useState(false)
     //const [attachments, setAttachments] = useState([])
     let attachments = []
     const ticketID = params.id
@@ -60,14 +126,25 @@ function TicketChatPage(props) {
                     {StatusIndicator("INPROGRESS")}
                 </div>
                 <div style={{display:"inline-block", float:"right"}}>
-                    {editIcon("white", 20)}
+                    {!editingStatus && <EditButton onClick={()=>setEditingStatus(true)}/>}
+                    {editingStatus && <CloseEditButton onClick={()=>setEditingStatus(false)}/>}
                 </div>
-                <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
+                {editingStatus && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
+                    <StatusEditList type={"INPROGRESS"} onClick={(t)=>{}}/>
+                </div>}
+                <div style={{marginTop:"7px", width:"150px", display:"inline-block", paddingLeft:"20px"}}>
                     {PriorityIndicator("LOW")}
                 </div>
-                <div style={{display:"inline-block", float:"right"}}>
-                    {editIcon("white", 20)}
+                <div style={{marginTop:"7px",display:"inline-block", float:"right"}}>
+                    {!editingPriority && <EditButton onClick={()=>setEditingPriority(true)}/>}
+                    {editingPriority && <CloseEditButton onClick={()=>setEditingPriority(false)}/>}
                 </div>
+                {editingPriority && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
+                    <PriorityEdit type={"LOW"} onClick={()=>{}}/>
+                    <PriorityEdit type={"MEDIUM"} onClick={()=>{}}/>
+                    <PriorityEdit type={"HIGH"} onClick={()=>{}}/>
+                </div>}
+
 
             </div>
 
@@ -84,10 +161,21 @@ function TicketChatPage(props) {
                 
                 - Checked for physical damage: I have carefully inspected the screen for any signs of physical damage, such as cracks or scratches. Fortunately, there are no visible damages that could be causing the issue.`)}
             </div>
-            <h5 style={{color:"#EEEEEE", marginTop:"14px", marginBottom:"15px"}}>PRODUCT: Apple - iPhone 13 Pro 128GB</h5>
-            <hr style={{color:"white", width:"75%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
+            <div style={{backgroundColor:"rgba(0,0,0,0.2)", paddingLeft:"25px", paddingRight:"25px", maxWidth:"350px", borderRadius:"25px", alignSelf:"center", margin:"auto"}}>
+                <div style={{color:"#EEEEEE", paddingTop:"5px", paddingBottom:"5px",  marginTop:"14px", marginBottom:"15px", fontSize:14}}>PRODUCT: Apple - iPhone 13 Pro 128GB</div>
+            </div>
+            <div style={{backgroundColor:"rgba(0,0,0,0.1)", paddingLeft:"25px", paddingRight:"25px", maxWidth:"300px", borderRadius:"25px", alignSelf:"center", margin:"auto", marginBottom:"10px"}}>
+                <div style={{ color:"#EEEEEE",display:"inline-block", paddingTop:"5px", paddingBottom:"5px",  marginTop:"4px", marginBottom:"4px", fontSize:14}}>Expert: Mario Rossi</div>
+                <div style={{display:"inline-block", marginLeft:"14px", marginRight:"14px", marginBottom:"10px"}}>
+                    <EditButton onClick={()=>{}}/>
+                </div>
+            </div>
+            <NavigationButton text={"Update ticket"} onClick={()=>{}}/>
+            <hr style={{color:"white", width:"75%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"20px"}}/>
             <h1 style={{color:"#EEEEEE", marginTop:"30px"}}>CHAT</h1>
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"22px", marginTop:"2px"}}/>
+
+
 
             <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
 
