@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { addNewProfile } from "../../../API/Profiles";
 import NavigationButton from "../../Common/NavigationButton";
 import NavigationLink from "../../Common/NavigationLink";
-import { filterIcon } from "../../Common/Icons"
+import { crossIcon, filterIcon } from "../../Common/Icons"
+import TicketHistoryTable from "./TicketHistoryTable";
 
 
 function TicketHistoryPage(props) {
@@ -16,6 +17,7 @@ function TicketHistoryPage(props) {
     const [errMessage, setErrMessage] = useState("");
     const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
+    const [ticketList, setTicketList] = useState([])
 
     const loggedIn = props.loggedIn
     return <>
@@ -29,35 +31,35 @@ function TicketHistoryPage(props) {
                     <Col xs={2}>
                         <span style={{ color: "#DDDDDD" }}>Ticket ID</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span className="input-group-text">{filterIcon()}</span>
+                            <span style={{cursor: ticketId ? "pointer" : ""}} onClick={() => setTicketId("")} className="input-group-text">{ticketId ? crossIcon("black", 17) : filterIcon()}</span>
                             <input style={{ height: "40px" }} type="text" className="form-control" placeholder="---" value={ticketId} onChange={e => setTicketId(e.target.value)} />
                         </div>
                     </Col>
                     <Col xs={2}>
                         <span style={{ color: "#DDDDDD" }}>User Email</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span className="input-group-text">{filterIcon()}</span>
+                        <span style={{cursor: userEmail ? "pointer" : ""}} onClick={() => setUserEmail("")} className="input-group-text">{userEmail ? crossIcon("black", 17) : filterIcon()}</span>
                             <input style={{ height: "40px" }} type="text" className="form-control" placeholder="---" value={userEmail} onChange={e => setUserEmail(e.target.value)} />
                         </div>
                     </Col>
                     <Col xs={2}>
                         <span style={{ color: "#DDDDDD" }}>Expert Email</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span className="input-group-text">{filterIcon()}</span>
+                        <span style={{cursor: expertEmail ? "pointer" : ""}} onClick={() => setExpertEmail("")} className="input-group-text">{expertEmail ? crossIcon("black", 17) : filterIcon()}</span>
                             <input style={{ height: "40px" }} type="text" className="form-control" placeholder="---" value={expertEmail} onChange={e => setExpertEmail(e.target.value)} />
                         </div>
                     </Col>
                     <Col xs={2}>
                         <span style={{ color: "#DDDDDD" }}>Initial Date</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span className="input-group-text">{filterIcon()}</span>
+                        <span style={{cursor: initialDate ? "pointer" : ""}} onClick={() => setInitialDate("")} className="input-group-text">{initialDate ? crossIcon("black", 17) : filterIcon()}</span>
                             <input style={{ height: "40px" }} type="date" className="form-control" placeholder="---" value={initialDate} onChange={e => setInitialDate(e.target.value)} />
                         </div>
                     </Col>
                     <Col xs={2}>
                         <span style={{ color: "#DDDDDD" }}>Final Date</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span className="input-group-text">{filterIcon()}</span>
+                        <span style={{cursor: finalDate ? "pointer" : ""}} onClick={() => setFinalDate("")} className="input-group-text">{finalDate ? crossIcon("black", 17) : filterIcon()}</span>
                             <input style={{ height: "40px" }} type="date" className="form-control" placeholder="---" value={finalDate} onChange={e => setFinalDate(e.target.value)} />
                         </div>
                     </Col>
@@ -74,6 +76,8 @@ function TicketHistoryPage(props) {
             }
 
             <hr style={{ color: "white", width: "90%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "20px", marginTop: "20px" }} />
+
+            <TicketHistoryTable ticketList={ticketList}/>
 
         </div>
     </>
