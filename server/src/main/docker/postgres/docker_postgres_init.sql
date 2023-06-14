@@ -1,7 +1,8 @@
 create table if not exists categories
 (
-    id bigserial primary key,
-    name varchar (255) not null
+    id   bigserial
+        primary key,
+    name varchar(255) not null
 );
 
 alter table categories
@@ -9,12 +10,13 @@ alter table categories
 
 create table if not exists products
 (
-    product_id varchar(255) not null
+    product_id  varchar(255) not null
         primary key,
-    brand      varchar(255) not null,
-    name       varchar(255) not null,
-    category   bigint
-        references categories
+    brand       varchar(255) not null,
+    name        varchar(255) not null,
+    category_id bigint       not null
+        constraint fkog2rp4qthbtt2lfyhfo32lsw9
+            references categories
 );
 
 alter table products
@@ -22,17 +24,36 @@ alter table products
 
 create table if not exists profiles
 (
-    id      bigserial
+    id           bigserial
         primary key,
-    email   varchar(255) not null
+    address      varchar(255),
+    city         varchar(255),
+    country      varchar(255),
+    email        varchar(255) not null
         constraint uk_lnk8iosvsrn5614xw3lgnybgk
             unique,
-    name    varchar(255) not null,
-    role    varchar(255) not null,
-    surname varchar(255) not null
+    name         varchar(255) not null,
+    phone_number varchar(255),
+    region       varchar(255),
+    role         varchar(255) not null,
+    surname      varchar(255) not null
 );
 
 alter table profiles
+    owner to postgres;
+
+create table if not exists category_assigned
+(
+    expert_id   bigint not null
+        constraint fkhaj7tcvv98any2j4kjnrwnc3s
+            references profiles,
+    category_id bigint not null
+        constraint fkh2e1cphdejxr5wx7q9hllsjyx
+            references categories,
+    primary key (expert_id, category_id)
+);
+
+alter table category_assigned
     owner to postgres;
 
 create table if not exists tickets
@@ -127,9 +148,27 @@ $$
         select nextval('profiles_id_seq') into id;
         insert into profiles(id, email, name, surname, role) values (id, 'manager@polito.it', 'Manager', 'PoliTo', 'MANAGER');
 
-        insert into products(product_id, name, brand) values ('1234512345123', 'PC', 'HP');
-        insert into products(product_id, name, brand) values ('5432154321321', 'iPhone', 'Apple');
-        insert into products(product_id, name, brand) values ('1234567890123', 'smartphone', 'Samsung');
-    END;
+        select nextval('categories_id_seq') into id;
+        insert into categories(id, name) values (id, 'SMARTPHONE');
+        insert into products(product_id, name, brand, category_id) values ('5432154321321', 'iPhone', 'Apple', id);
+        insert into products(product_id, name, brand, category_id) values ('1234567890123', 'smartphone', 'Samsung', id);
+
+        select nextval('categories_id_seq') into id;
+        insert into categories(id, name) values (id, 'TV');
+
+        select nextval('categories_id_seq') into id;
+        insert into categories(id, name) values (id, 'PC');
+        insert into products(product_id, name, brand, category_id) values ('1234512345123', 'PC', 'HP', id);
+
+        select nextval('categories_id_seq') into id;
+        insert into categories(id, name) values (id, 'SOFTWARE');
+
+        select nextval('categories_id_seq') into id;
+        insert into categories(id, name) values (id, 'STORAGE_DEVICE');
+
+        select nextval('categories_id_seq') into id;
+        insert into categories(id, name) values (id, 'OTHER');
+
+    END
 $$;
 COMMIT;

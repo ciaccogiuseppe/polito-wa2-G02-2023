@@ -9,13 +9,13 @@ import jakarta.persistence.*
 @Table(name="categories")
 class Category : EntityBase<Long>() {
     @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     var name: ProductCategory = ProductCategory.OTHER
 
     @OneToMany(mappedBy = "category")
     var products: MutableSet<Product> = mutableSetOf()
 
     @ManyToMany(mappedBy = "expertCategories")
-    @JoinColumn
     var experts: MutableSet<Profile> = mutableSetOf()
 }
 

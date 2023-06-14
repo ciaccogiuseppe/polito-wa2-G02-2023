@@ -51,7 +51,7 @@ class Profile : EntityBase<Long>() {
     @ManyToMany
     @JoinTable(
         name = "category_assigned",
-        joinColumns = [JoinColumn(name = "email")],
+        joinColumns = [JoinColumn(name = "expert_id")],
         inverseJoinColumns = [JoinColumn(name = "category_id")]
     )
     var expertCategories = mutableSetOf<Category>()
