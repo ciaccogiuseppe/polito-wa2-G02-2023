@@ -42,7 +42,7 @@ function ProfileUpdatePage(props) {
 
                 <div style={{marginTop:"15px", marginBottom:"15px"}}>
                     <h5 style={{color:"white"}}>Address</h5>
-                    <Form.Control value={address} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="Address" onChange={e => setLastName(e.target.value)}/>
+                    <Form.Control value={address} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="Address" onChange={e => setAddress(e.target.value)}/>
                 </div>
             </div>
 
