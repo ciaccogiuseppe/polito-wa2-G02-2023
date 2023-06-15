@@ -35,7 +35,7 @@ function App() {
           <Route path='/productid' element= {<ProductIdPage/>}/>
           <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn}/>}/>
           <Route path='/usercreate' element= {<ProfileCreatePage/>}/>
-          <Route path='/userupdate' element= {<ProfileUpdatePage/>}/>
+          <Route path='/profileupdate' element= {<ProfileUpdatePage loggedIn={loggedIn}/>}/>
           <Route path="*" element={<RedirectToHome/>} />
         </Routes>
       </Router>

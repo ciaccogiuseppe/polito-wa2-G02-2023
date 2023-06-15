@@ -1,112 +1,57 @@
-import {Button, Form, Spinner} from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import {useEffect, useState} from "react";
-import {addNewProfile, editProfile, getProfileDetails} from "../../../API/Profiles";
+import {Form} from "react-bootstrap";
+import NavigationButton from "../../Common/NavigationButton";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
+const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
+function ProfileUpdatePage(props) {
+    const loggedIn=props.loggedIn
+    const navigate = useNavigate()
 
+    const [firstName,setFirstName] = useState(Profile.firstName)
+    const [lastName,setLastName] = useState(Profile.lastName)
+    const [address,setAddress] = useState(Profile.address)
+    function formElement(val, setVal) {
+        return <Form.Control value={val} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="file" onChange={e => setVal(e.target.value)}/>
 
-function ProfileUpdatePage(props){
-    const [oldEmail, setOldEmail] = useState("");
-    const [fetched, setFetched] = useState(false);
-    const [email, setEmail] = useState("");
-    const [name, setName] = useState("");
-    const [surname, setSurname] = useState("");
-    const [errMessage, setErrMessage] = useState("");
-    const [response, setResponse] = useState("");
-    const [loading, setLoading] = useState(false);
-
-    function getProfile(){
-        if(oldEmail==""){
-            setErrMessage("Email must not be empty");
-            return;
-        }
-        else if ( oldEmail.includes("/")){
-            setErrMessage("Wrong email format");
-            return;
-        }
-        setLoading(true);
-        setResponse("");
-        getProfileDetails(oldEmail).then(
-            res => {
-                setErrMessage("");
-                setName(res.name);
-                setSurname(res.surname);
-                setEmail(oldEmail);
-                setFetched(true);
-                setLoading(false);
-                //console.log(res);
-            }
-        ).catch(err => {
-            //console.log(err);
-            setResponse("");
-            setErrMessage(err.message);
-            setLoading(false);
-        })
-    }
-
-    function reset(){
-        setFetched(false);
-        setEmail("");
-        setName("");
-        setSurname("");
-    }
-    function updateProfile(){
-        setLoading(true);
-        editProfile({oldemail:oldEmail, email:email, name:name, surname:surname}).then(
-            res => {
-                setErrMessage("");
-                setResponse("Profile updated successfully");
-                setEmail("");
-                setOldEmail("");
-                setName("");
-                setSurname("");
-                setLoading(false);
-                setFetched(false);
-                //console.log(res);
-            }
-        ).catch(err => {
-            //console.log(err);
-            setResponse("");
-            setErrMessage(err.message);
-            setLoading(false);
-        })
     }
 
     return <>
-            <AppNavbar/>
+        <AppNavbar loggedIn={loggedIn} selected={"profile"}/>
 
-            <div className="CenteredButton">
-                <Form className="form">
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label className="text-info">Email address</Form.Label>
-                        {fetched?
-                            <Form.Label className="text-white">: {oldEmail}</Form.Label>:
-                            <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto", marginBottom:"4px"}} value={oldEmail} type="email" disabled={fetched} placeholder="Email address" onChange={e => setOldEmail(e.target.value)}/>
-                        }
-                        </Form.Group>
-                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton"  onClick={(e) => {e.preventDefault(); fetched? reset():getProfile(oldEmail);}}>{fetched? "Change profile to edit":"Get profile to update"}</Button>
-                </Form>
-                {fetched && <>
-                    <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto"}}/>
-                    <Form className="form">
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">New Email address</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={email} type="email" placeholder="New email" onChange={e => setEmail(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Name</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={name} type="text" placeholder="Name" onChange={e => setName(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Surname</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={surname} type="text" placeholder="Surname" onChange={e => setSurname(e.target.value)}/>
-                    </Form.Group>
-                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); if(!e.currentTarget.form.checkValidity()) console.log("here");  updateProfile();}}>Update profile</Button>
-                </Form> </>}
-                <hr style={{color:"white", width:"90%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}/>
-                {loading? <Spinner style={{alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}} animation="border" variant="info" /> :
-                    <>
-                        {response?<h4 className="text-success" style={{marginTop:"10px"}}>{response}</h4>:<></>}
-                        {errMessage?<h5 className="text-danger" style={{marginTop:"10px"}}>{errMessage}</h5>:<></>}</>}
 
+        <div className="CenteredButton" style={{marginTop:"50px"}}>
+            <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>PROFILE EDIT</h1>
+            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"20px", marginTop:"2px"}}/>
+            <div style={{width:"350px", borderRadius:"25px", marginTop:"20px", paddingTop:"5px", paddingBottom:"5px", margin:"auto", backgroundColor:"rgba(0,0,0,0.1)"}}>
+                <div>
+                    <h5 style={{color:"white"}}>First name</h5>
+                    <Form.Control value={firstName} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="First Name" onChange={e => setFirstName(e.target.value)}/>
+                </div>
+                <div style={{marginTop:"15px"}}>
+                    <h5 style={{color:"white"}}>Last name</h5>
+                    <Form.Control value={lastName} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="Last Name" onChange={e => setLastName(e.target.value)}/>
+                </div>
+
+                <div style={{marginTop:"15px"}}>
+                    <h5 style={{color:"white"}}>E-mail</h5>
+                    <Form.Control value={Profile.email} disabled={true} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, opacity:"0.8"}} placeholder="E-mail" onChange={e => {}}/>
+                </div>
+
+                <div style={{marginTop:"15px", marginBottom:"15px"}}>
+                    <h5 style={{color:"white"}}>Address</h5>
+                    <Form.Control value={address} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="Address" onChange={e => setLastName(e.target.value)}/>
+                </div>
             </div>
+
+            <div style={{marginTop:"20px"}}>
+                <NavigationButton text={"Submit"} onClick={e => {e.preventDefault(); navigate("/editprofile")}}/>
+            </div>
+
+
+        </div>
     </>
 }
 

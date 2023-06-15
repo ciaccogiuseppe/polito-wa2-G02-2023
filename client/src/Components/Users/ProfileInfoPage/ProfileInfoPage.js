@@ -21,15 +21,15 @@ function ProfileInfoPage(props) {
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>PROFILE INFO</h1>
-            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
+            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"20px", marginTop:"2px"}}/>
             <div style={{width:"350px", borderRadius:"25px", marginTop:"20px", paddingTop:"5px", paddingBottom:"5px", margin:"auto", backgroundColor:"rgba(0,0,0,0.1)"}}>
                 <div>
-                    <h5 style={{color:"white"}}>Name</h5>
+                    <h5 style={{color:"white"}}>First name</h5>
                     <hr style={{color:"white", width:"125px", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"4px", marginTop:"4px"}}/>
                     <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.firstName}</h5>
                 </div>
                 <div>
-                    <h5 style={{color:"white"}}>Surname</h5>
+                    <h5 style={{color:"white"}}>Last name</h5>
                     <hr style={{color:"white", width:"125px", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"4px", marginTop:"4px"}}/>
                     <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.lastName}</h5>
                 </div>
@@ -48,7 +48,7 @@ function ProfileInfoPage(props) {
             </div>
 
             <div style={{marginTop:"20px"}}>
-                <NavigationButton text={"Edit profile"} onClick={e => {e.preventDefault(); navigate("/editprofile")}}/>
+                <NavigationButton text={"Edit profile"} onClick={e => {e.preventDefault(); navigate("/profileupdate")}}/>
             </div>
 
 
