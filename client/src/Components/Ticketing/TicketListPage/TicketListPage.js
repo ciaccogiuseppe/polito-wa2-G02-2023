@@ -9,6 +9,8 @@ import {Checkbox, ListItemText, MenuItem, OutlinedInput, Slider} from "@mui/mate
 import StatusIndicator from "../TicketCommon/StatusIndicator";
 import PriorityIndicator from "../TicketCommon/PriorityIndicator";
 import Select from 'react-select';
+import AddButton from "../../Common/AddButton";
+import {useNavigate} from "react-router-dom";
 
 
 const variants = [
@@ -112,8 +114,12 @@ function TicketListPage(props) {
     const [selectedStatus, setSelectedStatus] = useState([])
     const [selectedOption, setSelectedOption] = useState("")
     const [showFilters, setShowFilters] = useState(false)
+    const navigate = useNavigate()
     return <>
         <AppNavbar loggedIn={loggedIn} selected={"tickets"}/>
+        <div style={{position:"fixed", bottom:"24px", right:"24px"}}>
+            <AddButton onClick={()=>navigate("/newticket")}/>
+        </div>
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>
 

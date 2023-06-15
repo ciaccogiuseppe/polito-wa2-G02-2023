@@ -4,7 +4,7 @@ import {useState} from "react";
 import {plusIcon} from "./Icons";
 
 function AddButton(props){
-    const [color, setColor] = useState("#A0C1D9")
+    const [color, setColor] = useState("#758C9F")
     const [textColor, setTextColor] = useState("#333333")
     const styles = props.style
     return <Button
