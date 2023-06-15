@@ -33,7 +33,7 @@ function App() {
           <Route path='/tickethistory' element= {<TicketHistoryPage loggedIn={loggedIn}/>}/>
           <Route path='/products' element= {<ProductsPage/>}/>
           <Route path='/productid' element= {<ProductIdPage/>}/>
-          <Route path='/userinfo' element= {<ProfileInfoPage/>}/>
+          <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn}/>}/>
           <Route path='/usercreate' element= {<ProfileCreatePage/>}/>
           <Route path='/userupdate' element= {<ProfileUpdatePage/>}/>
           <Route path="*" element={<RedirectToHome/>} />

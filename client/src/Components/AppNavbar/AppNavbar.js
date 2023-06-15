@@ -18,7 +18,7 @@ function AppNavbar(props){
                         <NavbarLink href={"/"} text={"HOME"} selected={selected==="home"}/>
                         {props.loggedIn && <>
                             <NavbarLink href={"/tickets"} text={"TICKETS"}  selected={selected==="tickets"}/>
-                            <NavbarLink href={"/"} text={"PROFILE"}  selected={selected==="profile"}/>
+                            <NavbarLink href={"/profileinfo"} text={"PROFILE"}  selected={selected==="profile"}/>
                         </>}
                         {/*<NavbarLink href={"/"} text={"CONTACTS"}  selected={selected==="contacts"}/>*/}
                         <NavbarLink href={"/aboutus"} text={"ABOUT US"}  selected={selected==="aboutus"}/>

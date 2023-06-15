@@ -29,26 +29,6 @@ function TicketCreatePage(props) {
                     <Form.Control value={description} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="textarea" as={"textarea"} placeholder="Ticket Description" onChange={e => setDescription(e.target.value)}/>
 
                 </Form.Group>
-                {/*<Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label style={{color:"#DDDDDD"}}>Attachments</Form.Label>
-
-
-
-                    <Form.Control value={file[1]} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="file" onChange={e =>
-                    {
-                        let files = [...file]
-                        files[1] = e.target.value
-                        setFile(files)}
-                    }/>
-
-                    <Form.Control value={file[2]} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="file" onChange={e =>
-                    {
-                        let files = [...file]
-                        files[2] = e.target.value
-                        setFile(files)}
-                    }/>
-
-                </Form.Group>*/}
 
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label style={{color:"#DDDDDD"}}>Product</Form.Label>
