@@ -16,6 +16,7 @@ import TicketCreatePage from "./Components/Ticketing/TicketCreatePage/TicketCrea
 import TicketChatPage from "./Components/Ticketing/TicketChatPage/TicketChatPage";
 import ExpertCreatePage from './Components/Admin/ExpertCreatePage/ExpertCreatePage';
 import TicketHistoryPage from './Components/Ticketing/TicketHistoryPage/TicketHistoryPage';
+import ProductCreatePage from "./Components/Products/ProductCreatePage/ProductCreatePage";
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(true)
@@ -32,6 +33,7 @@ function App() {
           <Route path='/expertcreate' element= {<ExpertCreatePage loggedIn={loggedIn}/>}/>
           <Route path='/tickethistory' element= {<TicketHistoryPage loggedIn={loggedIn}/>}/>
           <Route path='/products' element= {<ProductsPage loggedIn={loggedIn}/>}/>
+          <Route path='/newproduct' element= {<ProductCreatePage loggedIn={loggedIn}/>}/>
           <Route path='/productid' element= {<ProductIdPage/>}/>
           <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn}/>}/>
           <Route path='/usercreate' element= {<ProfileCreatePage/>}/>
