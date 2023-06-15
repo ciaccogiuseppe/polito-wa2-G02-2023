@@ -64,11 +64,11 @@ function TicketHistoryPage(props) {
                         </div>
                     </Col>
                 </Row>
-                <NavigationButton disabled={userEmail == "" && expertEmail == "" && ticketId == "" && initialDate == "" && finalDate == "" } text={"Search"} onClick={e => e.preventDefault()} />
+                <NavigationButton disabled={userEmail === "" && expertEmail === "" && ticketId === "" && initialDate === "" && finalDate === "" } text={"Search"} onClick={e => e.preventDefault()} />
             </div>
 
             {
-                userEmail == "" && expertEmail == "" && ticketId == "" && initialDate == "" && finalDate == "" ?
+                userEmail === "" && expertEmail === "" && ticketId === "" && initialDate === "" && finalDate === "" ?
                     <div style={{ fontSize: "12px", color: "#550000", marginTop: "5px" }}>
                         <span>At least one filter is required to start a search.</span>
                     </div> :

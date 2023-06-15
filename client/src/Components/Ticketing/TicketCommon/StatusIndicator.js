@@ -28,7 +28,7 @@ function StatusIndicator(type) {
             return <div style={{
                 borderRadius: "25px",
                 color: "white",
-                backgroundColor: "#dc8429",
+                backgroundColor: "#b087c7",
                 fontSize: 10,
                 textAlign: "center",
                 verticalAlign: "middle",

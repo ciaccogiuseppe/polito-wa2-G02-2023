@@ -2,6 +2,7 @@ import "./TicketListPage.css"
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import StatusIndicator from "../TicketCommon/StatusIndicator";
+import PriorityIndicator from "../TicketCommon/PriorityIndicator";
 
 
 function TicketTableTR(props){
@@ -11,6 +12,7 @@ function TicketTableTR(props){
     const title = props.title
     const createdTime = props.createdTime
     const status = StatusIndicator(props.status)
+    const priority = PriorityIndicator(props.priority)
     return <tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")} onClick={()=>navigate(`/tickets/${ticketId}`)}>
         <td className="text-light">{title}</td>
         <td style={{verticalAlign:"middle"}}>{status}</td>
