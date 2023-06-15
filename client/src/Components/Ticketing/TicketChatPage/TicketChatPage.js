@@ -157,8 +157,10 @@ function TicketChatPage(props) {
     const [addingMessage, setAddingMessage] = useState(false)
     const [editingStatus, setEditingStatus] = useState(false)
     const [editingPriority, setEditingPriority] = useState(false)
+    const [editingExpert, setEditingExpert] = useState(false)
     const [attachments, setAttachments] = useState([])
     const [updateAttachments, setUpdateAttachments] = useState(false)
+    const [editExpert, setEditExpert] = useState("")
     //let attachments = []
     console.log(attachments)
     console.log(attachments.filter(t => t !== "").length)
@@ -226,11 +228,16 @@ function TicketChatPage(props) {
             <div style={{backgroundColor:"rgba(0,0,0,0.2)", paddingLeft:"25px", paddingRight:"25px", maxWidth:"350px", borderRadius:"25px", alignSelf:"center", margin:"auto"}}>
                 <div style={{color:"#EEEEEE", paddingTop:"5px", paddingBottom:"5px",  marginTop:"14px", marginBottom:"15px", fontSize:14}}>PRODUCT: Apple - iPhone 13 Pro 128GB</div>
             </div>
-            <div style={{backgroundColor:"rgba(0,0,0,0.1)", paddingLeft:"25px", paddingRight:"25px", maxWidth:"300px", borderRadius:"25px", alignSelf:"center", margin:"auto", marginBottom:"10px"}}>
-                <div style={{ color:"#EEEEEE",display:"inline-block", paddingTop:"5px", paddingBottom:"5px",  marginTop:"4px", marginBottom:"4px", fontSize:14}}>Expert: Mario Rossi</div>
+            <div style={{backgroundColor:"rgba(0,0,0,0.1)", paddingLeft:"25px", paddingRight:"25px", paddingBottom:"5px", maxWidth:"300px", borderRadius:"25px", alignSelf:"center", margin:"auto", marginBottom:"10px"}}>
+                <div style={{ color:"#EEEEEE",display:"inline-block", paddingTop:"5px", marginTop:"4px", fontSize:14}}>Expert: Mario Rossi</div>
                 <div style={{display:"inline-block", marginLeft:"14px", marginRight:"14px", marginBottom:"10px"}}>
-                    <EditButton onClick={()=>{}}/>
+
+                        {!editingExpert && <EditButton onClick={()=>setEditingExpert(true)}/>}
+                        {editingExpert && <CloseEditButton onClick={()=>setEditingExpert(false)}/>}
+
                 </div>
+
+                {editingExpert && <div style={{marginBottom:"10px"}}><Form.Control className={"form-control:focus"} placeholder={"Expert E-mail"} style={{fontSize:12}}/></div>}
             </div>
             <NavigationButton text={"Update ticket"} onClick={()=>{}}/>
             <hr style={{color:"white", width:"75%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"20px"}}/>
