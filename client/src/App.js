@@ -31,7 +31,7 @@ function App() {
           <Route path='/aboutus' element= {<AboutUsPage loggedIn={loggedIn}/>}/>
           <Route path='/expertcreate' element= {<ExpertCreatePage loggedIn={loggedIn}/>}/>
           <Route path='/tickethistory' element= {<TicketHistoryPage loggedIn={loggedIn}/>}/>
-          <Route path='/products' element= {<ProductsPage/>}/>
+          <Route path='/products' element= {<ProductsPage loggedIn={loggedIn}/>}/>
           <Route path='/productid' element= {<ProductIdPage/>}/>
           <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn}/>}/>
           <Route path='/usercreate' element= {<ProfileCreatePage/>}/>
