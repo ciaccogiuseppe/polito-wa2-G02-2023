@@ -7,7 +7,7 @@ import ChatMessage from "./ChatMessage";
 import {Button, CloseButton, Form} from "react-bootstrap";
 import AddButton from "../../Common/AddButton";
 import AttachmentOverlay from "./AttachmentOverlay";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import DeleteButton from "../../Common/DeleteButton";
 import SendButton from "../../Common/SendButton";
 import PriorityIndicator from "../TicketCommon/PriorityIndicator";
@@ -20,23 +20,69 @@ const imageList = [
 
 ]
 
-function AddAttachment(props) {
-    const [color, setColor] = useState("#d98080")
-    const [attachment, setAttachment] = useState("")
-    const setNewAttachment=props.setAttachment;
+function UploadButton(props) {
+    const [uploadedFileName, setUploadedFileName] = useState(null);
+    const inputRef = useRef(null);
+    const addFile = props.addFile
+    const enabled = props.enabled
+    const handleUpload = () => {
+        inputRef.current?.click();
+    };
 
-    useEffect(() => {
-        setNewAttachment(attachment)
-    }, [attachment])
-    return <>
-        <div style={{flex:"true"}}>
-            <input style={{maxWidth:"230px", marginTop:"10px", marginLeft:"10px"}} onChange={(e)=> {setColor("#d98080"); setAttachment(e.target.value)}} type="file" className="filestyle" value={attachment} data-icon="false"/>
-            {attachment !== "" && <a style={{cursor:"pointer"}} onClick={(e)=>{e.preventDefault(); setAttachment("")}} onMouseOver={()=>setColor("#a63030")} onMouseLeave={()=>setColor("#d98080")}>
-                {xIcon(color, "20")}
-            </a>}
+    const handleDisplayFileDetails = () => {
+        inputRef.current?.files &&
+            addFile(inputRef.current.files[0])
+    };
+    return (
+        <div className="m-3">
+            <input
+                ref={inputRef}
+                onChange={handleDisplayFileDetails}
+                className="d-none"
+                type="file"
+            />
+            <NavigationButton disabled={!enabled} text={<div>Upload attachment</div>} onClick={handleUpload}/>
         </div>
+    );
+}
+
+
+function DeleteAttachmentButton(props){
+    const [color, setColor] = useState("#d98080")
+    const onClick = props.onClick
+    return <a style={{cursor:"pointer"}} onClick={(e)=>{e.preventDefault(); onClick()}} onMouseOver={()=>setColor("#a63030")} onMouseLeave={()=>setColor("#d98080")}>
+        {xIcon(color, "20")}
+    </a>
+}
+
+function AddAttachment(props) {
+    const attachment_old = props.attachment
+    const [color, setColor] = useState("#d98080")
+    //const [attachment, setAttachment] = useState(attachment_old)
+    const attachments = props.attachments
+    const setAttachments=props.setAttachments;
+
+    /*useEffect(() => {
+        setNewAttachment(attachment)
+    }, [attachment])*/
+
+    return <><div>
+        {attachments.filter(t => t!==undefined).length > 0 &&
+            <div style={{borderRadius:"25px",marginLeft:"25px", marginTop:"10px", paddingTop:"10px", paddingBottom:"10px", paddingLeft:"20px", backgroundColor:"rgba(0,0,0,0.1)", width:"250px"}}>
+                {attachments.map((t,index) => t !== undefined?
+                    <><div>
+
+                        <div style={{maxWidth:"180px", textOverflow:"ellipsis", whiteSpace:"nowrap", overflow:"hidden", display:"inline-block"}}>{t.name} </div>
+                        <div style={{display:"inline-block", float:"right", marginRight:"15px"}}><DeleteAttachmentButton onClick={()=>{const tmp = attachments; tmp.splice(index,1); setAttachments([...tmp])}}/></div> </div> </>: <></>)}
+
+            </div>}
+        <div style={{flex:"true", marginLeft:"30px"}}>
+            <UploadButton enabled={attachments.length < 5} addFile={(file) => {const tmp = attachments; tmp.push(file); setAttachments([...tmp])}}/>
+        </div>
+    </div>
     </>
 }
+
 
 function EditButton(props){
     const [color, setColor] = useState("white")
@@ -111,9 +157,25 @@ function TicketChatPage(props) {
     const [addingMessage, setAddingMessage] = useState(false)
     const [editingStatus, setEditingStatus] = useState(false)
     const [editingPriority, setEditingPriority] = useState(false)
-    //const [attachments, setAttachments] = useState([])
-    let attachments = []
+    const [attachments, setAttachments] = useState([])
+    const [updateAttachments, setUpdateAttachments] = useState(false)
+    //let attachments = []
+    console.log(attachments)
+    console.log(attachments.filter(t => t !== "").length)
     const ticketID = params.id
+
+    useEffect(()=>{
+        if(updateAttachments){
+            const tmp = attachments.filter(t => t !== "")
+            while(tmp.length !== 5){
+                tmp.push("")
+            }
+            setAttachments([...tmp])
+            setUpdateAttachments(false)
+        }
+
+    }, [attachments, updateAttachments])
+
     return <>
         <AppNavbar loggedIn={loggedIn} selected={"tickets"}/>
         {overlayShown &&<AttachmentOverlay startPos={startPos} imageList={imageList} closeModal={() => setOverlayShown(false)}/>}
@@ -185,10 +247,8 @@ function TicketChatPage(props) {
 
 
                 {addingMessage && <><Form.Control style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
-                {[...Array(maxAttachments)].map( (a, index) =>
-                    <>
-                        <AddAttachment setAttachment={att => attachments[index] = att} />
-                    </>)}
+
+                        <AddAttachment attachments={attachments} setAttachments={setAttachments}/>
 
                 </>}
 

@@ -195,7 +195,7 @@ function TicketListPage(props) {
                             onChange={ (event, newValue) => {
                                 setPriority(newValue);
                             }}
-                            valueLabelDisplay="auto"
+                            valueLabelDisplay="off"
                             getAriaValueText={()=>{"a"}}
 
                             style={{color:"#A0C1D9"}}

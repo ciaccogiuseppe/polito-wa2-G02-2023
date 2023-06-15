@@ -17,8 +17,10 @@ function StatusIndicator(type) {
                 padding: 5
             }}>CLOSED</div>
         case "REOPENED":
-            return <div className="text-bg-light" style={{
+            return <div style={{
                 borderRadius: "25px",
+                color: "white",
+                backgroundColor: "#9a9a9a",
                 fontSize: 10,
                 textAlign: "center",
                 verticalAlign: "middle",
