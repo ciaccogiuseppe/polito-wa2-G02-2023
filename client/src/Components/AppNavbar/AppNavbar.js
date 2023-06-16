@@ -21,7 +21,13 @@ function AppNavbar(props){
                         {props.loggedIn && <>
                             <NavbarLink href={"/tickets"} text={"TICKETS"}  selected={selected==="tickets"}/>
                             <NavbarLink href={"/profileinfo"} text={"PROFILE"}  selected={selected==="profile"}/>
-                            {(props.user !== null && props.user.role === "MANAGER") && <NavbarLink href={"/products"} text={"PRODUCTS"}  selected={selected==="products"}/>}
+                            {(props.user !== null && props.user.role === "MANAGER") &&
+                                <>
+                                    <NavbarLink href={"/products"} text={"PRODUCTS"}  selected={selected==="products"}/>
+                                    <NavbarLink href={"/brands"} text={"BRANDS"}  selected={selected==="brands"}/>
+
+                                </>
+                            }
                         </>}
                         {/*<NavbarLink href={"/"} text={"CONTACTS"}  selected={selected==="contacts"}/>*/}
                         <NavbarLink href={"/aboutus"} text={"ABOUT US"}  selected={selected==="aboutus"}/>

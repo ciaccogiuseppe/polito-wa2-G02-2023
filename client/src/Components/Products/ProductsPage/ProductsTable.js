@@ -1,26 +1,12 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {reformatCategory} from "./ProductsPage";
 
 function reformatId(id){
     return id.substring(0,4) + " " + id.substring(4,8) + " " + id.substring(8,11) + " " + id.substring(11,13)
 }
 
-function reformatCategory(category){
-    switch(category){
-        case "SMARTPHONE":
-            return "Smartphone"
-        case "PC":
-            return "PC"
-        case "TV":
-            return "TV"
-        case "SOFTWARE":
-            return "Software"
-        case "STORAGE_DEVICE":
-            return "Storage Device"
-        case "OTHER":
-            return "Other"
-    }
-}
+
 
 function ProductsTableTR(props){
     const [BGcolor, setBGcolor] = useState("");

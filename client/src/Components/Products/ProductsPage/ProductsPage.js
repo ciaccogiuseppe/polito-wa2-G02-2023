@@ -10,6 +10,42 @@ import {Row} from "react-bootstrap";
 import {Slider} from "@mui/material";
 import PriorityIndicator from "../../Ticketing/TicketCommon/PriorityIndicator";
 
+export function reformatCategory(category){
+    switch(category){
+        case "SMARTPHONE":
+            return "Smartphone"
+        case "PC":
+            return "PC"
+        case "TV":
+            return "TV"
+        case "SOFTWARE":
+            return "Software"
+        case "STORAGE_DEVICE":
+            return "Storage Device"
+        case "OTHER":
+            return "Other"
+    }
+}
+
+export function deformatCategory(category){
+    switch(category){
+        case "":
+            return ""
+        case "Smartphone":
+            return "SMARTPHONE"
+        case "PC":
+            return "PC"
+        case "TV":
+            return "TV"
+        case "Software":
+            return "SOFTWARE"
+        case "Storage Device":
+            return "STORAGE_DEVICE"
+        case "Other":
+            return "OTHER"
+    }
+}
+
 function ProductsPage(props) {
     const [errMessage, setErrMessage] = useState("");
     const [productsList, setProductsList] = useState([]);
@@ -44,14 +80,14 @@ function ProductsPage(props) {
             allProducts
                 .map(p => { return {category:p.category, brand:p.brand}})
                 .filter((v,i,a)=>a.indexOf(v)===i).sort()
-                .filter(v => (categoryFilter === "" || v.category === categoryFilter))
+                .filter(v => (deformatCategory(categoryFilter) === "" || v.category === deformatCategory(categoryFilter)))
                 .map(p => p.brand)
                 .filter((v,i,a)=>a.indexOf(v)===i).sort())
     }, [productsList, categoryFilter])
 
     function applyFilter(){
         setProductsList(allProducts.filter(a =>
-            (categoryFilter === "" || a.category === categoryFilter) &&
+            (categoryFilter === "" || reformatCategory(a.category) === categoryFilter) &&
             (brandFilter === "" || a.brand === brandFilter)
         ))
     }
@@ -86,7 +122,7 @@ function ProductsPage(props) {
                                 <span style={{cursor: categoryFilter ? "pointer" : ""}} onClick={() => setCategoryFilter("")} className="input-group-text">{categoryFilter ? crossIcon("black", 17) : filterIcon()}</span>
                                 <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={categoryFilter} onChange={e => {setCategoryFilter(e.target.value); setBrandFilter("")}}>
                                     <option></option>
-                                    {categories.map(c => <option>{c}</option>)}
+                                    {categories.map(c => <option>{reformatCategory(c)}</option>)}
                                 </select>
                             </div>
                         </div>

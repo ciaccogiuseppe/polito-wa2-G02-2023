@@ -22,6 +22,8 @@ import {getProfileInfo} from "./API/Auth";
 import {APIURL} from "./API/API_URL";
 import axios from "axios";
 import {setAuthToken} from "./API/AuthCommon";
+import BrandsPage from "./Components/Brands/BrandsPage/BrandsPage";
+import BrandCreatePage from "./Components/Brands/BrandCreatePage/BrandCreatePage";
 
 export const api = axios.create({
   baseURL: APIURL,
@@ -66,12 +68,14 @@ function App() {
                   if (res.status === 200) {
                     const newAccessToken = res.data.token;
                     localStorage.setItem('token', newAccessToken);
+                      localStorage.setItem('refreshToken', res.data.refreshToken);
                     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                     return axios(originalRequest);
                   }
                 })
                 .catch((error) => {
                   // Handle token refresh failure (e.g., logout user)
+                    logout()
                   console.log('Failed to refresh access token: ', error);
                 });
           }
@@ -115,6 +119,7 @@ function App() {
 
   function logout(){
     localStorage.removeItem("token")
+      localStorage.removeItem("refreshToken")
     setLoggedIn(false)
     window.location.href = "/"
   }
@@ -138,6 +143,8 @@ function App() {
             <Route path='/expertcreate' element= {<ExpertCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
             <Route path='/tickethistory' element= {<TicketHistoryPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
             <Route path='/products' element= {<ProductsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/brands' element= {<BrandsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/newbrand' element= {<BrandCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
             <Route path='/newproduct' element= {<ProductCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
             <Route path='/productid' element= {<ProductIdPage/>}/>
             <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn} user={user} logout={logout}/>}/>

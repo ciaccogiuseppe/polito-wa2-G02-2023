@@ -61,6 +61,51 @@ async function getAllCategories(){
         });
 }
 
+async function getAllBrands(){
+    const url = APIURL + "/API/public/brands/";
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+
+    return api.get(url).then(response => {
+        //get token from response
+        //console.log(response.data.accessToken)
+        return response.data
+
+    })
+        .catch(err => {
+            console.log(err)
+            Promise.reject(err.response.data.detail)
+        });
+}
+
+
+async function addProductAPI(productPayload){
+    return api.post(APIURL + "/API/manager/products/", productPayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
+async function addBrandAPI(brandPayload){
+    return api.post(APIURL + "/API/manager/brand/", brandPayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
+
 async function getProductDetails(productID){
     const url = APIURL + "/API/products/" + productID;
     const response = await fetch(url);
@@ -88,4 +133,4 @@ async function getProductDetails(productID){
 
 
 
-export {getAllProducts, getProductDetails, getAllCategories}
+export {getAllProducts, getProductDetails, getAllCategories, getAllBrands, addProductAPI, addBrandAPI}

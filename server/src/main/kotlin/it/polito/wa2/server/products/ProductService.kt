@@ -4,4 +4,6 @@ interface ProductService {
     fun getAllProducts(): List<ProductDTO>
 
     fun getProduct(productId: String): ProductDTO
+
+    fun addProduct(productDTO: ProductDTO) : ProductDTO
 }

@@ -73,10 +73,23 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     /************** Category exception handlers **************/
     @ExceptionHandler(CategoryNotFoundException::class)
     fun handleTicketNotFound(e: CategoryNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+
+    /************** Brand exception handlers **************/
+    @ExceptionHandler(BrandNotFoundException::class)
+    fun handleTicketNotFound(e: BrandNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+
+    @ExceptionHandler(UnprocessableBrandException::class)
+    fun handleTicketNotFound(e: UnprocessableBrandException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+
+    @ExceptionHandler(DuplicateBrandException::class)
+    fun handleTicketNotFound(e: DuplicateBrandException) = ProblemDetail.forStatusAndDetail( HttpStatus.CONFLICT, e.message!! )
+
+
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message)
 class UnprocessableProductException(message: String): RuntimeException(message)
+class BadRequestProductException(message: String): RuntimeException(message)
 class DuplicateProductException(message: String): RuntimeException(message)
 class ProfileNotFoundException(message: String): RuntimeException(message)
 class UnprocessableProfileException(message: String): RuntimeException(message)
@@ -95,3 +108,7 @@ class ForbiddenException(message: String): RuntimeException(message)
 class UnprocessableUserException(message: String): RuntimeException(message)
 class BadRequestUserException(message: String): RuntimeException(message)
 class CategoryNotFoundException(message: String): RuntimeException(message)
+class BrandNotFoundException(message: String): RuntimeException(message)
+class UnprocessableBrandException(message: String): RuntimeException(message)
+class BadRequestBrandException(message: String): RuntimeException(message)
+class DuplicateBrandException(message: String): RuntimeException(message)
