@@ -19,12 +19,12 @@ import TicketHistoryPage from './Components/Ticketing/TicketHistoryPage/TicketHi
 import ProductCreatePage from "./Components/Products/ProductCreatePage/ProductCreatePage";
 
 function App() {
-    const [loggedIn, setLoggedIn] = useState(true)
+    const [loggedIn, setLoggedIn] = useState(localStorage.token !== undefined)
   return (
       <Router>
         <Routes>
           <Route path='/' element= {<HomePage loggedIn={loggedIn}/>}/>
-          <Route path='/login' element= {<LoginPage loggedIn={loggedIn}/>}/>
+          <Route path='/login' element= {<LoginPage loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
           <Route path='/signup' element= {<ProfileCreatePage loggedIn={loggedIn}/>}/>
           <Route path='/tickets' element= {<TicketListPage loggedIn={loggedIn}/>}/>
           <Route path='/tickets/:id' element= {<TicketChatPage loggedIn={loggedIn}/>}/>

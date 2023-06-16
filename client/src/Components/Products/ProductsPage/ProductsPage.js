@@ -14,6 +14,12 @@ function ProductsPage(props) {
     const [errMessage, setErrMessage] = useState("");
     const [productsList, setProductsList] = useState([]);
     const [showFilters, setShowFilters] = useState(false)
+
+
+    useEffect(() => {
+        getAllProducts().then()
+    },[])
+
     function getProducts() {
         getAllProducts().then(
             res => {

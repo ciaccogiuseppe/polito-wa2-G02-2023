@@ -6,12 +6,20 @@ import NavigationButton from "../../Common/NavigationButton";
 import "./LoginPage.css"
 import {Link, useNavigate} from "react-router-dom";
 import NavigationLink from "../../Common/NavigationLink";
+import {loginAPI} from "../../../API/Login";
 
 function LoginPage(props) {
     const loggedIn=props.loggedIn
+    const setLoggedIn=props.setLoggedIn
     const navigate = useNavigate()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+
+
+    function login() {
+        loginAPI({username:email, password:password}).then(setLoggedIn(true))
+    }
+
     return <>
             <AppNavbar loggedIn={loggedIn}/>
             <div className="CenteredButton" style={{marginTop:"50px"}}>
@@ -26,7 +34,7 @@ function LoginPage(props) {
                         <Form.Label style={{color:"#DDDDDD"}}>Password</Form.Label>
                         <Form.Control value={password} style={{width: "300px", alignSelf:"center", margin:"auto"}} type="password" placeholder="Password" onChange={e => setPassword(e.target.value)}/>
                     </Form.Group>
-                    <NavigationButton text={"Login"} onClick={e => e.preventDefault()}/>
+                    <NavigationButton text={"Login"} onClick={e => {e.preventDefault(); login()}}/>
                 </Form>
                 <div style={{fontSize:"12px", color:"#EEEEEE", marginTop:"5px" }}>
                     <span>Don't have an account?</span> <NavigationLink href={"/signup"} text={"Sign up"}/>
