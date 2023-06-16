@@ -17,7 +17,7 @@ function ProfileInfoPage(props) {
     }
 
     return <>
-        <AppNavbar logout={props.logout} loggedIn={loggedIn} selected={"profile"}/>
+        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"profile"}/>
 
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>
@@ -41,11 +41,11 @@ function ProfileInfoPage(props) {
                     <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.email}</h5>
                 </div>
 
-                <div>
+                {Profile.address && <div>
                     <h5 style={{color:"white"}}>Address</h5>
                     <hr style={{color:"white", width:"125px", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"4px", marginTop:"4px"}}/>
                     <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.address}</h5>
-                </div>
+                </div>}
             </div>
 
             <div style={{marginTop:"20px"}}>

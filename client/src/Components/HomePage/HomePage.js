@@ -9,17 +9,18 @@ import NavigationLink from "../Common/NavigationLink";
 function HomePage(props) {
     const navigate = useNavigate();
     const loggedIn = props.loggedIn
+    const user = props.user
 
 
     return <>
-        <AppNavbar logout={props.logout} loggedIn={loggedIn} selected={"home"}/>
+        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"home"}/>
         <div className="CenteredButton" style={{marginTop:"50px"}}>
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>TICKETING SUPPORT</h1>
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
             <h5 style={{color:"#EEEEEE"}}>simple and easy ticketing</h5>
         </div>
 
-        {loggedIn &&
+        {(loggedIn && user!==null && user.role === "CLIENT") &&
         <>
             <div className="CenteredButton" style={{marginTop:"70px"}}>
                 <NavigationButton text={"Open a ticket"} onClick={(e) => { e.preventDefault(); navigate("/newticket") }}/>

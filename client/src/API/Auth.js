@@ -24,6 +24,18 @@ async function loginAPI(loginPayload){
         )
 }
 
+async function signupAPI(signupPayload){
+    return axios.post(APIURL + "/API/signup", signupPayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+            console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
 async function getProfileInfo(){
     const token = localStorage.getItem("token");
     if (token) {
@@ -33,7 +45,7 @@ async function getProfileInfo(){
         .then(response => {
             return response
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log(err.response.data.detail));
 }
 
-export {loginAPI, getProfileInfo}
+export {loginAPI, getProfileInfo, signupAPI}

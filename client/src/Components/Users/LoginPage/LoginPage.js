@@ -6,7 +6,7 @@ import NavigationButton from "../../Common/NavigationButton";
 import "./LoginPage.css"
 import {Link, useNavigate} from "react-router-dom";
 import NavigationLink from "../../Common/NavigationLink";
-import {loginAPI} from "../../../API/Login";
+import {loginAPI} from "../../../API/Auth";
 import ErrorMessage from "../../Common/ErrorMessage";
 
 function LoginPage(props) {
@@ -33,7 +33,7 @@ function LoginPage(props) {
     }, [])
 
     return <>
-            <AppNavbar loggedIn={loggedIn} logout={props.logout}/>
+            <AppNavbar user={props.user} loggedIn={loggedIn} logout={props.logout}/>
             <div className="CenteredButton" style={{marginTop:"50px"}}>
                 <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>LOGIN</h1>
                 <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>

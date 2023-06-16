@@ -179,7 +179,7 @@ function TicketChatPage(props) {
     }, [attachments, updateAttachments])
 
     return <>
-        <AppNavbar logout={props.logout} loggedIn={loggedIn} selected={"tickets"}/>
+        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"tickets"}/>
         {overlayShown &&<AttachmentOverlay startPos={startPos} imageList={imageList} closeModal={() => setOverlayShown(false)}/>}
         <div className="CenteredButton" style={{marginTop:"50px"}}>
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>TICKET</h1>

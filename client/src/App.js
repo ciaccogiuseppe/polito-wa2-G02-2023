@@ -18,18 +18,30 @@ import ExpertCreatePage from './Components/Admin/ExpertCreatePage/ExpertCreatePa
 import TicketHistoryPage from './Components/Ticketing/TicketHistoryPage/TicketHistoryPage';
 import ProductCreatePage from "./Components/Products/ProductCreatePage/ProductCreatePage";
 import jwtDecode from "jwt-decode";
-import {getProfileInfo} from "./API/Login";
+import {getProfileInfo} from "./API/Auth";
 
 function App() {
 
   const [loggedIn, setLoggedIn] = useState(localStorage.token !== undefined)
-  const [role, setRole] = useState(null)
   const [user, setUser] = useState(null)
   useEffect(() => {
-    if(localStorage.token)
-      getProfileInfo().then(response => setUser(response.data))
+    if(localStorage.token){
+
+      let role
+      const data = jwtDecode(localStorage.token)
+      if(data.realm_access.roles.includes("app_client")){
+        role = "CLIENT"
+      }
+      else if (data.realm_access.roles.includes("app_expert")){
+        role = "EXPERT"
+      }
+      else if (data.realm_access.roles.includes("app_manager")){
+        role = "MANAGER"
+      }
+      getProfileInfo().then(response => setUser({...response.data, role:role}))
+    }
+
     if(loggedIn===false){
-      setRole(null)
       setUser(null)
     }
   }, [loggedIn])
@@ -43,27 +55,27 @@ function App() {
   return (
       <Router>
         <Routes>
-          <Route path='/' element= {<HomePage loggedIn={loggedIn} logout={logout}/>}/>
+          <Route path='/' element= {<HomePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
 
           {!loggedIn && <>
-          <Route path='/login' element= {<LoginPage loggedIn={loggedIn} setLoggedIn={setLoggedIn} logout={logout}/>}/>
-          <Route path='/signup' element= {<ProfileCreatePage loggedIn={loggedIn} logout={logout}/>}/>
+          <Route path='/login' element= {<LoginPage user={user} loggedIn={loggedIn} setLoggedIn={setLoggedIn} logout={logout}/>}/>
+          <Route path='/signup' element= {<ProfileCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
           </>}
 
-          <Route path='/aboutus' element= {<AboutUsPage loggedIn={loggedIn} logout={logout}/>}/>
+          <Route path='/aboutus' element= {<AboutUsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
 
           {(loggedIn && user!==null) && <>
-            <Route path='/tickets' element= {<TicketListPage loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/tickets/:id' element= {<TicketChatPage loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/newticket' element= {<TicketCreatePage loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/expertcreate' element= {<ExpertCreatePage loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/tickethistory' element= {<TicketHistoryPage loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/products' element= {<ProductsPage loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/newproduct' element= {<ProductCreatePage loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/tickets' element= {<TicketListPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/tickets/:id' element= {<TicketChatPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/newticket' element= {<TicketCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/expertcreate' element= {<ExpertCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/tickethistory' element= {<TicketHistoryPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/products' element= {<ProductsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/newproduct' element= {<ProductCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
             <Route path='/productid' element= {<ProductIdPage/>}/>
             <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn} user={user} logout={logout}/>}/>
             <Route path='/usercreate' element= {<ProfileCreatePage/>}/>
-            <Route path='/profileupdate' element= {<ProfileUpdatePage loggedIn={loggedIn} logout={logout}/>}/>
+            <Route path='/profileupdate' element= {<ProfileUpdatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
 
           </>}
           <Route path="*" element={<RedirectToHome/>} />

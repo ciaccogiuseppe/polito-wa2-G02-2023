@@ -7,7 +7,7 @@ function RedirectToHome(props){
         navigate("/");
     });
     return <>
-    <AppNavbar logout={props.logout}/>
+    <AppNavbar user={props.user} logout={props.logout}/>
     </>
 }
 
