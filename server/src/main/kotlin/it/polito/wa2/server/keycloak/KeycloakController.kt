@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
 @RestController
+@CrossOrigin(origins =["http://localhost:3001"])
 @Observed
 class KeycloakController(private val keycloakService: KeycloakService) {
     @PostMapping("/API/signup")
