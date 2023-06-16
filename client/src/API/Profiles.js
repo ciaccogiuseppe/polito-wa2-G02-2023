@@ -1,4 +1,55 @@
 import { APIURL } from './API_URL';
+import axios from "axios";
+import {setAuthToken} from "./AuthCommon";
+
+async function updateClientAPI(updatePayload, email){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.put(APIURL + "/API/client/user/" + email, updatePayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
+async function updateExpertAPI(updatePayload, email){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.put(APIURL + "/API/expert/user/" + email, updatePayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
+async function updateManagerAPI(updatePayload, email){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.put(APIURL + "/API/manager/user/" + email, updatePayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
 
 async function getProfileDetails(email){
     const url = APIURL + "/API/profiles/" + email;
@@ -104,4 +155,4 @@ async function editProfile(profile){
     throw(err);
 }
 
-export {getProfileDetails, addNewProfile, editProfile}
+export {getProfileDetails, addNewProfile, editProfile, updateClientAPI, updateManagerAPI, updateExpertAPI}

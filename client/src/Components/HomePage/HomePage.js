@@ -28,6 +28,14 @@ function HomePage(props) {
         </>
         }
 
+        {(loggedIn && user!==null && user.role === "EXPERT") &&
+            <>
+                <div className="CenteredButton" style={{marginTop:"70px"}}>
+                    <NavigationButton text={"View assigned tickets"} onClick={(e) => { e.preventDefault(); navigate("/tickets") }}/>
+                </div>
+            </>
+        }
+
         {!loggedIn &&
             <>
                 <div className="CenteredButton" style={{marginTop:"70px"}}>
