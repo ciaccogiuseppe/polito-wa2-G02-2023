@@ -40,6 +40,7 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.GET, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers(HttpMethod.POST, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers("/API/signup").permitAll()
+            .requestMatchers("/API/refreshtoken").permitAll()
             .requestMatchers("/API/createExpert").hasRole(MANAGER)
             .anyRequest().authenticated()
         httpSecurity.oauth2ResourceServer()
