@@ -46,6 +46,7 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .jwtAuthenticationConverter(jwtAuthConverter)
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         httpSecurity.csrf().disable()
+        httpSecurity.cors()
         return httpSecurity.build()
     }
 }

@@ -18,6 +18,7 @@ class AuthController(
 ) {
     private val restTemplate = RestTemplate()
 
+    @CrossOrigin(origins =["http://localhost:3001"])
     @PostMapping("/API/login")
     @ResponseBody
     fun login(@RequestBody loginRequest: LoginRequest): LoginResponse {
@@ -44,7 +45,7 @@ class AuthController(
                 json.parseMap(responseBody)["access_token"]!!.toString(),
                 json.parseMap(responseBody)["expires_in"]!! as Long
             )
-            return LoginResponse(tokenResponse.accessToken, tokenResponse.expiresIn)
+            return LoginResponse(tokenResponse.token, tokenResponse.expiresIn)
 
         } catch(e: RuntimeException){
             println(e)
@@ -54,5 +55,5 @@ class AuthController(
 }
 
 data class LoginRequest(val username: String, val password: String)
-data class LoginResponse(val accessToken: String, val expiresIn: Long)
-data class TokenResponse(val accessToken: String, val expiresIn:Long)
+data class LoginResponse(val token: String, val expiresIn: Long)
+data class TokenResponse(val token: String, val expiresIn:Long)
