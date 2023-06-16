@@ -2,14 +2,18 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 import {Form, Spinner} from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {getProfileInfo} from "../../../API/Auth";
+import SuccessMessage from "../../Common/SuccessMessage";
 
 //const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
 function ProfileInfoPage(props) {
+    const location = useLocation()
+    let message = location.state && location.state.message ;
     const loggedIn=props.loggedIn
     const [Profile, setProfile] = useState(null)
+    const [successMessage, setSuccessMessage] = useState(message || "")
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
 
@@ -64,6 +68,8 @@ function ProfileInfoPage(props) {
 
 
             </div>
+
+            {successMessage && <SuccessMessage text={successMessage} close={()=>setSuccessMessage("")}/> }
 
             <div style={{marginTop:"20px"}}>
                 <NavigationButton text={"Edit profile"} onClick={e => {e.preventDefault(); navigate("/profileupdate")}}/>
