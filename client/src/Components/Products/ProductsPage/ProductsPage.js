@@ -48,7 +48,7 @@ function ProductsPage(props) {
     const [categoryFilter, setCategoryFilter] = useState("")
 
     return <>
-        <AppNavbar loggedIn={loggedIn} selected={"products"}/>
+        <AppNavbar logout={props.logout} loggedIn={loggedIn} selected={"products"}/>
 
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>

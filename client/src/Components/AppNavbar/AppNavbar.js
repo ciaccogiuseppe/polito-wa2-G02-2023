@@ -2,11 +2,13 @@ import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import {useState} from "react";
 import NavbarLink from "./NavbarLink";
+import NavbarButton from "./NavbarButton";
 
 
 function AppNavbar(props){
     const navigate = useNavigate();
     const selected = props.selected
+    const logout = props.logout
     return <>
         <>
             <Navbar className="fixed-top" style={{backgroundColor:"#FDE0BE", padding:0, boxShadow:"0px 10px 20px -10px rgba(0,0,0,0.8)", justifyContent:"center"}}>
@@ -38,7 +40,12 @@ function AppNavbar(props){
                         <NavDropdown.Item href="/usercreate" onClick={(e)=>{e.preventDefault(); navigate("/userupdate");}}>Update profile</NavDropdown.Item>
                     </NavDropdown>*/}
                     </Nav>
+
+
                 </Navbar.Collapse>
+                {props.loggedIn && <Nav style={{right:"20px", position:"absolute"}}>
+                    <NavbarButton onClick={() => {logout()}} href={"/"} text={"LOGOUT"}/>
+                </Nav>}
             </Navbar>
         </>
 

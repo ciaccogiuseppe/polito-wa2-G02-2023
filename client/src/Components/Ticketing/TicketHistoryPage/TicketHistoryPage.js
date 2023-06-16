@@ -21,7 +21,7 @@ function TicketHistoryPage(props) {
 
     const loggedIn = props.loggedIn
     return <>
-        <AppNavbar loggedIn={loggedIn} />
+        <AppNavbar logout={props.logout} loggedIn={loggedIn} />
         <div className="CenteredButton" style={{ marginTop: "50px" }}>
             <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>TICKET HISTORY</h1>
             <hr style={{ color: "white", width: "25%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "2px", marginTop: "2px" }} />

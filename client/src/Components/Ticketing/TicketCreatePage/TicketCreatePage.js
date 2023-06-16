@@ -16,7 +16,7 @@ function TicketCreatePage(props) {
     }
 
     return <>
-            <AppNavbar loggedIn={loggedIn} selected={"tickets"}/>
+            <AppNavbar logout={props.logout} loggedIn={loggedIn} selected={"tickets"}/>
 
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>

@@ -31,7 +31,7 @@ function ProductIdPage(props){
     }
 
     return <>
-            <AppNavbar/>
+            <AppNavbar logout={props.logout}/>
 
             <div className="CenteredButton">
                 

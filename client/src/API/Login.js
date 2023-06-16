@@ -5,7 +5,7 @@ import {setAuthToken} from "./AuthCommon";
 
 
 async function loginAPI(loginPayload){
-    axios.post(APIURL + "/API/login", loginPayload)
+    return axios.post(APIURL + "/API/login", loginPayload)
         .then(response => {
             //get token from response
             //console.log(response.data.accessToken)
@@ -16,9 +16,24 @@ async function loginAPI(loginPayload){
 
             //set token to axios common header
             setAuthToken(token);
+            return response
+        })
+        .catch(err =>{
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
 
+async function getProfileInfo(){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.get(APIURL + "/API/authenticated/profile/")
+        .then(response => {
+            return response
         })
         .catch(err => console.log(err));
 }
 
-export {loginAPI}
+export {loginAPI, getProfileInfo}

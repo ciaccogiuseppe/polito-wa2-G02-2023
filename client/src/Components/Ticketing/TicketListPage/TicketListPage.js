@@ -116,7 +116,7 @@ function TicketListPage(props) {
     const [showFilters, setShowFilters] = useState(false)
     const navigate = useNavigate()
     return <>
-        <AppNavbar loggedIn={loggedIn} selected={"tickets"}/>
+        <AppNavbar loggedIn={loggedIn} selected={"tickets"} logout={props.logout}/>
         <div style={{position:"fixed", bottom:"24px", right:"24px"}}>
             <AddButton onClick={()=>navigate("/newticket")}/>
         </div>

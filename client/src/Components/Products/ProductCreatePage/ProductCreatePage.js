@@ -16,7 +16,7 @@ function ProductCreatePage(props) {
     }
 
     return <>
-        <AppNavbar loggedIn={loggedIn} selected={"products"}/>
+        <AppNavbar loggedIn={loggedIn} selected={"products"} logout={props.logout}/>
 
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>

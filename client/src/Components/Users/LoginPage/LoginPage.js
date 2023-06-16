@@ -7,21 +7,33 @@ import "./LoginPage.css"
 import {Link, useNavigate} from "react-router-dom";
 import NavigationLink from "../../Common/NavigationLink";
 import {loginAPI} from "../../../API/Login";
+import ErrorMessage from "../../Common/ErrorMessage";
 
 function LoginPage(props) {
     const loggedIn=props.loggedIn
     const setLoggedIn=props.setLoggedIn
+    const [errorMessage, setErrorMessage] = useState("")
     const navigate = useNavigate()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
 
     function login() {
-        loginAPI({username:email, password:password}).then(setLoggedIn(true))
+        loginAPI({username:email, password:password}).then(
+            () => {
+                setLoggedIn(true)
+                navigate("/")
+            }
+            ).catch(err => {console.log(err); setErrorMessage(err)})
+
     }
 
+    useEffect(() => {
+       setErrorMessage("")
+    }, [])
+
     return <>
-            <AppNavbar loggedIn={loggedIn}/>
+            <AppNavbar loggedIn={loggedIn} logout={props.logout}/>
             <div className="CenteredButton" style={{marginTop:"50px"}}>
                 <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>LOGIN</h1>
                 <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
@@ -39,6 +51,8 @@ function LoginPage(props) {
                 <div style={{fontSize:"12px", color:"#EEEEEE", marginTop:"5px" }}>
                     <span>Don't have an account?</span> <NavigationLink href={"/signup"} text={"Sign up"}/>
                 </div>
+
+                {errorMessage && <ErrorMessage close={()=>setErrorMessage("")} text={errorMessage}/>}
 
             </div>
     </>

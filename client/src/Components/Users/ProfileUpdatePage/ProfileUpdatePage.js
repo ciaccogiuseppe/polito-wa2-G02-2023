@@ -19,7 +19,7 @@ function ProfileUpdatePage(props) {
     }
 
     return <>
-        <AppNavbar loggedIn={loggedIn} selected={"profile"}/>
+        <AppNavbar loggedIn={loggedIn} selected={"profile"} logout={props.logout}/>
 
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>

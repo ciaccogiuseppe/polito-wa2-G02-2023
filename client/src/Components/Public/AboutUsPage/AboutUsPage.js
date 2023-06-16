@@ -3,7 +3,7 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 function AboutUsPage(props) {
     const loggedIn=props.loggedIn
     return <>
-            <AppNavbar loggedIn={loggedIn} selected={"aboutus"}/>
+            <AppNavbar logout={props.logout} loggedIn={loggedIn} selected={"aboutus"}/>
             <div className="CenteredButton" style={{marginTop:"50px"}}>
                 <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>ABOUT US</h1>
                 <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"20px", marginTop:"2px"}}/>

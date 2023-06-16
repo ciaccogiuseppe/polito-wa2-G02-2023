@@ -4,10 +4,11 @@ import NavigationButton from "../../Common/NavigationButton";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 
-const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
+//const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
 function ProfileInfoPage(props) {
     const loggedIn=props.loggedIn
+    const Profile = props.user
     const navigate = useNavigate()
 
     function formElement(val, setVal) {
@@ -16,7 +17,7 @@ function ProfileInfoPage(props) {
     }
 
     return <>
-        <AppNavbar loggedIn={loggedIn} selected={"profile"}/>
+        <AppNavbar logout={props.logout} loggedIn={loggedIn} selected={"profile"}/>
 
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>
@@ -26,12 +27,12 @@ function ProfileInfoPage(props) {
                 <div>
                     <h5 style={{color:"white"}}>First name</h5>
                     <hr style={{color:"white", width:"125px", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"4px", marginTop:"4px"}}/>
-                    <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.firstName}</h5>
+                    <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.name}</h5>
                 </div>
                 <div>
                     <h5 style={{color:"white"}}>Last name</h5>
                     <hr style={{color:"white", width:"125px", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"4px", marginTop:"4px"}}/>
-                    <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.lastName}</h5>
+                    <h5 style={{color:"#e3e3e3", fontSize:13}}>{Profile.surname}</h5>
                 </div>
 
                 <div>
