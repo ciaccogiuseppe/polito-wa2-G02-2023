@@ -1,13 +1,14 @@
 import { APIURL } from './API_URL';
 import axios from "axios";
 import {setAuthToken} from "./AuthCommon";
+import {api} from "../App";
 
 async function updateClientAPI(updatePayload, email){
     const token = localStorage.getItem("token");
     if (token) {
         setAuthToken(token);
     }
-    return axios.put(APIURL + "/API/client/user/" + email, updatePayload)
+    return api.put(APIURL + "/API/client/user/" + email, updatePayload)
         .then(response => {
             return response
         })
@@ -23,7 +24,7 @@ async function updateExpertAPI(updatePayload, email){
     if (token) {
         setAuthToken(token);
     }
-    return axios.put(APIURL + "/API/expert/user/" + email, updatePayload)
+    return api.put(APIURL + "/API/expert/user/" + email, updatePayload)
         .then(response => {
             return response
         })
@@ -39,7 +40,7 @@ async function updateManagerAPI(updatePayload, email){
     if (token) {
         setAuthToken(token);
     }
-    return axios.put(APIURL + "/API/manager/user/" + email, updatePayload)
+    return api.put(APIURL + "/API/manager/user/" + email, updatePayload)
         .then(response => {
             return response
         })

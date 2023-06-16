@@ -19,11 +19,78 @@ import TicketHistoryPage from './Components/Ticketing/TicketHistoryPage/TicketHi
 import ProductCreatePage from "./Components/Products/ProductCreatePage/ProductCreatePage";
 import jwtDecode from "jwt-decode";
 import {getProfileInfo} from "./API/Auth";
+import {APIURL} from "./API/API_URL";
+import axios from "axios";
+import {setAuthToken} from "./API/AuthCommon";
+
+export const api = axios.create({
+  baseURL: APIURL,
+});
+
 
 function App() {
 
   const [loggedIn, setLoggedIn] = useState(localStorage.token !== undefined)
   const [user, setUser] = useState(null)
+
+
+  useEffect(() => {
+    // Add a request interceptor to attach the access token to all outgoing requests
+    const requestInterceptor = api.interceptors.request.use(
+        (config) => {
+          const accessToken = localStorage.getItem('token');
+          if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+          }
+          return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
+    // Add a response interceptor to handle token refresh
+    const responseInterceptor = api.interceptors.response.use(
+        (response) => response,
+        (error) => {
+          const originalRequest = error.config;
+          const refreshToken = localStorage.getItem('refreshToken');
+
+          // If the error response status is 401 and the original request has not already been retried
+          if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+              setAuthToken("");
+            return axios
+                .post(APIURL+"/API/refreshtoken", {
+                  refreshToken: refreshToken,
+                })
+                .then((res) => {
+                  if (res.status === 200) {
+                    const newAccessToken = res.data.token;
+                    localStorage.setItem('token', newAccessToken);
+                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return axios(originalRequest);
+                  }
+                })
+                .catch((error) => {
+                  // Handle token refresh failure (e.g., logout user)
+                  console.log('Failed to refresh access token: ', error);
+                });
+          }
+
+          return Promise.reject(error);
+        }
+    );
+
+    return () => {
+      // Remove the request and response interceptors on component unmount
+      api.interceptors.request.eject(requestInterceptor);
+      api.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
+
+
+
+
+
   useEffect(() => {
     if(localStorage.token){
 

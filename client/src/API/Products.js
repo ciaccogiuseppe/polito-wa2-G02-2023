@@ -1,6 +1,7 @@
 import { APIURL } from './API_URL';
 import {setAuthToken} from "./AuthCommon";
 import axios from "axios";
+import {api} from "../App";
 
 async function getAllProducts(){
     const url = APIURL + "/API/public/products/";
@@ -9,7 +10,7 @@ async function getAllProducts(){
         setAuthToken(token);
     }
 
-    return axios.get(url).then(response => {
+    return api.get(url).then(response => {
         //get token from response
         //console.log(response.data.accessToken)
         return response.data
@@ -48,7 +49,7 @@ async function getAllCategories(){
         setAuthToken(token);
     }
 
-    return axios.get(url).then(response => {
+    return api.get(url).then(response => {
         //get token from response
         //console.log(response.data.accessToken)
         return response.data

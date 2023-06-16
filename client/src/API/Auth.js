@@ -1,11 +1,12 @@
 import axios from "axios";
 import {APIURL} from "./API_URL";
 import {setAuthToken} from "./AuthCommon";
+import {api} from "../App";
 
 
 
 async function loginAPI(loginPayload){
-    return axios.post(APIURL + "/API/login", loginPayload)
+    return api.post(APIURL + "/API/login", loginPayload)
         .then(response => {
             //get token from response
             //console.log(response.data.accessToken)
@@ -13,6 +14,7 @@ async function loginAPI(loginPayload){
 
             //set JWT token to local
             localStorage.setItem("token", token);
+            localStorage.setItem("refreshToken", response.data.refreshToken)
 
             //set token to axios common header
             setAuthToken(token);
@@ -25,7 +27,7 @@ async function loginAPI(loginPayload){
 }
 
 async function signupAPI(signupPayload){
-    return axios.post(APIURL + "/API/signup", signupPayload)
+    return api.post(APIURL + "/API/signup", signupPayload)
         .then(response => {
             return response
         })
@@ -41,7 +43,7 @@ async function getProfileInfo(){
     if (token) {
         setAuthToken(token);
     }
-    return axios.get(APIURL + "/API/authenticated/profile/")
+    return api.get(APIURL + "/API/authenticated/profile/")
         .then(response => {
             return response
         })
