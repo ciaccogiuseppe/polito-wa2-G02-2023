@@ -9,13 +9,16 @@ async function getAllProducts(){
         setAuthToken(token);
     }
 
-    axios.get(url).then(response => {
+    return axios.get(url).then(response => {
         //get token from response
         //console.log(response.data.accessToken)
-        console.log(response.data)
+        return response.data
 
     })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err)
+            Promise.reject(err.response.data.detail)
+        });
 
 
     /*const response = await fetch(url);
@@ -36,6 +39,25 @@ async function getAllProducts(){
             break;
     }
     throw(err);*/
+}
+
+async function getAllCategories(){
+    const url = APIURL + "/API/public/categories/";
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+
+    return axios.get(url).then(response => {
+        //get token from response
+        //console.log(response.data.accessToken)
+        return response.data
+
+    })
+        .catch(err => {
+            console.log(err)
+            Promise.reject(err.response.data.detail)
+        });
 }
 
 async function getProductDetails(productID){
@@ -65,4 +87,4 @@ async function getProductDetails(productID){
 
 
 
-export {getAllProducts, getProductDetails}
+export {getAllProducts, getProductDetails, getAllCategories}

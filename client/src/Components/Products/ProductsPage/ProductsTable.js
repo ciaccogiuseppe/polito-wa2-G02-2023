@@ -1,11 +1,31 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 
+function reformatId(id){
+    return id.substring(0,4) + " " + id.substring(4,8) + " " + id.substring(8,11) + " " + id.substring(11,13)
+}
+
+function reformatCategory(category){
+    switch(category){
+        case "SMARTPHONE":
+            return "Smartphone"
+        case "PC":
+            return "PC"
+        case "TV":
+            return "TV"
+        case "SOFTWARE":
+            return "Software"
+        case "STORAGE_DEVICE":
+            return "Storage Device"
+        case "OTHER":
+            return "Other"
+    }
+}
 
 function ProductsTableTR(props){
     const [BGcolor, setBGcolor] = useState("");
-    const category = props.category
-    const id = props.id
+    const category = reformatCategory(props.category)
+    const id = reformatId(props.id)
     const brand = props.brand
     const name = props.name
     return <tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")} onClick={()=>{}}>
@@ -33,12 +53,12 @@ function ProductsTable(props){
                     </thead>
                     <tbody>
                     {/*<tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")}><td className="text-light">Can't use touchscreen on my phone</td><td style={{verticalAlign:"middle"}}><div  style={{borderRadius:"25px", color:"white", backgroundColor:"#dc8429", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>IN PROGRESS</div></td><td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>05/02/2022</td></tr>*/}
-                    <ProductsTableTR id={"0000 0000 000 00"} category={"Smartphone"} brand={"Apple"} name={"iPhone 13 Pro"}/>
-                    <ProductsTableTR id={"0000 0000 000 01"} category={"Smartphone"} brand={"Samsung"} name={"Galaxy S10"}/>
-                    <ProductsTableTR id={"0000 0000 000 02"} category={"PC"} brand={"HP"} name={"Omen Intel i7"}/>
-                    <ProductsTableTR id={"0000 0000 000 03"} category={"PC"} brand={"HP"} name={"Omen Intel i5"}/>
-                    <ProductsTableTR id={"0000 0000 000 04"} category={"Tablet"} brand={"Apple"} name={"iPad 7th Generation"}/>
-
+                    {products.map(p =>
+                        <ProductsTableTR
+                        id={p.productId}
+                        category={p.category}
+                        brand={p.brand}
+                        name={p.name}/>)}
 
                     </tbody>
                 </table>

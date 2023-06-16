@@ -13,39 +13,48 @@ import PriorityIndicator from "../../Ticketing/TicketCommon/PriorityIndicator";
 function ProductsPage(props) {
     const [errMessage, setErrMessage] = useState("");
     const [productsList, setProductsList] = useState([]);
+    const [allProducts, setAllProducts] = useState([])
     const [showFilters, setShowFilters] = useState(false)
 
 
     useEffect(() => {
-        getAllProducts().then()
+        getAllProducts().then(products => {
+            setProductsList(products)
+            setAllProducts(products)
+        })
     },[])
 
-    function getProducts() {
-        getAllProducts().then(
-            res => {
-                setErrMessage("");
-                setProductsList([]);
-                for (let product of res) {
-                    setProductsList((oldList) => oldList.concat(
-                        <tr key={product.productId}>
-                            <td className="text-info">{product.productId}</td>
-                            <td className="text-info">{product.name}</td>
-                            <td className="text-info">{product.brand}</td>
-                        </tr>));
-                }
-            }
-        ).catch(err => {
-            setProductsList([]);
-            setErrMessage(err.message);
-        })
-    }
+    useEffect(() => {
+        setCategories(allProducts.map(p => p.category).filter((v,i,a)=>a.indexOf(v)===i).sort())
+    }, [productsList])
 
-    useEffect(() => getProducts(), []);
+
+
     const loggedIn = props.loggedIn
     const navigate = useNavigate()
 
     const [brandFilter, setBrandFilter] = useState("")
+    const [categories, setCategories] = useState([])
+    const [brands, setBrands] = useState([])
     const [categoryFilter, setCategoryFilter] = useState("")
+
+    useEffect(() => {
+
+        setBrands(
+            allProducts
+                .map(p => { return {category:p.category, brand:p.brand}})
+                .filter((v,i,a)=>a.indexOf(v)===i).sort()
+                .filter(v => (categoryFilter === "" || v.category === categoryFilter))
+                .map(p => p.brand)
+                .filter((v,i,a)=>a.indexOf(v)===i).sort())
+    }, [productsList, categoryFilter])
+
+    function applyFilter(){
+        setProductsList(allProducts.filter(a =>
+            (categoryFilter === "" || a.category === categoryFilter) &&
+            (brandFilter === "" || a.brand === brandFilter)
+        ))
+    }
 
     return <>
         <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"products"}/>
@@ -74,8 +83,11 @@ function ProductsPage(props) {
                         <div style={{display:"inline-block", maxWidth:"250px"}}>
                             <span style={{ color: "#DDDDDD" }}>Category</span>
                             <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                                <span style={{cursor: categoryFilter ? "pointer" : ""}} onClick={() => setBrandFilter("")} className="input-group-text">{categoryFilter ? crossIcon("black", 17) : filterIcon()}</span>
-                                <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={categoryFilter} onChange={e => categoryFilter(e.target.value)} />
+                                <span style={{cursor: categoryFilter ? "pointer" : ""}} onClick={() => setCategoryFilter("")} className="input-group-text">{categoryFilter ? crossIcon("black", 17) : filterIcon()}</span>
+                                <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={categoryFilter} onChange={e => {setCategoryFilter(e.target.value); setBrandFilter("")}}>
+                                    <option></option>
+                                    {categories.map(c => <option>{c}</option>)}
+                                </select>
                             </div>
                         </div>
 
@@ -83,12 +95,18 @@ function ProductsPage(props) {
                             <span style={{ color: "#DDDDDD" }}>Brand</span>
                             <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                                 <span style={{cursor: brandFilter ? "pointer" : ""}} onClick={() => setBrandFilter("")} className="input-group-text">{brandFilter ? crossIcon("black", 17) : filterIcon()}</span>
-                                <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={brandFilter} onChange={e => setBrandFilter(e.target.value)} />
+                                <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
+                                    <option></option>
+                                    {brands.map(b => <option>{b}</option>)}
+                                </select>
                             </div>
                         </div>
 
                         <div style={{marginTop:"15px", marginBottom:"15px"}}>
-                            <NavigationButton disabled={brandFilter === "" && categoryFilter === "" } text={"Search"} onClick={e => e.preventDefault()} />
+                            {(brandFilter === "" && categoryFilter === "") ?
+                                <NavigationButton text={"Reset"} onClick={e => {e.preventDefault(); applyFilter()} }/> :
+                                <NavigationButton disabled={brandFilter === "" && categoryFilter === "" } text={"Filter"} onClick={e => {e.preventDefault(); applyFilter()} }/>
+                            }
 
                         </div>
 
@@ -98,7 +116,7 @@ function ProductsPage(props) {
             </div>
 
 
-            <ProductsTable products={[]}/>
+            <ProductsTable products={productsList}/>
             <div style={{position:"fixed", bottom:"24px", right:"24px"}}>
                 <AddButton onClick={()=>navigate("/newproduct")}/>
             </div>
