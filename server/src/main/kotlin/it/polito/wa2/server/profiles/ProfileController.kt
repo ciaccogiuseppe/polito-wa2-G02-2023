@@ -10,10 +10,17 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
-@CrossOrigin(origins =["http://localhost:3000"])
+@CrossOrigin(origins =["http://localhost:3001"])
 @RestController
 @Observed
 class ProfileController(private val profileService: ProfileService) {
+
+    @GetMapping("/API/authenticated/profile/")
+    fun getProfileInfo(principal: Principal) : ProfileDTO{
+        val userEmail = retrieveUserEmail(principal)
+        return profileService.getProfile(userEmail)
+    }
+
     @GetMapping("/API/manager/profiles/{email}")
     fun getProfile(@PathVariable email: String): ProfileDTO {
         checkEmail(email)
@@ -57,6 +64,11 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong profile format")
         if (profileDTO == null)
             throw BadRequestProfileException("Profile must not be NULL")
+    }
+
+    fun retrieveUserEmail(principal: Principal): String {
+        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
+        return token.tokenAttributes["email"] as String
     }
 
     fun checkEmail(email: String){
