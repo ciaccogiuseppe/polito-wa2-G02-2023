@@ -5,7 +5,10 @@ import it.polito.wa2.server.BadRequestUserException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableUserException
+import it.polito.wa2.server.categories.ProductCategory
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.validation.BindingResult
@@ -31,29 +34,36 @@ class KeycloakController(private val keycloakService: KeycloakService) {
     }
 
     @PutMapping("/API/client/user/{email}")
-    fun clientUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+    fun clientUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
         val userEmail = retrieveUserEmail(principal)
         checkEmailWithLoggedUser(email, userEmail)
-        checkInputUser(userDTO, br)
+        checkInputUpdateUser(userDTO, br)
         keycloakService.updateUser(email, userDTO!!)
     }
 
     @PutMapping("/API/expert/user/{email}")
-    fun expertUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+    fun expertUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
         val userEmail = retrieveUserEmail(principal)
         checkEmailWithLoggedUser(email, userEmail)
-        checkInputUser(userDTO, br)
+        checkInputUpdateUser(userDTO, br)
         keycloakService.updateUser(email, userDTO!!)
     }
 
     @PutMapping("/API/manager/user/{email}")
-    fun managerUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+    fun managerUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
         checkEmail(email)
-        checkInputUser(userDTO, br)
+        checkInputUpdateUser(userDTO, br)
         keycloakService.updateUser(email, userDTO!!)
     }
 
     private fun checkInputUser(userDTO: UserDTO?, br: BindingResult){
+        if (br.hasErrors())
+            throw UnprocessableUserException("Wrong user format")
+        if (userDTO == null)
+            throw BadRequestUserException("User must not be NULL")
+    }
+
+    private fun checkInputUpdateUser(userDTO: UserUpdateDTO?, br: BindingResult){
         if (br.hasErrors())
             throw UnprocessableUserException("Wrong user format")
         if (userDTO == null)
@@ -75,4 +85,7 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         return token.tokenAttributes["email"] as String
     }
+
+
 }
+

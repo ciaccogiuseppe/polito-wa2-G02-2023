@@ -36,7 +36,7 @@ class KeycloakServiceImpl(
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.EXPERT)
     }
 
-    override fun updateUser(email: String, userDTO: UserDTO) {
+    override fun updateUser(email: String, userDTO: UserUpdateDTO) {
         if (email != userDTO.email)
             throw BadRequestProfileException("Email in path doesn't match the email in the body")
         // An email is associated with, at most, one user

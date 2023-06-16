@@ -5,5 +5,5 @@ interface KeycloakService {
 
     fun addExpert(userDTO: UserDTO)
 
-    fun updateUser(email: String, userDTO: UserDTO)
+    fun updateUser(email: String, userDTO: UserUpdateDTO)
 }
