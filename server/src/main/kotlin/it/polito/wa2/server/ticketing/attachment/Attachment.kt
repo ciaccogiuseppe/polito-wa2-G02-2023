@@ -17,7 +17,7 @@ class Attachment :EntityBase<Long>(){
     var attachment: ByteArray = byteArrayOf()
 
     @ManyToOne
-    @JoinColumn(name="message_id", nullable = false)
+    @JoinColumn(name="message_id")
     var message : Message? = null
 
 }

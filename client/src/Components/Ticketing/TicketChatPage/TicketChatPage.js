@@ -24,6 +24,7 @@ import {priorityMap} from "../TicketListPage/TicketListTable";
 import {getProductByIdAPI} from "../../../API/Products";
 import {getExpertsByCategory, getProfileDetails} from "../../../API/Profiles";
 import InfoMessage from "../../Common/InfoMessage";
+import {addMessageAPI, getChatClient} from "../../../API/Chat";
 
 
 const imageList = [
@@ -41,9 +42,31 @@ function UploadButton(props) {
         inputRef.current?.click();
     };
 
-    const handleDisplayFileDetails = () => {
+    const convertBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file)
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            }
+            fileReader.onerror = (error) => {
+                reject(error);
+            }
+        })
+    }
+
+    const handleDisplayFileDetails = (e) => {
+        //addFile({name:e.target.files[0].name, attachment: e.target.files[0]})
+        //convertBase64(e.target.files[0]).then(a=>console.log(a))
         inputRef.current?.files &&
-            addFile(inputRef.current.files[0])
+        convertBase64(e.target.files[0]).then(a=>
+            addFile({
+                name:e.target.files[0].name,
+                attachment:a.split(',')[1],
+                timestamp: new Date().toISOString()
+
+            }))
+
     };
     return (
         <div className="m-3">
@@ -54,6 +77,8 @@ function UploadButton(props) {
                 type="file"
             />
             <NavigationButton disabled={!enabled} text={<div>Upload attachment</div>} onClick={handleUpload}/>
+
+
         </div>
     );
 }
@@ -178,6 +203,9 @@ function TicketChatPage(props) {
     const [expert, setExpert] = useState("")
     const [category, setCategory] = useState("")
     const [newExperts, setNewExperts] = useState("")
+    const [chat, setChat] = useState([])
+    const [chatErrorMessage, setChatErrorMessage] = useState("")
+    const [newMessage, setNewMessage] = useState("")
 
     const [newPriority, setNewPriority] = useState("")
     const [newStatus, setNewStatus] = useState("")
@@ -206,6 +234,10 @@ function TicketChatPage(props) {
 
                 )
                 .catch(err => setErrorMessage(err))
+
+            getChatClient(ticketID)
+                .then(response=>setChat(response))
+                .catch(err => setChatErrorMessage(err))
         }
         else if(user.role === "EXPERT"){
             getTicketExpertAPI(ticketID)
@@ -255,13 +287,22 @@ function TicketChatPage(props) {
     }, [attachments, updateAttachments])
 
     useEffect(() => {
-        if(category){
+        if(category && user.role==="MANAGER"){
             getExpertsByCategory(category).then(a => setNewExperts(a.data))
         }
     }, [category])
 
-    function searchExpert(){
-
+    function addMessage(){
+        addMessageAPI({
+            ticketId:parseInt(ticketID),
+            senderEmail:user.email,
+            text:newMessage,
+            attachments:attachments.map(a => {return{attachment:a.attachment, name:a.timestamp+a.name}})
+        }, ticketID).then(() => {
+            setNewMessage("")
+            setAttachments([])
+            setChatErrorMessage("")
+            setAddingMessage(false)}).catch(err => setChatErrorMessage(err))
     }
 
     function ticketUpdate(){
@@ -440,28 +481,36 @@ function TicketChatPage(props) {
 
                     <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
 
+                        {}
                         <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={true} timestamp={"05/03/2023 - 10:12"} name={"Mario Rossi"} text={`Could you provide additional information on xyz?`}/>
                         <ChatMessage imageList={imageList} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:13"} name={"Luigi Bianchi"}  text={`Here there are some info\n test test`}/>
                         <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:23"} name={"Luigi Bianchi"}  text={`Could you provide additional information on xyz?`}/>
 
 
-                        {addingMessage && <><Form.Control style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
+                        {addingMessage && <>
+
+                            <Form.Control value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
 
                             <AddAttachment attachments={attachments} setAttachments={setAttachments}/>
 
                         </>}
 
-                        <div style={{width:"100%", height:"60px"}}>
+
+                        {(user.role !== "MANAGER" && ticket.status === "IN_PROGRESS") &&<div style={{width:"100%", height:"60px"}}>
                             {!addingMessage ?
                                 <>
                                     <AddButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(true)}/>
                                 </> :
                                 <>
-                                    <SendButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
+                                    <SendButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => addMessage()}/>
                                     <DeleteButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
                                 </>}
-                        </div>
+                        </div>}
                     </div>
+                    {chatErrorMessage && <><div style={{margin:"10px"}}>
+                        <ErrorMessage text={chatErrorMessage} close={()=>{setChatErrorMessage("")}}/> </div></>}
+
+
                 </>}
 
 

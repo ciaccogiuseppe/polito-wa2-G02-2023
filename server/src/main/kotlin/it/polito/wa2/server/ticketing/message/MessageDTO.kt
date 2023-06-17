@@ -37,6 +37,7 @@ fun MessageDTO.toNewMessage(
     ticket: Ticket): Message {
     val message = Message()
     message.attachments = attachments
+    attachments.forEach{it.message=message}
     message.text = text
     message.sender = sender
     message.ticket = ticket

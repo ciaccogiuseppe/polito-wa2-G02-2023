@@ -64,9 +64,11 @@ class MessageServiceImpl(
         var attachmentId = attachmentDTO.attachmentId
         if(attachmentId == null)
             attachmentId = attachmentService.addAttachment(attachmentDTO)
-        val newAttachmentDTO = attachmentService.getAttachment(attachmentId, userEmail)
-        return attachmentRepository.findByIdOrNull(newAttachmentDTO.attachmentId)!!
+        //val newAttachmentDTO = attachmentService.getAttachment(attachmentId, userEmail)
+        return attachmentRepository.findByIdOrNull(attachmentId)!!
     }
+
+
 
     private fun getProfileByEmail(email: String): Profile {
         val profileDTO = profileService.getProfile(email)
@@ -75,7 +77,7 @@ class MessageServiceImpl(
 
     private fun addMessage(messageDTO: MessageDTO, userEmail: String, ticket: Ticket){
         val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
-        val sender = getProfileByEmail(messageDTO.senderEmail)
+        val sender = getProfileByEmail(userEmail)
         if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
