@@ -12,7 +12,7 @@ import Select from 'react-select';
 import AddButton from "../../Common/AddButton";
 import {useNavigate} from "react-router-dom";
 import {getAllProducts} from "../../../API/Products";
-import {getAllTicketsClient, getAllTicketsExpert} from "../../../API/Tickets";
+import {getAllTicketsClient, getAllTicketsExpert, getAllTicketsManager} from "../../../API/Tickets";
 
 
 function StatusSelector(props){
@@ -52,7 +52,7 @@ function TicketListPage(props) {
     const [priority, setPriority] = useState([0,3]);
     const [selectedStatus, setSelectedStatus] = useState([])
     const [selectedOption, setSelectedOption] = useState("")
-    const [showFilters, setShowFilters] = useState(false)
+    const [showFilters, setShowFilters] = useState(user.role==="MANAGER"?true:false)
     const [products, setProducts] = useState([])
     const [product, setProduct] = useState(null)
     const navigate = useNavigate()
@@ -73,7 +73,8 @@ function TicketListPage(props) {
                     .then(products =>
                         setProducts(products
                             .map(p => {return {productId:p.productId, name:p.name}})
-                            .filter(p => prodsIds.includes(p.productId))))
+                            .filter(p => prodsIds.includes(p.productId))
+                            .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))))
             })
         }
         else if (user.role === "EXPERT"){
@@ -89,10 +90,18 @@ function TicketListPage(props) {
                     .then(products =>
                         setProducts(products
                             .map(p => {return {productId:p.productId, name:p.name}})
-                            .filter(p => prodsIds.includes(p.productId))))
+                            .filter(p => prodsIds.includes(p.productId))
+                            .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))))
+
             })
         }
-
+        else if (user.role === "MANAGER"){
+            getAllProducts()
+                .then(products =>
+                    setProducts(products
+                        .map(p => {return {productId:p.productId, name:p.name}})
+                        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))))
+        }
     },[])
 
     function applyFilters(){
@@ -109,8 +118,9 @@ function TicketListPage(props) {
                 }
             ).then(tickets => {
                 setTicketList(tickets)
+                setShowFilters(false)
             })
-        if(user.role === "EXPERT")
+        else if(user.role === "EXPERT")
             getAllTicketsExpert(
                 {
                     expertEmail:user.email,
@@ -123,6 +133,23 @@ function TicketListPage(props) {
                 }
             ).then(tickets => {
                 setTicketList(tickets)
+                setShowFilters(false)
+            })
+        else if (user.role === "MANAGER")
+            getAllTicketsManager(
+                {
+                    customerEmail:userEmail,
+                    expertEmail:expertEmail,
+                    status:selectedStatus,
+                    minPriority:Math.min(...priority),
+                    maxPriority:Math.max(...priority),
+                    minTimestamp:initialDate && new Date(initialDate).toISOString().replace(/.$/,''),
+                    maxTimestamp:finalDate && new Date(finalDate).toISOString().replace(/.$/,''),
+                    productId:product
+                }
+            ).then(tickets => {
+                setTicketList(tickets)
+                setShowFilters(false)
             })
     }
 
@@ -155,7 +182,7 @@ function TicketListPage(props) {
                     <div style={{display:"inline-block", maxWidth:"250px"}}>
                         <span style={{ color: "#DDDDDD" }}>Product</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span style={{cursor: productId ? "pointer" : ""}} onClick={() => setProductId("")} className="input-group-text">{productId ? crossIcon("black", 17) : filterIcon()}</span>
+                            <span style={{cursor: product ? "pointer" : ""}} onClick={() => setProduct("")} className="input-group-text">{product ? crossIcon("black", 17) : filterIcon()}</span>
                             <select style={{ appearance:"searchfield", fontSize:13}} value={product} className="form-control" placeholder="---" onChange={e => {setProduct(e.target.value)}} >
                             <option></option>
                             {products.map(p => <option value={p.productId}>{p.name}</option>)}
@@ -229,7 +256,7 @@ function TicketListPage(props) {
                         {!(userEmail === "" && expertEmail === "" && !product && initialDate === "" && finalDate === "" && selectedStatus.length===0 && (Math.max(...priority) - Math.min(...priority) === 3)) ?
 
                             <NavigationButton disabled={userEmail === "" && expertEmail === "" && !product && initialDate === "" && finalDate === "" && selectedStatus.length===0 && (Math.max(...priority) - Math.min(...priority) === 3)   } text={"Search"} onClick={e => {e.preventDefault(); applyFilters()}} />:
-                        <NavigationButton text={"Reset"} onClick={e => {e.preventDefault(); applyFilters()}} />}
+                        <NavigationButton text={"Reset"} onClick={e => {e.preventDefault(); if(user.role === "MANAGER") setTicketList([]); else applyFilters()}} />}
                     </div>
 
                 </Row>
