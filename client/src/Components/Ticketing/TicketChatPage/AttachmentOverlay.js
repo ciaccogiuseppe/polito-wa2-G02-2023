@@ -49,7 +49,7 @@ function AttachmentOverlay(props){
     </Modal.Header>
         <Modal.Body style={{marginBottom:"40px", backgroundColor:"transparent", alignItems:"center", alignContent:"center", verticalAlign:"middle"}}>
         <LeftNavigate onClick={() => {setCurPos((curPos-1) < 0 ? imageList.length - 1 : curPos - 1)}}/>
-        <img style={{maxWidth:"75%", alignSelf:"center", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"10px", margin:"auto", height:"80%"}} src={imageList[curPos]} />
+        <img style={{maxWidth:"75%", alignSelf:"center", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"10px", margin:"auto", height:"80%"}} src={"data:image/png;base64, " + imageList[curPos]} />
 
         <RightNavigate onClick={() => {setCurPos((curPos+1)%imageList.length)}}/>
 

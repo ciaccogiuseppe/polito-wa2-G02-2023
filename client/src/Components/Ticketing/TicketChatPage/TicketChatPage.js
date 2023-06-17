@@ -24,7 +24,7 @@ import {priorityMap} from "../TicketListPage/TicketListTable";
 import {getProductByIdAPI} from "../../../API/Products";
 import {getExpertsByCategory, getProfileDetails} from "../../../API/Profiles";
 import InfoMessage from "../../Common/InfoMessage";
-import {addMessageAPI, getChatClient} from "../../../API/Chat";
+import {addMessageAPI, getChatClient, getChatExpert, getChatManager} from "../../../API/Chat";
 
 
 const imageList = [
@@ -185,6 +185,7 @@ function PriorityEdit(props){
 function TicketChatPage(props) {
     const loggedIn = props.loggedIn
     const user = props.user
+    const [album, setAlbum] = useState([])
     const maxAttachments = 5
     const [curAttachments, setCurAttachments] = useState(0)
     const params = useParams()
@@ -236,7 +237,7 @@ function TicketChatPage(props) {
                 .catch(err => setErrorMessage(err))
 
             getChatClient(ticketID)
-                .then(response=>setChat(response))
+                .then(response=>setChat(response.sort((a,b) => a.messageId > b.messageId)))
                 .catch(err => setChatErrorMessage(err))
         }
         else if(user.role === "EXPERT"){
@@ -254,6 +255,9 @@ function TicketChatPage(props) {
 
                 )
                 .catch(err => setErrorMessage(err))
+            getChatExpert(ticketID)
+                .then(response=>setChat(response.sort((a,b) => a.messageId > b.messageId)))
+                .catch(err => setChatErrorMessage(err))
         }
         else if(user.role === "MANAGER"){
             getTicketManagerAPI(ticketID)
@@ -271,6 +275,9 @@ function TicketChatPage(props) {
 
                 )
                 .catch(err => setErrorMessage(err))
+            getChatManager(ticketID)
+                .then(response=>setChat(response.sort((a,b) => a.messageId > b.messageId)))
+                .catch(err => setChatErrorMessage(err))
         }
     }, [])
 
@@ -302,7 +309,9 @@ function TicketChatPage(props) {
             setNewMessage("")
             setAttachments([])
             setChatErrorMessage("")
-            setAddingMessage(false)}).catch(err => setChatErrorMessage(err))
+            setAddingMessage(false)
+            window.location.reload()}
+        ).catch(err => setChatErrorMessage(err))
     }
 
     function ticketUpdate(){
@@ -352,7 +361,7 @@ function TicketChatPage(props) {
 
     return <>
         <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"tickets"}/>
-            {overlayShown &&<AttachmentOverlay startPos={startPos} imageList={imageList} closeModal={() => setOverlayShown(false)}/>}
+            {overlayShown &&<AttachmentOverlay startPos={startPos} imageList={album} closeModal={() => setOverlayShown(false)}/>}
         <div className="CenteredButton" style={{marginTop:"50px"}}>
 
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>TICKET</h1>
@@ -481,10 +490,18 @@ function TicketChatPage(props) {
 
                     <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
 
-                        {}
-                        <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={true} timestamp={"05/03/2023 - 10:12"} name={"Mario Rossi"} text={`Could you provide additional information on xyz?`}/>
+                        {chat.map(c => <ChatMessage
+                            imageList={c.attachments.map(c => c.attachment)}
+                            setAlbum={setAlbum}
+                            setStartPos={setStartPos}
+                            setOverlayShown={setOverlayShown}
+                            sender={c.senderEmail}
+                            isExpert={true}
+                            timestamp={c.sentTimestamp}
+                            text={c.text}/>)}
+                        {/*<ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={true} timestamp={"05/03/2023 - 10:12"} name={"Mario Rossi"} text={`Could you provide additional information on xyz?`}/>
                         <ChatMessage imageList={imageList} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:13"} name={"Luigi Bianchi"}  text={`Here there are some info\n test test`}/>
-                        <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:23"} name={"Luigi Bianchi"}  text={`Could you provide additional information on xyz?`}/>
+                        <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:23"} name={"Luigi Bianchi"}  text={`Could you provide additional information on xyz?`}/>*/}
 
 
                         {addingMessage && <>

@@ -36,4 +36,35 @@ async function getChatClient(ticketId){
 }
 
 
-export {addMessageAPI, getChatClient}
+async function getChatExpert(ticketId){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return api.get(APIURL + "/API/chat/"+ticketId)
+        .then(response => {
+            return response.data
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+async function getChatManager(ticketId){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return api.get(APIURL + "/API/manager/chat/"+ticketId)
+        .then(response => {
+            return response.data
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
+export {addMessageAPI, getChatClient, getChatExpert, getChatManager}
