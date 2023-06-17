@@ -267,8 +267,6 @@ $$
         insert into categories(id, name) values (id, 'TV');
 
         select nextval('categories_id_seq') into id;
-
-        select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'SOFTWARE');
 
         select nextval('categories_id_seq') into id;
