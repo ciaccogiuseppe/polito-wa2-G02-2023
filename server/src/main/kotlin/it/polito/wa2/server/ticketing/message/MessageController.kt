@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
+@CrossOrigin(origins =["http://localhost:3001"])
 @RestController
 @Observed
 class MessageController(private val messageService: MessageService) {

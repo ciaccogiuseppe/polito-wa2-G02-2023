@@ -5,6 +5,7 @@ import it.polito.wa2.server.BadRequestFilterException
 import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableTicketException
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -12,6 +13,7 @@ import java.security.Principal
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
+@CrossOrigin(origins =["http://localhost:3001"])
 @RestController
 @Observed
 class TicketHistoryController(private val ticketHistoryService: TicketHistoryService) {

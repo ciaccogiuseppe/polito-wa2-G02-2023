@@ -13,70 +13,6 @@ import AddButton from "../../Common/AddButton";
 import {useNavigate} from "react-router-dom";
 
 
-const variants = [
-    {
-        id: 3,
-        name: 'Voucher',
-        slug: 'voucher',
-        type: 'Main',
-        locale: 'en',
-        created_at: '2021-11-15T08:27:23.000Z',
-        updated_at: '2021-11-15T08:27:23.000Z',
-        cover: null,
-    },
-    {
-        id: 1,
-        name: 'Top Up',
-        slug: 'top-up',
-        type: 'Main',
-        locale: 'en',
-        created_at: '2021-11-15T08:26:44.000Z',
-        updated_at: '2021-11-15T08:26:44.000Z',
-        cover: null,
-    },
-    {
-        id: 2,
-        name: 'Game Key',
-        slug: 'game-key',
-        type: 'Main',
-        locale: 'en',
-        created_at: '2021-11-15T08:27:03.000Z',
-        updated_at: '2021-11-15T08:27:03.000Z',
-        cover: null,
-    },
-    {
-        id: 12,
-        name: 'Other',
-        slug: 'other',
-        type: 'SubMain',
-        locale: 'en',
-        created_at: '2021-11-15T08:30:50.000Z',
-        updated_at: '2021-11-15T08:30:50.000Z',
-        cover: null,
-    },
-    {
-        id: 11,
-        name: 'Nintendo',
-        slug: 'nintendo',
-        type: 'SubMain',
-        locale: 'en',
-        created_at: '2021-11-15T08:30:22.000Z',
-        updated_at: '2021-11-15T08:30:22.000Z',
-        cover: null,
-    },
-    {
-        id: 10,
-        name: 'Xbox',
-        slug: 'xbox',
-        type: 'SubMain',
-        locale: 'en',
-        created_at: '2021-11-15T08:30:08.000Z',
-        updated_at: '2021-11-15T08:30:08.000Z',
-        cover: null,
-    },
-];
-
-
 function StatusSelector(props){
     const selectedStatus = props.selectedStatus
     const setSelectedStatus = props.setSelectedStatus
@@ -101,6 +37,7 @@ function StatusSelector(props){
 
 function TicketListPage(props) {
     const loggedIn=props.loggedIn
+    const user = props.user
     const [userEmail, setUserEmail] = useState("");
     const [expertEmail, setExpertEmail] = useState("");
     const [productId, setProductId] = useState("");
@@ -117,9 +54,10 @@ function TicketListPage(props) {
     const navigate = useNavigate()
     return <>
         <AppNavbar user={props.user} loggedIn={loggedIn} selected={"tickets"} logout={props.logout}/>
-        <div style={{position:"fixed", bottom:"24px", right:"24px"}}>
+
+        {user.role === "CLIENT" && <div style={{position:"fixed", bottom:"24px", right:"24px"}}>
             <AddButton onClick={()=>navigate("/newticket")}/>
-        </div>
+        </div>}
 
         <div className="CenteredButton" style={{marginTop:"50px"}}>
 

@@ -57,7 +57,7 @@ function App() {
           const refreshToken = localStorage.getItem('refreshToken');
 
           // If the error response status is 401 and the original request has not already been retried
-          if (error.response.status === 401 && !originalRequest._retry) {
+          if (error.response.status === 401 && loggedIn && !originalRequest._retry) {
             originalRequest._retry = true;
               setAuthToken("");
             return axios
@@ -139,13 +139,15 @@ function App() {
           {(loggedIn && user!==null) && <>
             <Route path='/tickets' element= {<TicketListPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
             <Route path='/tickets/:id' element= {<TicketChatPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/newticket' element= {<TicketCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/expertcreate' element= {<ExpertCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/tickethistory' element= {<TicketHistoryPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/products' element= {<ProductsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/brands' element= {<BrandsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/newbrand' element= {<BrandCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
-            <Route path='/newproduct' element= {<ProductCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+              {user.role === "CLIENT" && <Route path='/newticket' element= {<TicketCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>}
+              {user.role === "MANAGER" && <>
+                  <Route path='/expertcreate' element= {<ExpertCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+                  <Route path='/tickethistory' element= {<TicketHistoryPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+                  <Route path='/products' element= {<ProductsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+                  <Route path='/brands' element= {<BrandsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+                  <Route path='/newbrand' element= {<BrandCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+                  <Route path='/newproduct' element= {<ProductCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+              </>}
             <Route path='/productid' element= {<ProductIdPage/>}/>
             <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn} user={user} logout={logout}/>}/>
             <Route path='/usercreate' element= {<ProfileCreatePage/>}/>

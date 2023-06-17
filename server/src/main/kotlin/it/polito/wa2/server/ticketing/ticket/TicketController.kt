@@ -14,6 +14,7 @@ import java.security.Principal
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
+@CrossOrigin(origins =["http://localhost:3001"])
 @RestController
 @Observed
 class TicketController(private val ticketService: TicketService) {

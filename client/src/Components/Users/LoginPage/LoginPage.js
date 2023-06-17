@@ -20,7 +20,8 @@ function LoginPage(props) {
 
     function login() {
         loginAPI({username:email, password:password}).then(
-            () => {
+            response => {
+                console.log(response)
                 setLoggedIn(true)
                 navigate("/")
             }
