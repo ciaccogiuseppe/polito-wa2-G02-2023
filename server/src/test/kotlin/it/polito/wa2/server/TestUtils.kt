@@ -1,6 +1,8 @@
 package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
+import it.polito.wa2.server.brands.Brand
+import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRole
@@ -29,11 +31,14 @@ class TestUtils {
             return profile
         }
 
-        fun testProduct(productId: String, name:String, brand:String) : Product {
+        fun testProduct(productId: String, name:String, brand:Brand, category:Category) : Product {
+
+
             val product = Product()
             product.productId = productId
             product.name = name
             product.brand = brand
+            product.category = category
 
             return product
         }
