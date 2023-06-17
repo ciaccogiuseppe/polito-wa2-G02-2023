@@ -29,6 +29,7 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+      - postgres-vol:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -111,6 +112,7 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-vol:/prometheus
     ports:
       - "9090:9090"
     networks:
@@ -137,3 +139,6 @@ services:
 networks:
   app-network:
 
+volumes:
+  postgres-vol:
+  prometheus-vol:
