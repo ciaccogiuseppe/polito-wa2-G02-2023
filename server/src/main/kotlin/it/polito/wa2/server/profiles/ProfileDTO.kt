@@ -20,11 +20,12 @@ data class ProfileDTO(
     val surname: String,
     @field:Positive
     val profileId: Long?,
-    val expertCategories: Set<ProductCategory>
+    val expertCategories: Set<ProductCategory>?,
+    val role: String?
 )
 
 fun Profile.toDTO(): ProfileDTO {
-    return ProfileDTO(email, name, surname, this.getId(), this.expertCategories.map { it.name }.toSet())
+    return ProfileDTO(email, name, surname, this.getId(), this.expertCategories.map { it.name }.toSet(), role.toString())
 }
 
 fun ProfileDTO.toNewProfile(profileRole: ProfileRole): Profile {

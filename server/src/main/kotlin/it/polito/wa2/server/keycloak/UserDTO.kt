@@ -22,7 +22,8 @@ data class UserDTO (
     @field:Pattern(regexp = "([a-zA-Z]+'?\\s?)+",
         message="surname must be valid")
     val lastName: String,
-    val expertCategories: Set<ProductCategory>
+    val expertCategories: Set<ProductCategory>?,
+    val role: String?
 )
 
 data class UserUpdateDTO (
@@ -38,15 +39,16 @@ data class UserUpdateDTO (
     @field:Pattern(regexp = "([a-zA-Z]+'?\\s?)+",
         message="surname must be valid")
     val lastName: String,
-    val expertCategories: Set<ProductCategory>
+    val expertCategories: Set<ProductCategory>?,
+    val role: String?
 )
 
 
 
 fun UserDTO.toProfileDTO(): ProfileDTO {
-    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories)
+    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories, this.role)
 }
 
 fun UserUpdateDTO.toProfileDTO():ProfileDTO{
-    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories)
+    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories, this.role)
 }

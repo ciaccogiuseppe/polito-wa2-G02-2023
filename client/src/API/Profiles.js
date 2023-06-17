@@ -53,29 +53,34 @@ async function updateManagerAPI(updatePayload, email){
 
 
 async function getProfileDetails(email){
-    const url = APIURL + "/API/profiles/" + email;
-    const response = await fetch(url);
-    let err = new Error();
-    if(response.ok){
-        const result = await response.json();
-        return result;
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
     }
-    switch(response.status){
-        case 500:
-            err.message = "500 - Internal Server Error";
-            break;
-        case 404:
-            err.message = "404 - Not Found";
-            break;
-        case 422:
-            const detail = JSON.parse(await response.text()).detail;
-            err.message = "422 - " + detail;
-            break;
-        default:
-            err.message = "Generic Server Error";
-            break;
+    return api.get(APIURL + "/API/authenticated/profiles/"+email)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+async function getExpertsByCategory(category){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
     }
-    throw(err);
+    return api.get(APIURL + "/API/manager/profiles/experts/"+category)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
 }
 
 async function addNewProfile(profile){
@@ -156,4 +161,4 @@ async function editProfile(profile){
     throw(err);
 }
 
-export {getProfileDetails, addNewProfile, editProfile, updateClientAPI, updateManagerAPI, updateExpertAPI}
+export {getProfileDetails, getExpertsByCategory, addNewProfile, editProfile, updateClientAPI, updateManagerAPI, updateExpertAPI}

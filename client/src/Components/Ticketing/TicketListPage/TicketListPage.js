@@ -66,7 +66,7 @@ function TicketListPage(props) {
                     customerEmail:user.email
                 }
             ).then(tickets => {
-                setTicketList(tickets)
+                setTicketList(tickets.sort((a,b) => a.ticketId < b.ticketId))
                 const prodsIds = tickets.map(t => t.productId)
 
                 getAllProducts()
@@ -83,7 +83,7 @@ function TicketListPage(props) {
                     expertEmail:user.email
                 }
             ).then(tickets => {
-                setTicketList(tickets)
+                setTicketList(tickets.sort((a,b) => a.ticketId < b.ticketId))
                 const prodsIds = tickets.map(t => t.productId)
 
                 getAllProducts()
@@ -117,7 +117,8 @@ function TicketListPage(props) {
                     productId:product
                 }
             ).then(tickets => {
-                setTicketList(tickets)
+                console.log(tickets)
+                setTicketList(tickets.sort((a,b) => a.ticketId < b.ticketId))
                 setShowFilters(false)
             })
         else if(user.role === "EXPERT")
@@ -132,7 +133,7 @@ function TicketListPage(props) {
                     productId:product
                 }
             ).then(tickets => {
-                setTicketList(tickets)
+                setTicketList(tickets.sort((a,b) => a.ticketId < b.ticketId))
                 setShowFilters(false)
             })
         else if (user.role === "MANAGER")
@@ -148,7 +149,7 @@ function TicketListPage(props) {
                     productId:product
                 }
             ).then(tickets => {
-                setTicketList(tickets)
+                setTicketList(tickets.sort((a,b) => a.ticketId < b.ticketId))
                 setShowFilters(false)
             })
     }

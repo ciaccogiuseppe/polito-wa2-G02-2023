@@ -1,6 +1,6 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import {useParams} from "react-router-dom";
-import {closeIcon, editIcon, xIcon} from "../../Common/Icons.js"
+import {closeIcon, downArrowIcon, editIcon, xIcon} from "../../Common/Icons.js"
 import StatusIndicator from "../TicketCommon/StatusIndicator";
 import TextNewLine from "../../Common/TextNewLine";
 import ChatMessage from "./ChatMessage";
@@ -12,6 +12,18 @@ import DeleteButton from "../../Common/DeleteButton";
 import SendButton from "../../Common/SendButton";
 import PriorityIndicator from "../TicketCommon/PriorityIndicator";
 import NavigationButton from "../../Common/NavigationButton";
+import {
+    assignTicketManagerAPI,
+    getTicketClientAPI, getTicketExpertAPI, getTicketManagerAPI,
+    updateTicketClientAPI,
+    updateTicketExpertAPI,
+    updateTicketManagerAPI
+} from "../../../API/Tickets";
+import ErrorMessage from "../../Common/ErrorMessage";
+import {priorityMap} from "../TicketListPage/TicketListTable";
+import {getProductByIdAPI} from "../../../API/Products";
+import {getExpertsByCategory, getProfileDetails} from "../../../API/Profiles";
+import InfoMessage from "../../Common/InfoMessage";
 
 
 const imageList = [
@@ -107,10 +119,9 @@ function CloseEditButton(props){
 }
 
 function StatusEdit(props){
-    const onClick = props.onClick();
     const [opacity, setOpacity] = useState("1")
     const type = props.type
-    return <div onMouseOver={()=>{setOpacity("0.6")}} onMouseLeave={()=>{setOpacity("1")}} style={{margin:"7px", cursor:"pointer", borderRadius:"25px", opacity:opacity}} >
+    return <div onMouseOver={()=>{setOpacity("0.6")}} onClick={()=> props.onClick()} onMouseLeave={()=>{setOpacity("1")}} style={{margin:"7px", cursor:"pointer", borderRadius:"25px", opacity:opacity}} >
         {StatusIndicator(type)}
     </div>
 }
@@ -135,20 +146,20 @@ function StatusEditList(props){
             types=["REOPENED", "CLOSED"]
             break;
     }
-    return types.map(t => <StatusEdit type={t} onClick={()=>{}}/>)
+    return types.map(t => <StatusEdit type={t} onClick={()=>{props.onClick(t)}}/>)
 }
 
 function PriorityEdit(props){
-    const onClick = props.onClick();
     const [opacity, setOpacity] = useState("1")
     const type = props.type
-    return <div onMouseOver={()=>{setOpacity("0.6")}} onMouseLeave={()=>{setOpacity("1")}} style={{margin:"7px", cursor:"pointer", borderRadius:"25px", opacity:opacity}} >
+    return <div onMouseOver={()=>{setOpacity("0.6")}} onClick={()=>props.onClick()} onMouseLeave={()=>{setOpacity("1")}} style={{margin:"7px", cursor:"pointer", borderRadius:"25px", opacity:opacity}} >
         {PriorityIndicator(type)}
     </div>
 }
 
 function TicketChatPage(props) {
     const loggedIn = props.loggedIn
+    const user = props.user
     const maxAttachments = 5
     const [curAttachments, setCurAttachments] = useState(0)
     const params = useParams()
@@ -160,14 +171,75 @@ function TicketChatPage(props) {
     const [editingExpert, setEditingExpert] = useState(false)
     const [attachments, setAttachments] = useState([])
     const [updateAttachments, setUpdateAttachments] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+    const [expertErrorMessage, setExpertErrorMessage] = useState("")
+    const [ticket, setTicket] = useState("")
+    const [product, setProduct] = useState("")
+    const [expert, setExpert] = useState("")
+    const [category, setCategory] = useState("")
+    const [newExperts, setNewExperts] = useState("")
+
+    const [newPriority, setNewPriority] = useState("")
+    const [newStatus, setNewStatus] = useState("")
+    const [newExpert, setNewExpert] = useState("")
+
+
     const [editExpert, setEditExpert] = useState("")
     //let attachments = []
-    console.log(attachments)
-    console.log(attachments.filter(t => t !== "").length)
+
     const ticketID = params.id
 
     useEffect(() => {
         window.scrollTo(0, 0)
+        if(user.role === "CLIENT"){
+            getTicketClientAPI(ticketID)
+                .then(response =>{
+                    setTicket(response)
+                    getProductByIdAPI(response.productId)
+                        .then(p => {
+                            setCategory(p.category)
+                            setProduct(p.brand + " - " + p.name)
+                        })
+                    getProfileDetails(response.expertEmail)
+                        .then(e => {setExpert(e.data)})
+                }
+
+                )
+                .catch(err => setErrorMessage(err))
+        }
+        else if(user.role === "EXPERT"){
+            getTicketExpertAPI(ticketID)
+                .then(response =>{
+                        setTicket(response)
+                        getProductByIdAPI(response.productId)
+                            .then(p => {
+                                setCategory(p.category)
+                                setProduct(p.brand + " - " + p.name)
+                            })
+                        getProfileDetails(response.expertEmail)
+                            .then(e => {setExpert(e.data)})
+                    }
+
+                )
+                .catch(err => setErrorMessage(err))
+        }
+        else if(user.role === "MANAGER"){
+            getTicketManagerAPI(ticketID)
+                .then(response =>{
+                        setTicket(response)
+                        getProductByIdAPI(response.productId)
+                            .then(p => {
+                                setCategory(p.category)
+                                setProduct(p.brand + " - " + p.name)
+                            })
+                    if(response.expertEmail)
+                        getProfileDetails(response.expertEmail)
+                            .then(e => {setExpert(e.data)})
+                    }
+
+                )
+                .catch(err => setErrorMessage(err))
+        }
     }, [])
 
     useEffect(()=>{
@@ -182,98 +254,216 @@ function TicketChatPage(props) {
 
     }, [attachments, updateAttachments])
 
+    useEffect(() => {
+        if(category){
+            getExpertsByCategory(category).then(a => setNewExperts(a.data))
+        }
+    }, [category])
+
+    function searchExpert(){
+
+    }
+
+    function ticketUpdate(){
+        if(user.role === "CLIENT"){
+            updateTicketClientAPI({
+                newState:newStatus,
+                ticketId:ticketID
+            }).then(response => window.location.reload())
+        }
+        else if(user.role === "EXPERT"){
+            updateTicketExpertAPI({
+                newState:newStatus,
+                ticketId:ticketID
+            }).then(response => window.location.reload())
+        }
+        else if(user.role === "MANAGER"){
+            updateTicketManagerAPI({
+                newState:newStatus,
+                ticketId:ticketID
+            }).then(response => window.location.reload())
+        }
+    }
+
+    function ticketAssign(){
+        let priority = 0
+        switch(newPriority){
+            case "LOW":
+                priority = 1
+                break;
+            case "MEDIUM":
+                priority = 2
+                break;
+            case "HIGH":
+                priority = 3
+                break;
+        }
+        if(user.role === "MANAGER"){
+            assignTicketManagerAPI({
+                expertEmail:newExpert,
+                priority:priority,
+                ticketId:ticketID
+            })
+                .then(response => window.location.reload())
+                .catch(err => setExpertErrorMessage(err))
+        }
+    }
+
     return <>
         <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"tickets"}/>
-        {overlayShown &&<AttachmentOverlay startPos={startPos} imageList={imageList} closeModal={() => setOverlayShown(false)}/>}
+            {overlayShown &&<AttachmentOverlay startPos={startPos} imageList={imageList} closeModal={() => setOverlayShown(false)}/>}
         <div className="CenteredButton" style={{marginTop:"50px"}}>
+
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>TICKET</h1>
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
-            <h5 style={{color:"#EEEEEE"}}>Can't use touchscreen on my phone</h5>
-            <div style={{width: "250px", alignSelf:"center", margin:"auto"}}>
-                <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
-                    {StatusIndicator("IN_PROGRESS")}
-                </div>
-                <div style={{display:"inline-block", float:"right"}}>
-                    {!editingStatus && <EditButton onClick={()=>setEditingStatus(true)}/>}
-                    {editingStatus && <CloseEditButton onClick={()=>setEditingStatus(false)}/>}
-                </div>
-                {editingStatus && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
-                    <StatusEditList type={"IN_PROGRESS"} onClick={(t)=>{}}/>
-                </div>}
-                <div style={{marginTop:"7px", width:"150px", display:"inline-block", paddingLeft:"20px"}}>
-                    {PriorityIndicator("LOW")}
-                </div>
-                <div style={{marginTop:"7px",display:"inline-block", float:"right"}}>
-                    {!editingPriority && <EditButton onClick={()=>setEditingPriority(true)}/>}
-                    {editingPriority && <CloseEditButton onClick={()=>setEditingPriority(false)}/>}
-                </div>
-                {editingPriority && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
-                    <PriorityEdit type={"LOW"} onClick={()=>{}}/>
-                    <PriorityEdit type={"MEDIUM"} onClick={()=>{}}/>
-                    <PriorityEdit type={"HIGH"} onClick={()=>{}}/>
-                </div>}
+            {errorMessage && <><div style={{margin:"10px"}}>
+                <ErrorMessage text={errorMessage} close={()=>{setErrorMessage("")}}/> </div></>}
+
+            {
+                ((ticket.status==="OPEN" || ticket.status === "REOPENED") && user.role === "MANAGER") &&
+                <InfoMessage text={"Ticket is not assigned, set a priority and assign to an expert"}/>
+            }
+
+            {ticket &&
+                <>
+                    <h5 style={{color:"#EEEEEE"}}>{ticket.title}</h5>
+                    <div style={{width: "250px", alignSelf:"center", margin:"auto"}}>
+                        <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
+                            {StatusIndicator(ticket.status)}
+                        </div>
+                        <div style={{display:"inline-block", float:"right"}}>
+                            {!editingStatus && <EditButton onClick={()=>setEditingStatus(true)}/>}
+                            {editingStatus && <CloseEditButton onClick={()=>setEditingStatus(false)}/>}
+                        </div>
+
+                        {newStatus && <>
+                            <div style={{width:"150px", display:"inline-block"}}>
+                                <div style={{margin:"5px"}}>
+                                    {downArrowIcon("white", 20)}
+                                </div>
+                            </div>
+                            <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
+                                {StatusIndicator(newStatus)}
+                            </div>
+                            <div style={{display:"inline-block", float:"right"}}>
+                                <CloseEditButton onClick={()=>setNewStatus("")}/>
+                            </div>
+                        </>}
 
 
-            </div>
+                        {editingStatus && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
+                            <StatusEditList type={ticket.status} onClick={(t)=>{setNewStatus(t); setEditingStatus(false)}}/>
+                        </div>}
+                        <div style={{marginTop:"7px", width:"150px", display:"inline-block", paddingLeft:(user.role==="MANAGER"&& (ticket.status === "OPEN" || ticket.status === "REOPENED"))?"20px":"10px",  paddingRight:(user.role==="MANAGER"&& (ticket.status === "OPEN" || ticket.status === "REOPENED"))?"0px":"10px"}}>
+                            {PriorityIndicator(priorityMap(ticket.priority))}
+                        </div>
 
-            <div style={{backgroundColor:"rgba(255,255,255,0.1)", borderRadius:"20px", padding:"15px", width:"85%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"15px" }}>
-                {TextNewLine(`I am writing to report a problem I am experiencing with the touchscreen functionality on my phone. I am unable to use the touchscreen properly, which is causing significant inconvenience in using my device.
-                
-                Problem Description:
-                I am unable to interact with the touchscreen on my phone. When I try to tap or swipe on the screen, there is no response or the response is delayed. This issue is persistent across the entire screen and not limited to specific areas.
-                
-                Troubleshooting Steps Taken:
-                I have attempted the following troubleshooting steps to resolve the issue, but none of them have been successful:
-                
-                - Restarted the phone: I have powered off my phone and turned it back on, hoping that a simple reboot would fix the problem. However, the touchscreen issue persists even after the restart.
-                
-                - Checked for physical damage: I have carefully inspected the screen for any signs of physical damage, such as cracks or scratches. Fortunately, there are no visible damages that could be causing the issue.`)}
-            </div>
-            <div style={{backgroundColor:"rgba(0,0,0,0.2)", paddingLeft:"25px", paddingRight:"25px", maxWidth:"350px", borderRadius:"25px", alignSelf:"center", margin:"auto"}}>
-                <div style={{color:"#EEEEEE", paddingTop:"5px", paddingBottom:"5px",  marginTop:"14px", marginBottom:"15px", fontSize:14}}>PRODUCT: Apple - iPhone 13 Pro 128GB</div>
-            </div>
-            <div style={{backgroundColor:"rgba(0,0,0,0.1)", paddingLeft:"25px", paddingRight:"25px", paddingBottom:"5px", maxWidth:"300px", borderRadius:"25px", alignSelf:"center", margin:"auto", marginBottom:"10px"}}>
-                <div style={{ color:"#EEEEEE",display:"inline-block", paddingTop:"5px", marginTop:"4px", fontSize:14}}>Expert: Mario Rossi</div>
-                <div style={{display:"inline-block", marginLeft:"14px", marginRight:"14px", marginBottom:"10px"}}>
+                        {(user.role === "MANAGER" && (ticket.status === "OPEN" || ticket.status === "REOPENED")) && <>
+                            <div style={{marginTop:"7px",display:"inline-block", float:"right"}}>
+                                {!editingPriority && <EditButton onClick={()=>setEditingPriority(true)}/>}
+                                {editingPriority && <CloseEditButton onClick={()=>setEditingPriority(false)}/>}
+                            </div>
+                            {newPriority && <>
+                                <div style={{width:"150px", display:"inline-block"}}>
+                                    <div style={{margin:"5px"}}>
+                                        {downArrowIcon("white", 20)}
+                                    </div>
+                                </div>
+                                <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
+                                    {PriorityIndicator(newPriority)}
+                                </div>
+                                <div style={{display:"inline-block", float:"right"}}>
+                                    <CloseEditButton onClick={()=>setNewPriority("")}/>
+                                </div>
+                            </>}
+                            {editingPriority && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
+                                <PriorityEdit type={"LOW"} onClick={()=> {setNewPriority("LOW"); setEditingPriority(false)}}/>
+                                <PriorityEdit type={"MEDIUM"} onClick={()=>{setNewPriority("MEDIUM"); setEditingPriority(false)}}/>
+                                <PriorityEdit type={"HIGH"} onClick={()=>{setNewPriority("HIGH"); setEditingPriority(false)}}/>
+                            </div>}
 
-                        {!editingExpert && <EditButton onClick={()=>setEditingExpert(true)}/>}
-                        {editingExpert && <CloseEditButton onClick={()=>setEditingExpert(false)}/>}
-
-                </div>
-
-                {editingExpert && <div style={{marginBottom:"10px"}}><Form.Control className={"form-control:focus"} placeholder={"Expert E-mail"} style={{fontSize:12}}/></div>}
-            </div>
-            <NavigationButton text={"Update ticket"} onClick={()=>{}}/>
-            <hr style={{color:"white", width:"75%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"20px"}}/>
-            <h1 style={{color:"#EEEEEE", marginTop:"30px"}}>CHAT</h1>
-            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"22px", marginTop:"2px"}}/>
-
+                        </>}
 
 
-            <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
 
-                <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={true} timestamp={"05/03/2023 - 10:12"} name={"Mario Rossi"} text={`Could you provide additional information on xyz?`}/>
-                <ChatMessage imageList={imageList} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:13"} name={"Luigi Bianchi"}  text={`Here there are some info\n test test`}/>
-                <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:23"} name={"Luigi Bianchi"}  text={`Could you provide additional information on xyz?`}/>
+                    </div>
+
+                    <div style={{backgroundColor:"rgba(255,255,255,0.1)", borderRadius:"20px", padding:"15px", width:"85%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"15px" }}>
+                        {TextNewLine(ticket.description)}
+                    </div>
+                    <div style={{backgroundColor:"rgba(0,0,0,0.2)", paddingLeft:"25px", paddingRight:"25px", maxWidth:"350px", borderRadius:"25px", alignSelf:"center", margin:"auto"}}>
+                        <div style={{color:"#EEEEEE", paddingTop:"5px", paddingBottom:"5px",  marginTop:"14px", marginBottom:"15px", fontSize:14}}>PRODUCT: {product}</div>
+                    </div>
+                    <div style={{backgroundColor:"rgba(0,0,0,0.1)", paddingLeft:"25px", paddingRight:"25px", paddingBottom:"5px", maxWidth:"300px", borderRadius:"25px", alignSelf:"center", margin:"auto", marginBottom:"10px"}}>
+                        <div style={{ color:"#EEEEEE",display:"inline-block", paddingTop:"5px", marginTop:"4px", fontSize:14}}>Expert: {expert.name} {expert.surname}</div>
+
+                        {(user.role === "MANAGER" && (ticket.status === "OPEN" || ticket.status === "REOPENED")) &&
+                        <div style={{display:"inline-block", marginLeft:"14px"}}>
+
+                            {!editingExpert && <EditButton onClick={()=>setEditingExpert(true)}/>}
+                            {editingExpert && <CloseEditButton onClick={()=>setEditingExpert(false)}/>}
+
+                        </div>}
+
+                        {editingExpert &&<>
+                            <div style={{marginBottom:"10px", marginTop:"10px"}}>
+                                <Form.Select className={"form-control:focus"} value={newExpert} onChange={(e)=>setNewExpert(e.target.value)} placeholder={"Expert E-mail"} style={{fontSize:12, marginBottom:"20px"}}>
+                                    <option></option>
+                                    {newExperts.map(p => <option>{p.email}</option>)}
+
+                                    {}
+                                </Form.Select>
+                            </div>
 
 
-                {addingMessage && <><Form.Control style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
+                        </>
 
-                        <AddAttachment attachments={attachments} setAttachments={setAttachments}/>
 
+                        }
+                    </div>
+
+                    <div>
+                        {expertErrorMessage && <><div style={{margin:"10px"}}>
+                            <ErrorMessage text={expertErrorMessage} close={()=>{setExpertErrorMessage("")}}/> </div></>}
+                    </div>
+                    {(newStatus) &&
+                        <NavigationButton text={"Update ticket"} onClick={()=>{ticketUpdate()}}/>
+                    }
+                    {(newExpert && newPriority) &&
+                        <NavigationButton text={"Assign ticket"} onClick={()=>{ticketAssign()}}/>
+                    }
+                    <hr style={{color:"white", width:"75%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"20px"}}/>
+                    <h1 style={{color:"#EEEEEE", marginTop:"30px"}}>CHAT</h1>
+                    <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"22px", marginTop:"2px"}}/>
+
+
+
+                    <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
+
+                        <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={true} timestamp={"05/03/2023 - 10:12"} name={"Mario Rossi"} text={`Could you provide additional information on xyz?`}/>
+                        <ChatMessage imageList={imageList} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:13"} name={"Luigi Bianchi"}  text={`Here there are some info\n test test`}/>
+                        <ChatMessage imageList={[]} setStartPos={setStartPos} setOverlayShown={setOverlayShown} isExpert={false} timestamp={"05/03/2023 - 10:23"} name={"Luigi Bianchi"}  text={`Could you provide additional information on xyz?`}/>
+
+
+                        {addingMessage && <><Form.Control style={{borderColor:"rgba(0,0,0,0.6)", paddingLeft:"32px", paddingTop:"15px", backgroundColor:"rgba(0,0,0,0.4)", color:"white", resize:"none", height:"200px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginTop:"5px"}} placeholder="Write your message here..." type="textarea" as="textarea"/>
+
+                            <AddAttachment attachments={attachments} setAttachments={setAttachments}/>
+
+                        </>}
+
+                        <div style={{width:"100%", height:"60px"}}>
+                            {!addingMessage ?
+                                <>
+                                    <AddButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(true)}/>
+                                </> :
+                                <>
+                                    <SendButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
+                                    <DeleteButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
+                                </>}
+                        </div>
+                    </div>
                 </>}
 
-                <div style={{width:"100%", height:"60px"}}>
-                    {!addingMessage ?
-                        <>
-                            <AddButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(true)}/>
-                        </> :
-                        <>
-                            <SendButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
-                            <DeleteButton style={{marginTop:"10px", marginRight:"10px", float:"right"}} onClick={() => setAddingMessage(false)}/>
-                        </>}
-                </div>
-            </div>
 
         </div>
     </>

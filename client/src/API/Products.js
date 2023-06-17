@@ -42,6 +42,29 @@ async function getAllProducts(){
     throw(err);*/
 }
 
+
+async function getProductByIdAPI(productId){
+    const url = APIURL + "/API/public/products/"+productId;
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+
+    return api.get(url).then(response => {
+        //get token from response
+        //console.log(response.data.accessToken)
+        return response.data
+
+    })
+        .catch(err => {
+            console.log(err)
+            Promise.reject(err.response.data.detail)
+        });
+
+}
+
+
+
 async function getAllCategories(){
     const url = APIURL + "/API/public/categories/";
     const token = localStorage.getItem("token");
@@ -133,4 +156,4 @@ async function getProductDetails(productID){
 
 
 
-export {getAllProducts, getProductDetails, getAllCategories, getAllBrands, addProductAPI, addBrandAPI}
+export {getAllProducts, getProductDetails, getAllCategories, getAllBrands, getProductByIdAPI, addProductAPI, addBrandAPI}

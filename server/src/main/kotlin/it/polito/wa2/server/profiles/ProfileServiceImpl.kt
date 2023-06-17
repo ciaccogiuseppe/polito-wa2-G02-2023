@@ -9,6 +9,7 @@ import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.CategoryService
 import it.polito.wa2.server.categories.ProductCategory
+import it.polito.wa2.server.products.Product
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,6 +33,14 @@ class ProfileServiceImpl(
             ?: throw ProfileNotFoundException("Profile not found")
     }
 
+    @Transactional(readOnly = true)
+    override fun getExpertByCategory(category: String): List<ProfileDTO> {
+        return profileRepository
+            .findByRole(ProfileRole.EXPERT)
+            .filter{it.expertCategories.map{it.name}.filter{it.toString().equals(category)}.isNotEmpty()}
+            .map { it.toDTO() }
+    }
+
     override fun addProfile(profileDTO: ProfileDTO) {
         if (profileRepository.findByEmail(profileDTO.email) != null)
             throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
@@ -43,7 +52,7 @@ class ProfileServiceImpl(
             throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
         val profile = profileDTO.toNewProfile(profileRole)
         if (profileRole == ProfileRole.EXPERT)
-            profile.expertCategories = profileDTO.expertCategories.map { getCategoryByName(it) }.toMutableSet()
+            profile.expertCategories = profileDTO.expertCategories!!.map { getCategoryByName(it) }.toMutableSet()
         profileRepository.save(profile)
     }
 
@@ -52,14 +61,14 @@ class ProfileServiceImpl(
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
         if (email != newProfileDTO.email)
             throw BadRequestProfileException("Email in path doesn't match the email in the body")
-        if (profile.role != ProfileRole.EXPERT && newProfileDTO.expertCategories.isNotEmpty())
+        if (profile.role != ProfileRole.EXPERT && newProfileDTO.expertCategories!!.isNotEmpty())
             throw UnprocessableProfileException("Only the experts can be assigned to categories")
 
         profile.email = newProfileDTO.email
         profile.name = newProfileDTO.name
         profile.surname = newProfileDTO.surname
         if (profile.role == ProfileRole.EXPERT)
-            profile.expertCategories = newProfileDTO.expertCategories.map { getCategoryByName(it) }.toMutableSet()
+            profile.expertCategories = newProfileDTO.expertCategories!!.map { getCategoryByName(it) }.toMutableSet()
         profileRepository.save(profile)
     }
 

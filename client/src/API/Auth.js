@@ -48,7 +48,11 @@ async function getProfileInfo(){
         .then(response => {
             return response
         })
-        .catch(err => console.log(err.response.data.detail));
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
 }
 
 export {loginAPI, getProfileInfo, signupAPI}

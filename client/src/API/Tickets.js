@@ -42,6 +42,63 @@ async function getAllTicketsClient(ticketFilters){
         });
 }
 
+async function getTicketClientAPI(ticketID){
+    const url = APIURL + "/API/client/ticketing/"+ticketID;
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+
+    return api.get(url).then(response => {
+        //get token from response
+        //console.log(response.data.accessToken)
+        return response.data
+
+    })
+        .catch(err => {
+            console.log(err)
+            Promise.reject(err.response.data.detail)
+        });
+}
+
+async function getTicketExpertAPI(ticketID){
+    const url = APIURL + "/API/expert/ticketing/"+ticketID;
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+
+    return api.get(url).then(response => {
+        //get token from response
+        //console.log(response.data.accessToken)
+        return response.data
+
+    })
+        .catch(err => {
+            console.log(err)
+            Promise.reject(err.response.data.detail)
+        });
+}
+
+async function getTicketManagerAPI(ticketID){
+    const url = APIURL + "/API/manager/ticketing/"+ticketID;
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+
+    return api.get(url).then(response => {
+        //get token from response
+        //console.log(response.data.accessToken)
+        return response.data
+
+    })
+        .catch(err => {
+            console.log(err)
+            Promise.reject(err.response.data.detail)
+        });
+}
+
 async function getAllTicketsExpert(ticketFilters){
     const  filters = "" +
         (ticketFilters.customerEmail ? `&customerEmail=${ticketFilters.customerEmail}` : "") +
@@ -99,5 +156,66 @@ async function getAllTicketsManager(ticketFilters){
 }
 
 
+async function updateTicketClientAPI(updateTicket){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return api.put(APIURL + "/API/client/ticketing/update", updateTicket)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+async function updateTicketManagerAPI(updateTicket){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return api.put(APIURL + "/API/manager/ticketing/update", updateTicket)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+async function assignTicketManagerAPI(assignTicket){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return api.put(APIURL + "/API/manager/ticketing/assign", assignTicket)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+async function updateTicketExpertAPI(updateTicket){
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return api.put(APIURL + "/API/expert/ticketing/update", updateTicket)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
 
-export {addTicketAPI, getAllTicketsClient, getAllTicketsExpert, getAllTicketsManager}
+
+export {addTicketAPI, assignTicketManagerAPI, updateTicketClientAPI, updateTicketManagerAPI, updateTicketExpertAPI, getAllTicketsClient, getTicketExpertAPI, getTicketManagerAPI, getAllTicketsExpert, getAllTicketsManager, getTicketClientAPI}
