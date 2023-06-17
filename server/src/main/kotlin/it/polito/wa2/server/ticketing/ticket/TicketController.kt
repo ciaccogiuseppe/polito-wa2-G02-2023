@@ -81,11 +81,11 @@ class TicketController(private val ticketService: TicketService) {
         val userEmail = retrieveUserEmail(principal)
         checkFilterParameters(
             customerEmail, minPriority, maxPriority, productId,
-            createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertEmail, status
+            createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, userEmail, status
         )
         return ticketService.expertGetTicketsFiltered(
             customerEmail, minPriority, maxPriority, productId,
-            createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertEmail,
+            createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, userEmail,
             status, userEmail
         )
     }

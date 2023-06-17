@@ -12,7 +12,7 @@ import Select from 'react-select';
 import AddButton from "../../Common/AddButton";
 import {useNavigate} from "react-router-dom";
 import {getAllProducts} from "../../../API/Products";
-import {getAllTicketsClient} from "../../../API/Tickets";
+import {getAllTicketsClient, getAllTicketsExpert} from "../../../API/Tickets";
 
 
 function StatusSelector(props){
@@ -60,36 +60,70 @@ function TicketListPage(props) {
     useEffect(() => {
         window.scrollTo(0, 0)
 
-        getAllTicketsClient(
-            {
-                customerEmail:user.email
-            }
-        ).then(tickets => {
-            setTicketList(tickets)
-            const prodsIds = tickets.map(t => t.productId)
+        if(user.role === "CLIENT"){
+            getAllTicketsClient(
+                {
+                    customerEmail:user.email
+                }
+            ).then(tickets => {
+                setTicketList(tickets)
+                const prodsIds = tickets.map(t => t.productId)
 
-            getAllProducts()
-                .then(products =>
-                    setProducts(products
-                        .map(p => {return {productId:p.productId, name:p.name}})
-                        .filter(p => prodsIds.includes(p.productId))))
-        })
+                getAllProducts()
+                    .then(products =>
+                        setProducts(products
+                            .map(p => {return {productId:p.productId, name:p.name}})
+                            .filter(p => prodsIds.includes(p.productId))))
+            })
+        }
+        else if (user.role === "EXPERT"){
+            getAllTicketsExpert(
+                {
+                    expertEmail:user.email
+                }
+            ).then(tickets => {
+                setTicketList(tickets)
+                const prodsIds = tickets.map(t => t.productId)
+
+                getAllProducts()
+                    .then(products =>
+                        setProducts(products
+                            .map(p => {return {productId:p.productId, name:p.name}})
+                            .filter(p => prodsIds.includes(p.productId))))
+            })
+        }
+
     },[])
 
     function applyFilters(){
-        getAllTicketsClient(
-            {
-                customerEmail:user.email,
-                status:selectedStatus,
-                minPriority:Math.min(...priority),
-                maxPriority:Math.max(...priority),
-                minTimestamp:initialDate && new Date(initialDate).toISOString().replace(/.$/,''),
-                maxTimestamp:finalDate && new Date(finalDate).toISOString().replace(/.$/,''),
-                productId:product
-            }
-        ).then(tickets => {
-            setTicketList(tickets)
-        })
+        if(user.role === "CLIENT")
+            getAllTicketsClient(
+                {
+                    customerEmail:user.email,
+                    status:selectedStatus,
+                    minPriority:Math.min(...priority),
+                    maxPriority:Math.max(...priority),
+                    minTimestamp:initialDate && new Date(initialDate).toISOString().replace(/.$/,''),
+                    maxTimestamp:finalDate && new Date(finalDate).toISOString().replace(/.$/,''),
+                    productId:product
+                }
+            ).then(tickets => {
+                setTicketList(tickets)
+            })
+        if(user.role === "EXPERT")
+            getAllTicketsExpert(
+                {
+                    expertEmail:user.email,
+                    status:selectedStatus,
+                    minPriority:Math.min(...priority),
+                    maxPriority:Math.max(...priority),
+                    minTimestamp:initialDate && new Date(initialDate).toISOString().replace(/.$/,''),
+                    maxTimestamp:finalDate && new Date(finalDate).toISOString().replace(/.$/,''),
+                    productId:product
+                }
+            ).then(tickets => {
+                setTicketList(tickets)
+            })
     }
 
     return <>
@@ -203,7 +237,9 @@ function TicketListPage(props) {
 
             </div>
 
-            <TicketListTable ticketList={ticketList.map(t => {return {...t, product:products.filter(p=>p.productId===t.productId).map(p => p.name)[0]}})}/>
+            <TicketListTable ticketList={
+                ticketList &&
+                ticketList.map(t => {return {...t, product:products.filter(p=>p.productId===t.productId).map(p => p.name)[0]}})}/>
         </div>
     </>
 }

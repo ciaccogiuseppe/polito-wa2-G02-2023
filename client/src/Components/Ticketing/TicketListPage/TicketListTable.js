@@ -39,7 +39,7 @@ function TicketListTable(props){
     const ticketList = props.ticketList
 
     return <>
-        {ticketList.length > 0  &&
+        {ticketList && ticketList.length > 0  &&
         <div style={{alignItems:"center", alignSelf:"center"}}>
             <table className="table  roundedTable"  style={{alignContent: "center", width: "70%", margin: "auto", marginTop:"20px"}}>
                 <thead>
