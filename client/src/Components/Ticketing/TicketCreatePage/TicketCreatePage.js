@@ -24,6 +24,7 @@ function TicketCreatePage(props) {
     const [warranty, setWarranty] = useState([])
 
     useEffect(() => {
+        window.scrollTo(0, 0)
         getAllProducts().then(products => {
             setProducts(products)
             setCategories(products.map(p => reformatCategory(p.category)).filter((v,i,a)=>a.indexOf(v)===i).sort())

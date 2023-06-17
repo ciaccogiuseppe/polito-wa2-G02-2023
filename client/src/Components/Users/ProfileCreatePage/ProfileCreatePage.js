@@ -78,6 +78,9 @@ function ProfileCreatePage(props){
             () => navigate("/")
         ).catch(err => setErrorMessage(err))
     }
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return <>
             <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn}/>

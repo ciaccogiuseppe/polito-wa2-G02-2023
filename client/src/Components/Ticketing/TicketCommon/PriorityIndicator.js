@@ -30,6 +30,16 @@ function PriorityIndicator(type) {
                 verticalAlign: "middle",
                 padding: 5
             }}>HIGH</div>
+        default:
+            return <div style={{
+                borderRadius: "25px",
+                color: "white",
+                backgroundColor: "#a1a1a1",
+                fontSize: 10,
+                textAlign: "center",
+                verticalAlign: "middle",
+                padding: 5
+            }}>NONE</div>
     }
 }
 

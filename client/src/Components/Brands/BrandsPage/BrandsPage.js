@@ -13,6 +13,7 @@ function BrandsPage(props) {
 
 
     useEffect(() => {
+        window.scrollTo(0, 0)
         getAllBrands().then(brands => {
             setBrandsList(brands.map(b=>b.name).sort())
         })

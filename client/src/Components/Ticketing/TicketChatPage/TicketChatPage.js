@@ -119,7 +119,7 @@ function StatusEditList(props){
     const type = props.type
     let types=[]
     switch(type){
-        case("INPROGRESS"):
+        case("IN_PROGRESS"):
             types=["OPEN", "CLOSED", "RESOLVED"]
             break;
         case("OPEN"):
@@ -166,6 +166,10 @@ function TicketChatPage(props) {
     console.log(attachments.filter(t => t !== "").length)
     const ticketID = params.id
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     useEffect(()=>{
         if(updateAttachments){
             const tmp = attachments.filter(t => t !== "")
@@ -187,14 +191,14 @@ function TicketChatPage(props) {
             <h5 style={{color:"#EEEEEE"}}>Can't use touchscreen on my phone</h5>
             <div style={{width: "250px", alignSelf:"center", margin:"auto"}}>
                 <div style={{width:"150px", display:"inline-block", paddingLeft:"20px"}}>
-                    {StatusIndicator("INPROGRESS")}
+                    {StatusIndicator("IN_PROGRESS")}
                 </div>
                 <div style={{display:"inline-block", float:"right"}}>
                     {!editingStatus && <EditButton onClick={()=>setEditingStatus(true)}/>}
                     {editingStatus && <CloseEditButton onClick={()=>setEditingStatus(false)}/>}
                 </div>
                 {editingStatus && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
-                    <StatusEditList type={"INPROGRESS"} onClick={(t)=>{}}/>
+                    <StatusEditList type={"IN_PROGRESS"} onClick={(t)=>{}}/>
                 </div>}
                 <div style={{marginTop:"7px", width:"150px", display:"inline-block", paddingLeft:"20px"}}>
                     {PriorityIndicator("LOW")}

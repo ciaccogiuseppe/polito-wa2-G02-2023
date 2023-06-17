@@ -1,7 +1,7 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import {Form} from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {updateClientAPI, updateExpertAPI, updateManagerAPI} from "../../../API/Profiles";
 import ErrorMessage from "../../Common/ErrorMessage";
@@ -39,6 +39,9 @@ function ProfileUpdatePage(props) {
                 .catch(err => setErrorMessage(err))
         }
     }
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return <>
         <AppNavbar user={props.user} loggedIn={loggedIn} selected={"profile"} logout={props.logout}/>

@@ -3,7 +3,7 @@ import {Col, Form, Row} from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import NavigationLink from "../../Common/NavigationLink";
 import TicketListTable from "./TicketListTable";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {caretDownIcon, caretUpIcon, crossIcon, filterIcon} from "../../Common/Icons";
 import {Checkbox, ListItemText, MenuItem, OutlinedInput, Slider} from "@mui/material";
 import StatusIndicator from "../TicketCommon/StatusIndicator";
@@ -11,6 +11,8 @@ import PriorityIndicator from "../TicketCommon/PriorityIndicator";
 import Select from 'react-select';
 import AddButton from "../../Common/AddButton";
 import {useNavigate} from "react-router-dom";
+import {getAllProducts} from "../../../API/Products";
+import {getAllTicketsClient} from "../../../API/Tickets";
 
 
 function StatusSelector(props){
@@ -23,8 +25,8 @@ function StatusSelector(props){
         <div onClick={()=>{if(selectedStatus.includes("REOPENED")) setSelectedStatus(selectedStatus.filter(a => a !=="REOPENED")); else setSelectedStatus([...selectedStatus, "REOPENED"])}} style={{cursor:"pointer", opacity:selectedStatus.includes("REOPENED")?1:0.4, display:"inline-block", width:"85px", marginLeft:"5px", marginRight:"5px"}}>
             {StatusIndicator("REOPENED")}
         </div>
-        <div onClick={()=>{if(selectedStatus.includes("INPROGRESS")) setSelectedStatus(selectedStatus.filter(a => a !=="INPROGRESS")); else setSelectedStatus([...selectedStatus, "INPROGRESS"])}} style={{cursor:"pointer", opacity:selectedStatus.includes("INPROGRESS")?1:0.4, display:"inline-block", width:"85px", marginLeft:"5px", marginRight:"5px"}}>
-            {StatusIndicator("INPROGRESS")}
+        <div onClick={()=>{if(selectedStatus.includes("IN_PROGRESS")) setSelectedStatus(selectedStatus.filter(a => a !=="IN_PROGRESS")); else setSelectedStatus([...selectedStatus, "IN_PROGRESS"])}} style={{cursor:"pointer", opacity:selectedStatus.includes("IN_PROGRESS")?1:0.4, display:"inline-block", width:"85px", marginLeft:"5px", marginRight:"5px"}}>
+            {StatusIndicator("IN_PROGRESS")}
         </div>
         <div onClick={()=>{if(selectedStatus.includes("RESOLVED")) setSelectedStatus(selectedStatus.filter(a => a !=="RESOLVED")); else setSelectedStatus([...selectedStatus, "RESOLVED"])}} style={{cursor:"pointer", opacity:selectedStatus.includes("RESOLVED")?1:0.4, display:"inline-block", width:"85px", marginLeft:"5px", marginRight:"5px"}}>
             {StatusIndicator("RESOLVED")}
@@ -47,11 +49,49 @@ function TicketListPage(props) {
     const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
     const [ticketList, setTicketList] = useState([])
-    const [priority, setPriority] = useState([0,2]);
+    const [priority, setPriority] = useState([0,3]);
     const [selectedStatus, setSelectedStatus] = useState([])
     const [selectedOption, setSelectedOption] = useState("")
     const [showFilters, setShowFilters] = useState(false)
+    const [products, setProducts] = useState([])
+    const [product, setProduct] = useState(null)
     const navigate = useNavigate()
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+
+        getAllTicketsClient(
+            {
+                customerEmail:user.email
+            }
+        ).then(tickets => {
+            setTicketList(tickets)
+            const prodsIds = tickets.map(t => t.productId)
+
+            getAllProducts()
+                .then(products =>
+                    setProducts(products
+                        .map(p => {return {productId:p.productId, name:p.name}})
+                        .filter(p => prodsIds.includes(p.productId))))
+        })
+    },[])
+
+    function applyFilters(){
+        getAllTicketsClient(
+            {
+                customerEmail:user.email,
+                status:selectedStatus,
+                minPriority:Math.min(...priority),
+                maxPriority:Math.max(...priority),
+                minTimestamp:initialDate && new Date(initialDate).toISOString().replace(/.$/,''),
+                maxTimestamp:finalDate && new Date(finalDate).toISOString().replace(/.$/,''),
+                productId:product
+            }
+        ).then(tickets => {
+            setTicketList(tickets)
+        })
+    }
+
     return <>
         <AppNavbar user={props.user} loggedIn={loggedIn} selected={"tickets"} logout={props.logout}/>
 
@@ -82,39 +122,45 @@ function TicketListPage(props) {
                         <span style={{ color: "#DDDDDD" }}>Product</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                             <span style={{cursor: productId ? "pointer" : ""}} onClick={() => setProductId("")} className="input-group-text">{productId ? crossIcon("black", 17) : filterIcon()}</span>
-                            <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={productId} onChange={e => setProductId(e.target.value)} />
+                            <select style={{ appearance:"searchfield", fontSize:13}} value={product} className="form-control" placeholder="---" onChange={e => {setProduct(e.target.value)}} >
+                            <option></option>
+                            {products.map(p => <option value={p.productId}>{p.name}</option>)}
+                            </select>
                         </div>
                     </div>
                     <div style={{display:"inline-block", maxWidth:"250px"}}>
                         <span style={{ color: "#DDDDDD" }}>Created After</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                             <span style={{cursor: initialDate ? "pointer" : ""}} onClick={() => setInitialDate("")} className="input-group-text">{initialDate ? crossIcon("black", 17) : filterIcon()}</span>
-                            <input style={{ height: "40px" }} type="date" className="form-control" placeholder="---" value={initialDate} onChange={e => setInitialDate(e.target.value)} />
+                            <input style={{ fontSize:13}} type="date" className="form-control" placeholder="---" value={initialDate} onChange={e => setInitialDate(e.target.value)} />
                         </div>
                     </div>
                     <div style={{display:"inline-block", maxWidth:"250px"}}>
                         <span style={{ color: "#DDDDDD" }}>Created Before</span>
                         <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                             <span style={{cursor: finalDate ? "pointer" : ""}} onClick={() => setFinalDate("")} className="input-group-text">{finalDate ? crossIcon("black", 17) : filterIcon()}</span>
-                            <input style={{ height: "40px" }} type="date" className="form-control" placeholder="---" value={finalDate} onChange={e => setFinalDate(e.target.value)} />
+                            <input style={{  fontSize:13}} type="date" className="form-control" placeholder="---" value={finalDate} onChange={e => {setFinalDate(e.target.value);}} />
                         </div>
                     </div></Row>
-                <Row className="d-flex justify-content-center" style={{ marginBottom: "10px"}}>
+                    <Row className="d-flex justify-content-center" style={{ marginBottom: "10px"}}>
 
-                    <div style={{display:"inline-block", maxWidth:"250px"}}>
-                        <span style={{ color: "#DDDDDD" }}>User Email</span>
-                        <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span style={{cursor: userEmail ? "pointer" : ""}} onClick={() => setUserEmail("")} className="input-group-text">{userEmail ? crossIcon("black", 17) : filterIcon()}</span>
-                            <input style={{ height: "40px" }} type="text" className="form-control" placeholder="---" value={userEmail} onChange={e => setUserEmail(e.target.value)} />
-                        </div>
-                    </div>
-                    <div style={{display:"inline-block", maxWidth:"250px"}}>
-                        <span style={{ color: "#DDDDDD" }}>Expert Email</span>
-                        <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                            <span style={{cursor: expertEmail ? "pointer" : ""}} onClick={() => setExpertEmail("")} className="input-group-text">{expertEmail ? crossIcon("black", 17) : filterIcon()}</span>
-                            <input style={{ height: "40px" }} type="text" className="form-control" placeholder="---" value={expertEmail} onChange={e => setExpertEmail(e.target.value)} />
-                        </div>
-                    </div>
+                        {user.role === "MANAGER" && <>
+                            <div style={{display:"inline-block", maxWidth:"250px"}}>
+                                <span style={{ color: "#DDDDDD" }}>User Email</span>
+                                <div className="input-group mb-3" style={{ marginTop: "8px" }}>
+                                    <span style={{cursor: userEmail ? "pointer" : ""}} onClick={() => setUserEmail("")} className="input-group-text">{userEmail ? crossIcon("black", 17) : filterIcon()}</span>
+                                    <input style={{ fontSize:13}} type="text" className="form-control" placeholder="---" value={userEmail} onChange={e => setUserEmail(e.target.value)} />
+                                </div>
+                            </div>
+                            <div style={{display:"inline-block", maxWidth:"250px"}}>
+                                <span style={{ color: "#DDDDDD" }}>Expert Email</span>
+                                <div className="input-group mb-3" style={{ marginTop: "8px" }}>
+                                    <span style={{cursor: expertEmail ? "pointer" : ""}} onClick={() => setExpertEmail("")} className="input-group-text">{expertEmail ? crossIcon("black", 17) : filterIcon()}</span>
+                                    <input style={{ fontSize:13}} type="text" className="form-control" placeholder="---" value={expertEmail} onChange={e => setExpertEmail(e.target.value)} />
+                                </div>
+                            </div>
+                        </>}
+
 
 
 
@@ -129,7 +175,7 @@ function TicketListPage(props) {
                         <Slider
                             getAriaLabel={() => 'Priority Range'}
                             value={priority}
-                            max={2}
+                            max={3}
                             onChange={ (event, newValue) => {
                                 setPriority(newValue);
                             }}
@@ -137,14 +183,19 @@ function TicketListPage(props) {
                             getAriaValueText={()=>{"a"}}
 
                             style={{color:"#A0C1D9"}}
-                            marks={[{value:0, label: PriorityIndicator("LOW")},{value:1, label:PriorityIndicator("MEDIUM")},{value:2, label:PriorityIndicator("HIGH")}]}
+                            marks={[
+                                {value:0, label: <div style={{opacity:priority.includes(0)?1:0.5}}>{PriorityIndicator("NONE")}</div>},
+                                {value:1, label: <div style={{opacity:(Math.min(...priority) <= 1 && Math.max(...priority) >= 1)?1:0.5}}>{PriorityIndicator("LOW")}</div>},
+                                {value:2, label: <div style={{opacity:(Math.min(...priority) <= 2 && Math.max(...priority) >= 2)?1:0.5}}>{PriorityIndicator("MEDIUM")}</div>},
+                                {value:3, label: <div style={{opacity:priority.includes(3)?1:0.5}}>{PriorityIndicator("HIGH")}</div>}]}
                         />
                     </div>
 
-
                     <div style={{marginTop:"15px", marginBottom:"15px"}}>
-                        <NavigationButton disabled={userEmail === "" && expertEmail === "" && productId === "" && initialDate === "" && finalDate === "" } text={"Search"} onClick={e => e.preventDefault()} />
+                        {!(userEmail === "" && expertEmail === "" && !product && initialDate === "" && finalDate === "" && selectedStatus.length===0 && (Math.max(...priority) - Math.min(...priority) === 3)) ?
 
+                            <NavigationButton disabled={userEmail === "" && expertEmail === "" && !product && initialDate === "" && finalDate === "" && selectedStatus.length===0 && (Math.max(...priority) - Math.min(...priority) === 3)   } text={"Search"} onClick={e => {e.preventDefault(); applyFilters()}} />:
+                        <NavigationButton text={"Reset"} onClick={e => {e.preventDefault(); applyFilters()}} />}
                     </div>
 
                 </Row>
@@ -152,7 +203,7 @@ function TicketListPage(props) {
 
             </div>
 
-            <TicketListTable ticketList={ticketList}/>
+            <TicketListTable ticketList={ticketList.map(t => {return {...t, product:products.filter(p=>p.productId===t.productId).map(p => p.name)[0]}})}/>
         </div>
     </>
 }

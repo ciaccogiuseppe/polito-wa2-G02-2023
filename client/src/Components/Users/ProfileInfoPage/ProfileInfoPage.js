@@ -18,6 +18,7 @@ function ProfileInfoPage(props) {
     const navigate = useNavigate()
 
     useEffect(() =>{
+        window.scrollTo(0, 0)
         getProfileInfo().then(response => {setProfile(response.data)}).catch(err => console.log(err))
     }, [])
 

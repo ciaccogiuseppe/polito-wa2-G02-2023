@@ -22,6 +22,9 @@ function ExpertCreatePage(props) {
         setExpertCategories(expertCategories => [...expertCategories, event.target.id]) :
         setExpertCategories(expertCategories => expertCategories.filter(e => e!=event.target.id))
     }
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     let categoryCheckboxes = [];
     for (let category of categories) {

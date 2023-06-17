@@ -20,6 +20,9 @@ function BrandCreatePage(props) {
         }).then(() => navigate("/brands")).catch(err => setErrorMessage(err))
     }
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return <>
         <AppNavbar user={props.user} loggedIn={loggedIn} selected={"brands"} logout={props.logout}/>

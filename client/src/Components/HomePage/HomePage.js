@@ -2,7 +2,7 @@ import { Button } from "react-bootstrap";
 import {Link, useNavigate} from "react-router-dom";
 import "./HomePage.css";
 import AppNavbar from "../AppNavbar/AppNavbar";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import NavigationButton from "../Common/NavigationButton";
 import NavigationLink from "../Common/NavigationLink";
 
@@ -10,7 +10,9 @@ function HomePage(props) {
     const navigate = useNavigate();
     const loggedIn = props.loggedIn
     const user = props.user
-
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return <>
         <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"home"}/>

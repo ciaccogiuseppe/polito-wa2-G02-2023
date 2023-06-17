@@ -26,6 +26,7 @@ function ProductCreatePage(props) {
     const [pid3, setPid3] = useState("")
     const [pid4, setPid4] = useState("")
     useEffect(() => {
+        window.scrollTo(0, 0)
         getAllCategories().then((categories => {
             setCategories(categories.map(c => reformatCategory(c.categoryName)).sort())
         })).catch(err => console.log(err))
@@ -49,6 +50,7 @@ function ProductCreatePage(props) {
         return <Form.Control value={val} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="file" onChange={e => setVal(e.target.value)}/>
 
     }
+
 
     useEffect(() => {
         setProductId(pid1 + pid2 + pid3 + pid4)

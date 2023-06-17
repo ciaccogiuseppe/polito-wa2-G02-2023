@@ -19,6 +19,10 @@ function TicketHistoryPage(props) {
     const [loading, setLoading] = useState(false);
     const [ticketList, setTicketList] = useState([])
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     const loggedIn = props.loggedIn
     return <>
         <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} />

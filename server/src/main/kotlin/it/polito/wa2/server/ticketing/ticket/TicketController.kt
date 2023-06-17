@@ -104,11 +104,11 @@ class TicketController(private val ticketService: TicketService) {
     ): List<TicketDTO> {
         val userEmail = retrieveUserEmail(principal)
         checkFilterParameters(
-            customerEmail, minPriority, maxPriority, productId,
+            userEmail, minPriority, maxPriority, productId,
             createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertEmail, status
         )
         return ticketService.clientGetTicketsFiltered(
-            customerEmail, minPriority, maxPriority, productId,
+            userEmail, minPriority, maxPriority, productId,
             createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertEmail,
             status, userEmail
         )

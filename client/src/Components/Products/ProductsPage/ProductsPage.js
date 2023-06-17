@@ -54,6 +54,7 @@ function ProductsPage(props) {
 
 
     useEffect(() => {
+        window.scrollTo(0, 0)
         getAllProducts().then(products => {
             setProductsList(products)
             setAllProducts(products)

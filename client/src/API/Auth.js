@@ -6,6 +6,7 @@ import {api} from "../App";
 
 
 async function loginAPI(loginPayload){
+    setAuthToken("");
     return api.post(APIURL + "/API/login", loginPayload)
         .then(response => {
             //get token from response

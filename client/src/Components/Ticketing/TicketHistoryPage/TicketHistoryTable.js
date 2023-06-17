@@ -42,7 +42,7 @@ function TicketHistoryTable(props){
                 <tbody>
                 {/*<tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")}><td className="text-light">Can't use touchscreen on my phone</td><td style={{verticalAlign:"middle"}}><div  style={{borderRadius:"25px", color:"white", backgroundColor:"#dc8429", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>IN PROGRESS</div></td><td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>05/02/2022</td></tr>*/}
                 <TicketHistoryTR id={2} user="giuliano.rossi@polito.it" expert="morisio@polito.it" oldStatus="REOPENED" newStatus="RESOLVED"updated="05/03/2022" />
-                <TicketHistoryTR id={3} user="giuseppe.rossi@polito.it" expert="cabodi@polito.it" oldStatus="INPROGRESS" newStatus="RESOLVED"updated="05/03/2022" />
+                <TicketHistoryTR id={3} user="giuseppe.rossi@polito.it" expert="cabodi@polito.it" oldStatus="IN_PROGRESS" newStatus="RESOLVED"updated="05/03/2022" />
                 <TicketHistoryTR id={4} user="flavio.rossi@polito.it" expert="malnati@polito.it" oldStatus="CLOSED" newStatus="REOPENED"updated="05/03/2022" />
                 <TicketHistoryTR id={5} user="giacomo.rossi@polito.it" expert="camurati@polito.it" oldStatus="OPEN" newStatus="CLOSED"updated="05/03/2022" />
 

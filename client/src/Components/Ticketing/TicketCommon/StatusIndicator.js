@@ -26,7 +26,7 @@ function StatusIndicator(type) {
                 verticalAlign: "middle",
                 padding: 5
             }}>REOPENED</div>
-        case "INPROGRESS":
+        case "IN_PROGRESS":
             return <div style={{
                 borderRadius: "25px",
                 color: "white",
