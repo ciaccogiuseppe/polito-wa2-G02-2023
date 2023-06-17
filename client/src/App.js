@@ -33,6 +33,7 @@ export const api = axios.create({
 function App() {
 
   const [loggedIn, setLoggedIn] = useState(localStorage.token !== undefined)
+  const [tempDisableRedirect, setTempDisableRedirect] = useState(true)
   const [user, setUser] = useState(null)
 
 
@@ -109,12 +110,15 @@ function App() {
       else if (data.realm_access.roles.includes("app_manager")){
         role = "MANAGER"
       }
-      getProfileInfo().then(response => setUser({...response.data, role:role}))
+      getProfileInfo().then(response => {setUser({...response.data, role:role}); setTempDisableRedirect(false)})
     }
 
     if(loggedIn===false){
       setUser(null)
+        setTempDisableRedirect(false)
     }
+
+
   }, [loggedIn])
 
   function logout(){
@@ -154,7 +158,7 @@ function App() {
             <Route path='/profileupdate' element= {<ProfileUpdatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
 
           </>}
-          <Route path="*" element={<RedirectToHome/>} />
+            { !tempDisableRedirect && <Route path="*" element={<RedirectToHome/>} />}
         </Routes>
       </Router>
   );
