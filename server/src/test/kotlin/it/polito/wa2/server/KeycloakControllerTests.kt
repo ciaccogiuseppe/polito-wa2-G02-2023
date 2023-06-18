@@ -89,7 +89,9 @@ class KeycloakControllerTests {
             "mario.rossi@polito.it",
             "password",
             "Mario",
-            "Rossi"
+            "Rossi",
+            setOf(),
+            "CLIENT"
         )
 
         val headers = HttpHeaders()
@@ -146,7 +148,9 @@ class KeycloakControllerTests {
             "mario.rossi@polito.it",
             "password",
             "Mario",
-            "Rossi"
+            "Rossi",
+            setOf(),
+            "CLIENT"
         )
 
         val headers = HttpHeaders()
@@ -170,7 +174,9 @@ class KeycloakControllerTests {
             "luigi.verdi@polito.it",
             "password",
             "Luigi",
-            "Verdi"
+            "Verdi",
+            setOf(),
+            "EXPERT"
         )
 
         val entity = TestUtils.testEntityHeader(user, managerToken)
@@ -221,7 +227,9 @@ class KeycloakControllerTests {
             "luigi.verdi@polito.it",
             "password",
             "Luigi",
-            "Verdi"
+            "Verdi",
+            setOf(),
+            "EXPERT"
         )
 
         val entity = TestUtils.testEntityHeader(user, managerToken)

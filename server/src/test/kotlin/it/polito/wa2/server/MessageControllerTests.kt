@@ -2,6 +2,11 @@ package it.polito.wa2.server
 
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
+import it.polito.wa2.server.brands.Brand
+import it.polito.wa2.server.brands.BrandRepository
+import it.polito.wa2.server.categories.Category
+import it.polito.wa2.server.categories.CategoryRepository
+import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
@@ -95,6 +100,10 @@ class MessageControllerTests {
     lateinit var productRepository: ProductRepository
     @Autowired
     lateinit var messageRepository: MessageRepository
+    @Autowired
+    lateinit var brandRepository:  BrandRepository
+    @Autowired
+    lateinit var categoryRepository: CategoryRepository
     @Test
     //@DirtiesContext
     fun getExistingMessagesManager() {
@@ -109,7 +118,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -169,6 +186,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -183,7 +202,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -241,6 +268,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -256,8 +285,15 @@ class MessageControllerTests {
         profileRepository.save(customer2)
         profileRepository.save(expert)
         profileRepository.save(expert2)
+        val brand = Brand()
+        brand.name = "Apple"
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        brandRepository.save(brand)
+        val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -301,6 +337,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -313,8 +351,15 @@ class MessageControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
+        val brand = Brand()
+        brand.name = "Apple"
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        brandRepository.save(brand)
+        val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -371,6 +416,8 @@ class MessageControllerTests {
         profileRepository.delete(customer)
         profileRepository.delete(manager)
         profileRepository.delete(expert)
+        productRepository.delete(product)
+        brandRepository.delete(brand)
         productRepository.delete(product)
     }
 
@@ -388,7 +435,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -431,6 +486,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -447,7 +504,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -490,6 +555,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -506,7 +573,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -547,6 +622,8 @@ class MessageControllerTests {
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
+        productRepository.delete(product)
+        brandRepository.delete(brand)
         productRepository.delete(product)
     }
 
@@ -603,7 +680,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -659,6 +744,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(manager)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
 
@@ -673,7 +760,15 @@ class MessageControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -717,6 +812,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(manager)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -733,7 +830,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -772,6 +877,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -784,7 +891,15 @@ class MessageControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -828,6 +943,9 @@ class MessageControllerTests {
         profileRepository.delete(manager)
         profileRepository.delete(expert)
         productRepository.delete(product)
+
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -844,7 +962,15 @@ class MessageControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
         val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
@@ -883,6 +1009,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 
     @Test
@@ -895,7 +1023,15 @@ class MessageControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+val category = Category()
+        category.name=ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+
         productRepository.save(product)
 
 
@@ -925,6 +1061,8 @@ class MessageControllerTests {
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
     }
 }
 
