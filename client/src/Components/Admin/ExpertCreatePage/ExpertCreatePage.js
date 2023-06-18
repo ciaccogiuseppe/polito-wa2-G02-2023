@@ -3,8 +3,11 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 import React, { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
 import NavigationLink from "../../Common/NavigationLink";
+import ErrorMessage from "../../Common/ErrorMessage";
+import { createExpertAPI } from "../../../API/Auth";
+import { useNavigate } from "react-router-dom";
 
-const categories = ["Smartphone", "TV", "PC", "Software", "Storage devices", "Other"]
+const categories = [{ name: "Smartphone", enum: 0 }, { name: "TV", enum: 1 }, { name: "PC", enum: 2 }, { name: "Software", enum: 3 }, { name: "Storage devices", enum: 4 }, { name: "Other", enum: 5 }]
 
 function ExpertCreatePage(props) {
     const [email, setEmail] = useState("");
@@ -12,16 +15,79 @@ function ExpertCreatePage(props) {
     const [password2, setPassword2] = useState("");
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
-    const [errMessage, setErrMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const [expertCategories, setExpertCategories] = useState([]);
     const updateExpertCategories = (event) => {
         event.target.checked ?
-        setExpertCategories(expertCategories => [...expertCategories, event.target.id]) :
-        setExpertCategories(expertCategories => expertCategories.filter(e => e!=event.target.id))
+            setExpertCategories(expertCategories => [...expertCategories, Number(event.target.id)]) :
+            setExpertCategories(expertCategories => expertCategories.filter(e => e != Number(event.target.id)))
     }
+
+    function submit() {
+        setErrorMessage("")
+        let missingFields = ""
+        if (name.length === 0) {
+            missingFields = missingFields + "first name, "
+        }
+        if (surname.length === 0) {
+            missingFields = missingFields + "last name, "
+        }
+        if (email.length === 0) {
+            missingFields = missingFields + "email, "
+        }
+        if (password.length === 0) {
+            missingFields = missingFields + "password, "
+        }
+        if (password2.length === 0) {
+            missingFields = missingFields + "password match, "
+        }
+
+        if (missingFields.length > 0) {
+            missingFields = missingFields.substring(0, missingFields.length - 2)
+            setErrorMessage("Missing fields: " + missingFields)
+            return
+        }
+
+
+        if (!/^[A-Za-z]+$/i.test(name)) {
+            setErrorMessage("Error in form: wrong name format (first name)")
+            return
+        }
+        if (!/^[A-Za-z]+$/i.test(surname)) {
+            setErrorMessage("Error in form: wrong name format (last name)")
+            return
+        }
+
+        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+            setErrorMessage("Error in form: Email address is not valid")
+            return
+        }
+        if (password !== password2) {
+            setErrorMessage("Error in form: Passwords do not match")
+            return
+        }
+
+        if (expertCategories.length == 0) {
+            setErrorMessage("Error in form: No product categories selected")
+            return
+        }
+
+        createExpertAPI({
+            firstName: name,
+            lastName: surname,
+            email: email,
+            userName: email,
+            password: password,
+            expertCategories: expertCategories
+        }).then(
+            () => navigate("/")
+        ).catch(err => setErrorMessage(err))
+    }
+
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [])
@@ -31,10 +97,10 @@ function ExpertCreatePage(props) {
         categoryCheckboxes.push(
             <Form.Check style={{ color: "#DDDDDD", accentColor: "white", width: "200px", alignSelf: "center", textAlign: "left", margin: "auto", marginBottom: "10px" }}
                 type={"checkbox"}
-                id={category}
-                key={category}
-                label={category}
-                checked={expertCategories.includes(category)}
+                id={category.enum}
+                key={category.enum}
+                label={category.name}
+                checked={expertCategories.includes(category.enum)}
                 onChange={updateExpertCategories}
             />
         );
@@ -42,7 +108,7 @@ function ExpertCreatePage(props) {
 
     const loggedIn = props.loggedIn
     return <>
-        <AppNavbar user={props.user} loggedIn={loggedIn} logout={props.logout}/>
+        <AppNavbar user={props.user} loggedIn={loggedIn} logout={props.logout} selected={"expertcreate"}/>
         <div className="CenteredButton" style={{ marginTop: "50px" }}>
             <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>CREATE NEW EXPERT</h1>
             <hr style={{ color: "white", width: "25%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "2px", marginTop: "2px" }} />
@@ -75,8 +141,9 @@ function ExpertCreatePage(props) {
                     </Form>
                 </Col>
             </Row>
-            <NavigationButton text={"Create new expert"} onClick={e => e.preventDefault()} />
+            <NavigationButton text={"Create new expert"} onClick={e => { e.preventDefault(); submit() }} />
 
+            {errorMessage && <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />}
 
         </div>
     </>

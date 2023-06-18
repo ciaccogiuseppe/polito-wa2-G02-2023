@@ -39,6 +39,18 @@ async function signupAPI(signupPayload){
         )
 }
 
+async function createExpertAPI(signupPayload){
+    return api.post(APIURL + "/API/createExpert", signupPayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+            console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
 async function getProfileInfo(){
     const token = localStorage.getItem("token");
     if (token) {
@@ -55,4 +67,4 @@ async function getProfileInfo(){
         )
 }
 
-export {loginAPI, getProfileInfo, signupAPI}
+export {loginAPI, getProfileInfo, signupAPI, createExpertAPI}

@@ -26,7 +26,7 @@ function AppNavbar(props){
                                     <NavbarLink href={"/tickethistory"} text={"HISTORY"}  selected={selected==="tickethistory"}/>
                                     <NavbarLink href={"/products"} text={"PRODUCTS"}  selected={selected==="products"}/>
                                     <NavbarLink href={"/brands"} text={"BRANDS"}  selected={selected==="brands"}/>
-
+                                    <NavbarLink href={"/expertcreate"} text={"CREATE EXPERT"}  selected={selected==="expertcreate"}/>
                                 </>
                             }
                         </>}
