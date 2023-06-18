@@ -7,6 +7,7 @@ import it.polito.wa2.server.UnprocessableProductException
 import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.ticketing.ticket.TicketDTO
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
@@ -26,11 +27,10 @@ class ProductController(private val productService: ProductService) {
     }
 
     @PostMapping("/API/manager/products/")
+    @ResponseStatus(HttpStatus.CREATED)
     fun addProduct(principal: Principal, @RequestBody @Valid productDTO: ProductDTO?, br: BindingResult): ProductDTO {
-        if (!productDTO!!.productId.matches("\\d{13}".toRegex()))
-            throw UnprocessableProductException("Wrong format for productId")
         checkAddParameters(productDTO, br)
-        return productService.addProduct(productDTO)
+        return productService.addProduct(productDTO!!)
     }
 
 

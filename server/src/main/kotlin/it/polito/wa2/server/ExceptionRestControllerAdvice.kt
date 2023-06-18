@@ -26,6 +26,8 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(DuplicateProductException::class)
     fun handleDuplicateProduct(e: DuplicateProductException) = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.message!! )
+    @ExceptionHandler(BadRequestProductException::class)
+    fun handleBadRequestProduct(e: BadRequestProductException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
 
     /************** Profile exception handlers **************/
     @ExceptionHandler(ProfileNotFoundException::class)

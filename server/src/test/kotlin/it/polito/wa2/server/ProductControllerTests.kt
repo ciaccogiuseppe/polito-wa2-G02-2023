@@ -6,7 +6,10 @@ import it.polito.wa2.server.brands.BrandRepository
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.ProductCategory
+import it.polito.wa2.server.products.ProductDTO
 import it.polito.wa2.server.products.ProductRepository
+import it.polito.wa2.server.products.toDTO
+import it.polito.wa2.server.profiles.ProfileDTO
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -17,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.*
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -687,6 +691,266 @@ class ProductControllerTests {
         productRepository.delete(product1)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+    }
+
+
+    @Test
+    fun postProductSuccess() {
+        val uri = URI("http://localhost:$port/API/manager/products/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val category = Category()
+        category.name= ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+        val productEntity =
+            ProductDTO(
+                "0000000000000",
+                "PC Omen Intel i7",
+                brand.name,
+                category.name.toString()
+            )
+
+        val entity = TestUtils.testEntityHeader(productEntity, managerToken)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+        Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
+
+        val createdProduct = productRepository.findByIdOrNull(productEntity.productId)
+
+        Assertions.assertNotNull(createdProduct)
+        Assertions.assertEquals(productEntity.name, createdProduct?.name)
+        Assertions.assertEquals(brand, createdProduct?.brand)
+        Assertions.assertEquals(category, createdProduct?.category)
+
+        productRepository.delete(createdProduct!!)
+        categoryRepository.delete(category)
+        brandRepository.delete(brand)
+    }
+    @Test
+    fun postProductNullProduct() {
+        val uri = URI("http://localhost:$port/API/manager/products/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val category = Category()
+        category.name= ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+        val productEntity = null
+
+        val entity = TestUtils.testEntityHeader(productEntity, managerToken)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
+        categoryRepository.delete(category)
+        brandRepository.delete(brand)
+    }
+
+    @Test
+    fun postProductWrongIDFormat() {
+        val uri = URI("http://localhost:$port/API/manager/products/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val category = Category()
+        category.name= ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+        val productEntity =
+            ProductDTO(
+                "000000000000",
+                "PC Omen Intel i7",
+                brand.name,
+                category.name.toString()
+            )
+
+
+        val entity = TestUtils.testEntityHeader(productEntity, managerToken)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        categoryRepository.delete(category)
+        brandRepository.delete(brand)
+    }
+
+    @Test
+    fun postProductWrongProductFormat() {
+        val uri = URI("http://localhost:$port/API/manager/products/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val category = Category()
+        category.name= ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+        val productEntity =
+            ProductDTO(
+                "0000000000000",
+                "PC Omen Intel i7",
+                "",
+                category.name.toString()
+            )
+
+
+        val entity = TestUtils.testEntityHeader(productEntity, managerToken)
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+        categoryRepository.delete(category)
+        brandRepository.delete(brand)
+    }
+
+    @Test
+    fun postProductNotExistingBrand() {
+        val uri = URI("http://localhost:$port/API/manager/products/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val category = Category()
+        category.name= ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+
+
+        val productEntity =
+            ProductDTO(
+                "0000000000000",
+                "PC Omen Intel i7",
+                "abc",
+                category.name.toString()
+            )
+
+
+        val entity = TestUtils.testEntityHeader(productEntity, managerToken)
+
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+        categoryRepository.delete(category)
+        brandRepository.delete(brand)
+    }
+
+    @Test
+    fun postProductNotExistingCategory() {
+        val uri = URI("http://localhost:$port/API/manager/products/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val category = Category()
+        category.name= ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+
+
+        val productEntity =
+            ProductDTO(
+                "0000000000000",
+                "PC Omen Intel i7",
+                brand.name,
+                "abc"
+            )
+
+
+        val entity = TestUtils.testEntityHeader(productEntity, managerToken)
+
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+        categoryRepository.delete(category)
+        brandRepository.delete(brand)
+    }
+
+
+    @Test
+    fun postProductDuplicate() {
+        val uri = URI("http://localhost:$port/API/manager/products/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val category = Category()
+        category.name= ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        productRepository.save(product1)
+
+
+        val productEntity =
+            ProductDTO(
+                "0000000000000",
+                "PC Omen Intel i7",
+                brand.name,
+                category.name.toString()
+            )
+
+
+        val entity = TestUtils.testEntityHeader(productEntity, managerToken)
+
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+        Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
+
+        productRepository.delete(product1)
+        categoryRepository.delete(category)
+        brandRepository.delete(brand)
+
     }
 }
 
