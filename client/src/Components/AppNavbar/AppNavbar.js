@@ -23,6 +23,7 @@ function AppNavbar(props){
                             <NavbarLink href={"/profileinfo"} text={"PROFILE"}  selected={selected==="profile"}/>
                             {(props.user !== null && props.user.role === "MANAGER") &&
                                 <>
+                                    <NavbarLink href={"/tickethistory"} text={"HISTORY"}  selected={selected==="tickethistory"}/>
                                     <NavbarLink href={"/products"} text={"PRODUCTS"}  selected={selected==="products"}/>
                                     <NavbarLink href={"/brands"} text={"BRANDS"}  selected={selected==="brands"}/>
 

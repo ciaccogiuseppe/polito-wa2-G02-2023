@@ -1,11 +1,11 @@
 import { Button, Col, Form, Row } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import { useEffect, useState } from "react";
-import { addNewProfile } from "../../../API/Profiles";
 import NavigationButton from "../../Common/NavigationButton";
 import NavigationLink from "../../Common/NavigationLink";
 import { crossIcon, filterIcon, caretDownIcon, caretUpIcon, } from "../../Common/Icons"
 import TicketHistoryTable from "./TicketHistoryTable";
+import { getTicketHistoryAPI } from "../../../API/TicketHistory";
 
 
 function TicketHistoryPage(props) {
@@ -24,9 +24,24 @@ function TicketHistoryPage(props) {
         window.scrollTo(0, 0)
     }, [])
 
+    function applyFilters() {
+        getTicketHistoryAPI(
+            {
+                ticketId: ticketId,
+                userEmail: userEmail,
+                currentExpertEmail: expertEmail,
+                updatedAfter: initialDate && new Date(initialDate).toISOString().replace(/.$/, ''),
+                updatedBefore: finalDate && new Date(finalDate).toISOString().replace(/.$/, ''),
+            }
+        ).then(tickets => {
+            setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId))
+            setShowFilters(false)
+        })
+    }
+
     const loggedIn = props.loggedIn
     return <>
-        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} />
+        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"tickethistory"}/>
         <div className="CenteredButton" style={{ marginTop: "50px" }}>
             <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>TICKET HISTORY</h1>
             <hr style={{ color: "white", width: "25%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "2px", marginTop: "2px" }} />
@@ -84,7 +99,7 @@ function TicketHistoryPage(props) {
                                 </div>
                             </Col>
                         </Row>
-                        <NavigationButton disabled={userEmail === "" && expertEmail === "" && ticketId === "" && initialDate === "" && finalDate === ""} text={"Search"} onClick={e => e.preventDefault()} />
+                        <NavigationButton disabled={userEmail === "" && expertEmail === "" && ticketId === "" && initialDate === "" && finalDate === ""} text={"Search"} onClick={e => { e.preventDefault(); applyFilters() }} />
                     </div>
 
                     {
@@ -96,56 +111,12 @@ function TicketHistoryPage(props) {
                     }</>}
             </div>
 
-            <hr style={{ color: "white", width: "90%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "20px", marginTop: "20px" }} />
 
             <TicketHistoryTable ticketList={ticketList} />
 
         </div>
+
     </>
-
-
-    {/*function createProfile(){
-        setLoading(true);
-        addNewProfile({email:email, name:name, surname:surname}).then(
-            res => {
-                setErrMessage("");
-                setResponse("Profile added succesfully");
-                setLoading(false);
-                setEmail("");
-                setName("");
-                setSurname("");
-                //console.log(res);
-            }
-        ).catch(err => {
-            //console.log(err);
-            setResponse("");
-            setErrMessage(err.message);
-            setLoading(false);
-        })
-    }
-
-    return <>
-            <div className="CenteredButton">
-
-                <Form className="form">
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label className="text-info">Email address</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={email} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Name</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={name} type="text" placeholder="Name" onChange={e => setName(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Surname</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={surname} type="text" placeholder="Surname" onChange={e => setSurname(e.target.value)}/>
-                    </Form.Group>
-                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); createProfile();}}>Create Profile</Button>
-                </Form>
-                <hr style={{color:"white", width:"90%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}/>
-                {loading? <Spinner style={{alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}} animation="border" variant="info" /> :
-                    <>
-                        {response?<h4 className="text-success" style={{marginTop:"10px"}}>{response}</h4>:<></>}
-                        {errMessage?<h5 className="text-danger" style={{marginTop:"10px"}}>{errMessage}</h5>:<></>}</>}
-
-            </div>
-    </>*/}
 }
 
 export default TicketHistoryPage;
