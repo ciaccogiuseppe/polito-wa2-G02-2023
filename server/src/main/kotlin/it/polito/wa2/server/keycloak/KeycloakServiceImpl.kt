@@ -19,6 +19,7 @@ class KeycloakServiceImpl(
     companion object {
         const val CLIENT = "app_client"
         const val EXPERT = "app_expert"
+        const val VENDOR = "app_vendor"
         //const val MANAGER = "app_manager"
     }
 
@@ -34,6 +35,13 @@ class KeycloakServiceImpl(
         addUser(user)
         keycloakConfig.assignRoles(user.email, listOf(EXPERT))
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.EXPERT)
+    }
+
+    override fun addVendor(userDTO: UserDTO) {
+        val user = createUser(userDTO)
+        addUser(user)
+        keycloakConfig.assignRoles(user.email, listOf(VENDOR))
+        profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.VENDOR)
     }
 
     override fun updateUser(email: String, userDTO: UserUpdateDTO) {

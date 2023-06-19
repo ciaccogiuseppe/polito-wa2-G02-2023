@@ -24,6 +24,7 @@ import axios from "axios";
 import {setAuthToken} from "./API/AuthCommon";
 import BrandsPage from "./Components/Brands/BrandsPage/BrandsPage";
 import BrandCreatePage from "./Components/Brands/BrandCreatePage/BrandCreatePage";
+import VendorCreatePage from "./Components/Admin/VendorCreatePage/VendorCreatePage";
 
 export const api = axios.create({
   baseURL: APIURL,
@@ -85,10 +86,31 @@ function App() {
         }
     );
 
+    const int = setInterval(() => {
+        const refreshToken = localStorage.getItem('refreshToken');
+        axios
+            .post(APIURL+"/API/refreshtoken", {
+                refreshToken: refreshToken,
+            })
+            .then((res) => {
+                if (res.status === 200) {
+                    const newAccessToken = res.data.token;
+                    localStorage.setItem('token', newAccessToken);
+                    localStorage.setItem('refreshToken', res.data.refreshToken);
+                }
+            })
+            .catch((error) => {
+                // Handle token refresh failure (e.g., logout user)
+                logout()
+                console.log('Failed to refresh access token: ', error);
+            });
+    }, 120000)
+
     return () => {
       // Remove the request and response interceptors on component unmount
       api.interceptors.request.eject(requestInterceptor);
       api.interceptors.response.eject(responseInterceptor);
+      clearInterval(int)
     };
   }, []);
 
@@ -110,7 +132,18 @@ function App() {
       else if (data.realm_access.roles.includes("app_manager")){
         role = "MANAGER"
       }
-      getProfileInfo().then(response => {setUser({...response.data, role:role}); setTempDisableRedirect(false)})
+      else if (data.realm_access.roles.includes("app_vendor")){
+        role = "VENDOR"
+      }
+      getProfileInfo()
+          .then(response => {
+          setUser({...response.data, role:role});
+          setTempDisableRedirect(false)})
+          .catch(e =>{
+              if(window.location.pathname !== "/"){
+                  window.location.href ="/"
+              }
+          })
     }
 
     if(loggedIn===false){
@@ -146,6 +179,7 @@ function App() {
               {user.role === "CLIENT" && <Route path='/newticket' element= {<TicketCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>}
               {user.role === "MANAGER" && <>
                   <Route path='/expertcreate' element= {<ExpertCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
+                  <Route path='/vendorcreate' element= {<VendorCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
                   <Route path='/tickethistory' element= {<TicketHistoryPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
                   <Route path='/products' element= {<ProductsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
                   <Route path='/brands' element= {<BrandsPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
@@ -153,12 +187,12 @@ function App() {
                   <Route path='/newproduct' element= {<ProductCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
               </>}
             <Route path='/productid' element= {<ProductIdPage/>}/>
-            <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn} user={user} logout={logout}/>}/>
+              {user.role !== "VENDOR" && <Route path='/profileinfo' element= {<ProfileInfoPage loggedIn={loggedIn} user={user} logout={logout}/>}/>}
             <Route path='/usercreate' element= {<ProfileCreatePage/>}/>
             <Route path='/profileupdate' element= {<ProfileUpdatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
 
           </>}
-            { !tempDisableRedirect && <Route path="*" element={<RedirectToHome/>} />}
+            {!tempDisableRedirect && <Route path="*" element={<RedirectToHome/>} />}
         </Routes>
       </Router>
   );

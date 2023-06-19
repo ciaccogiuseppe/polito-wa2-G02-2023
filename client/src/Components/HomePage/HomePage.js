@@ -5,6 +5,7 @@ import AppNavbar from "../AppNavbar/AppNavbar";
 import {useEffect, useState} from "react";
 import NavigationButton from "../Common/NavigationButton";
 import NavigationLink from "../Common/NavigationLink";
+import WarrantyGenerate from "../Products/WarrantyGenerate/WarrantyGenerate";
 
 function HomePage(props) {
     const navigate = useNavigate();
@@ -35,6 +36,15 @@ function HomePage(props) {
                 <div className="CenteredButton" style={{marginTop:"70px"}}>
                     <NavigationButton text={"View assigned tickets"} onClick={(e) => { e.preventDefault(); navigate("/tickets") }}/>
                 </div>
+            </>
+        }
+
+        {(loggedIn && user!==null && user.role === "VENDOR") &&
+            <>
+                <WarrantyGenerate/>
+                {/*<div className="CenteredButton" style={{marginTop:"70px"}}>
+                    <NavigationButton text={"View assigned tickets"} onClick={(e) => { e.preventDefault(); navigate("/tickets") }}/>
+                </div>*/}
             </>
         }
 

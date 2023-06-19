@@ -39,6 +39,18 @@ async function signupAPI(signupPayload){
         )
 }
 
+async function createVendorAPI(signupPayload){
+    return api.post(APIURL + "/API/createVendor", signupPayload)
+        .then(response => {
+            return response
+        })
+        .catch(err =>{
+                console.log(err);
+                return Promise.reject(err.response.data.detail)
+            }
+        )
+}
+
 async function createExpertAPI(signupPayload){
     return api.post(APIURL + "/API/createExpert", signupPayload)
         .then(response => {
@@ -67,4 +79,4 @@ async function getProfileInfo(){
         )
 }
 
-export {loginAPI, getProfileInfo, signupAPI, createExpertAPI}
+export {loginAPI, getProfileInfo, signupAPI, createExpertAPI, createVendorAPI}

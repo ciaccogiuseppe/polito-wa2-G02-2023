@@ -33,6 +33,13 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         keycloakService.addExpert(userDTO!!)
     }
 
+    @PostMapping("/API/createVendor")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addVendor(@Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+        checkInputUser(userDTO, br)
+        keycloakService.addVendor(userDTO!!)
+    }
+
     @PutMapping("/API/client/user/{email}")
     fun clientUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
         val userEmail = retrieveUserEmail(principal)
