@@ -14,6 +14,8 @@ $$
         insert into profiles(id, email, name, surname, role) values (id, 'expert2@polito.it', 'ExpertB', 'PoliTo', 'EXPERT');
         select nextval('profiles_id_seq') into id;
         insert into profiles(id, email, name, surname, role) values (id, 'manager@polito.it', 'Manager', 'PoliTo', 'MANAGER');
+        select nextval('profiles_id_seq') into id;
+        insert into profiles(id, email, name, surname, role) values (id, 'vendor@polito.it', 'Vendor', 'PoliTo', 'VENDOR');
 
 
         insert into brands(name) values ('Apple');
