@@ -27,6 +27,7 @@ fun ProductDTO.toNewProduct(brand:Brand, category: Category): Product {
     product.category = category
     product.productId = this.productId
     product.name = this.name
+    product.serialNumGen = 1
 
     return product
 }

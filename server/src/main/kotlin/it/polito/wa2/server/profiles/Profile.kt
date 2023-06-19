@@ -2,6 +2,7 @@ package it.polito.wa2.server.profiles
 
 import it.polito.wa2.server.EntityBase
 import it.polito.wa2.server.categories.Category
+import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
@@ -24,15 +25,6 @@ class Profile : EntityBase<Long>() {
     @Column(nullable = true)
     var phoneNumber: String? = null
 
-    @Column(nullable = true)
-    var country: String? = null
-    @Column(nullable = true)
-    var region: String? = null
-    @Column(nullable = true)
-    var city: String? = null
-    @Column(nullable = true)
-    var address: String? = null
-
     @OneToMany(mappedBy = "customer")
     val ticketsCustomer = mutableSetOf<Ticket>()
 
@@ -48,6 +40,12 @@ class Profile : EntityBase<Long>() {
     @OneToMany(mappedBy = "currentExpert")
     val historyExpert = mutableSetOf<TicketHistory>()
 
+    @OneToOne(mappedBy="client", cascade = [CascadeType.ALL])
+    var address: Address? = null
+
+    @OneToMany(mappedBy = "client")
+    val items = mutableSetOf<Item>()
+
     @ManyToMany
     @JoinTable(
         name = "category_assigned",
@@ -58,5 +56,5 @@ class Profile : EntityBase<Long>() {
 }
 
 enum class ProfileRole {
-    CLIENT, EXPERT, MANAGER
+    CLIENT, EXPERT, MANAGER, VENDOR
 }

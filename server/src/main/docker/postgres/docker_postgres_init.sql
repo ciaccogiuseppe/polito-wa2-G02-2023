@@ -3,6 +3,8 @@ create table if not exists brands
     id   bigserial
         primary key,
     name varchar(255) not null
+        constraint uk_oce3937d2f4mpfqrycbr0l93m
+            unique
 );
 
 alter table brands
@@ -21,38 +23,67 @@ alter table categories
 
 create table if not exists products
 (
-    product_id  varchar(255) not null
+    product_id     varchar(255) not null
         primary key,
-    name        varchar(255) not null,
-    category_id bigint       not null
+    name           varchar(255) not null,
+    serial_num_gen bigint       not null,
+    brand_id       bigint       not null
+        constraint fka3a4mpsfdf4d2y6r8ra3sc8mv
+            references brands,
+    category_id    bigint       not null
         constraint fkog2rp4qthbtt2lfyhfo32lsw9
-            references categories,
-    brand_id     bigint       not null
-        constraint fkdg2rp4qthbtt2lfyhfo32lsw9
-            references brands
+            references categories
 );
 
 alter table products
+    owner to postgres;
+
+create table if not exists items
+(
+    serial_num bigint       not null,
+    uuid       varchar(255),
+    product_id varchar(255) not null
+        constraint fkmtk37pxnx7d5ck7fkq2xcna4i
+            references products,
+    client_id  bigint
+        constraint fk4lcgine4ykbqt0ee7sh7hukob
+            references profiles,
+    primary key (product_id, serial_num)
+);
+
+alter table items
     owner to postgres;
 
 create table if not exists profiles
 (
     id           bigserial
         primary key,
-    address      varchar(255),
-    city         varchar(255),
-    country      varchar(255),
     email        varchar(255) not null
         constraint uk_lnk8iosvsrn5614xw3lgnybgk
             unique,
     name         varchar(255) not null,
     phone_number varchar(255),
-    region       varchar(255),
     role         varchar(255) not null,
     surname      varchar(255) not null
 );
 
 alter table profiles
+    owner to postgres;
+
+create table if not exists addresses
+(
+    id        bigserial
+        primary key,
+    address   varchar(255),
+    city      varchar(255),
+    country   varchar(255),
+    region    varchar(255),
+    client_id bigint not null
+        constraint fkdois8l22rrsfm4w5l13wuaamy
+            references profiles
+);
+
+alter table addresses
     owner to postgres;
 
 create table if not exists category_assigned
@@ -254,17 +285,20 @@ $$
 
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'SMARTPHONE');
-        insert into products(product_id, name, brand_id, category_id) values ('0000000000001', 'iPhone 13 Pro', (select brands.id from brands where name = 'Apple'), id);
-        insert into products(product_id, name, brand_id, category_id) values ('0000000000002', 'Galaxy S10', (select brands.id from brands where name = 'Samsung'), id);
-        insert into products(product_id, name, brand_id, category_id) values ('0000000000004', 'Galaxy S21 Ultra', (select brands.id from brands where name = 'Samsung'), id);
-        insert into products(product_id, name, brand_id, category_id) values ('0000000000005', 'Galaxy Note 20', (select brands.id from brands where name = 'Samsung'), id);
-        insert into products(product_id, name, brand_id, category_id) values ('0000000000007', 'LG G8 ThinQ', (select brands.id from brands where name = 'LG'), id);
-        insert into products(product_id, name, brand_id, category_id) values ('0000000000008', 'LG V60 ThinQ', (select brands.id from brands where name = 'LG'), id);
-        insert into products(product_id, name, brand_id, category_id) values ('0000000000009', 'LG Gram', (select brands.id from brands where name = 'LG'), id);
+        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000001', 'iPhone 13 Pro', (select brands.id from brands where name = 'Apple'), id, 1);
+        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000002', 'Galaxy S10', (select brands.id from brands where name = 'Samsung'), id, 1);
+        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000004', 'Galaxy S21 Ultra', (select brands.id from brands where name = 'Samsung'), id, 1);
+        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000005', 'Galaxy Note 20', (select brands.id from brands where name = 'Samsung'), id, 1);
+        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000007', 'LG G8 ThinQ', (select brands.id from brands where name = 'LG'), id, 1);
+        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000008', 'LG V60 ThinQ', (select brands.id from brands where name = 'LG'), id, 1);
+        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000009', 'LG Gram', (select brands.id from brands where name = 'LG'), id, 1);
 
 
-       select nextval('categories_id_seq') into id;
+        select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'TV');
+
+        select nextval('categories_id_seq') into id;
+        insert into categories(id, name) values (id, 'PC');
 
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'SOFTWARE');
