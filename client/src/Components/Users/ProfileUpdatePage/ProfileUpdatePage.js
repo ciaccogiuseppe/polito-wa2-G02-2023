@@ -29,7 +29,7 @@ function ProfileUpdatePage(props) {
                 .catch(err => setErrorMessage(err))
         }
         else if(Profile.role === "EXPERT"){
-            updateExpertAPI({firstName:firstName, lastName:lastName, address:address, email:Profile.email, userName:Profile.email, expertCategories:[]}, Profile.email)
+            updateExpertAPI({firstName:firstName, lastName:lastName, address:address, email:Profile.email, userName:Profile.email, expertCategories: Profile.expertCategories}, Profile.email)
                 .then(()=>navigate("/profileinfo",  {replace:true, state:{message:"Profile updated successfully"}}))
                 .catch(err => setErrorMessage(err))
         }
