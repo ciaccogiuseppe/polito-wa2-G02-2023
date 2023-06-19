@@ -491,6 +491,7 @@ function TicketChatPage(props) {
                     <div style={{backgroundColor:"rgba(255,255,255,0.1)", verticalAlign:"middle", borderRadius:"20px", padding:"15px", width:"95%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
 
                         {chat.map(c => <ChatMessage
+                            user={props.user}
                             imageList={c.attachments.map(c => c.attachment)}
                             setAlbum={setAlbum}
                             setStartPos={setStartPos}

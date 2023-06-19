@@ -17,7 +17,13 @@ function ProfileCreatePage(props){
     const [password2, setPassword2] = useState("");
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
+    const [address,setAddress] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
+
+    const [country, setCountry]  = useState("")
+    const [region, setRegion]  = useState("")
+    const [city, setCity]  = useState("")
+
     const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
@@ -31,6 +37,18 @@ function ProfileCreatePage(props){
         }
         if(surname.length === 0){
             missingFields = missingFields + "last name, "
+        }
+        if(country.length === 0){
+            missingFields = missingFields + "country, "
+        }
+        if(region.length === 0){
+            missingFields = missingFields + "region, "
+        }
+        if(city.length === 0){
+            missingFields = missingFields + "city, "
+        }
+        if(address.length === 0){
+            missingFields = missingFields + "address, "
         }
         if(email.length === 0){
             missingFields = missingFields + "email, "
@@ -73,7 +91,8 @@ function ProfileCreatePage(props){
             email:email,
             userName:email,
             password:password,
-            expertCategories:[]
+            expertCategories:[],
+            address:{country:country, region:region, city:city, address:address}
         }).then(
             () => navigate("/")
         ).catch(err => setErrorMessage(err))
@@ -93,6 +112,13 @@ function ProfileCreatePage(props){
                         <div style={{width:"300px", margin:"auto"}}>
                             <Form.Control value={name} className={"form-control:focus"} style={{display:"inline-block",  marginRight:"10px", width: "140px", alignSelf:"center", marginTop:"5px", fontSize:12}} type="input" placeholder="First Name" onChange={e => setName(e.target.value)}/>
                             <Form.Control value={surname} className={"form-control:focus"} style={{display:"inline-block", marginLeft:"10px", width: "140px", alignSelf:"center", marginTop:"5px", fontSize:12}} type="input" placeholder="Last Name" onChange={e => setSurname(e.target.value)}/>
+                        </div>
+                        <div style={{marginTop:"15px"}}>
+                            <h5 style={{color:"white"}}>Address</h5>
+                            <Form.Control value={country} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="Country" onChange={e => setCountry(e.target.value)}/>
+                            <Form.Control value={region} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="Region" onChange={e => setRegion(e.target.value)}/>
+                            <Form.Control value={city} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="City" onChange={e => setCity(e.target.value)}/>
+                            <Form.Control value={address} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="Address" onChange={e => setAddress(e.target.value)}/>
                         </div>
                         </Form.Group>
                     <Form.Group className="mb-3" controlId="formBasicEmail">

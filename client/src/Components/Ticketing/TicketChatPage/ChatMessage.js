@@ -4,6 +4,7 @@ import {Row} from "react-bootstrap";
 import {attachmentIcon} from "../../Common/Icons";
 import {useEffect, useState} from "react";
 import {getProfileDetails} from "../../../API/Profiles";
+import {useNavigate} from "react-router-dom";
 
 export function isImage(data){
     let knownTypes = {
@@ -32,6 +33,7 @@ export function isImage(data){
 }
 
 function ChatMessage(props){
+    const user = props.user
     const [isExpert, setIsExpert] = useState(true)
     const setAlbum = props.setAlbum
     const setStartPos = props.setStartPos;
@@ -56,9 +58,13 @@ function ChatMessage(props){
         })
     }, [])
 
+    const navigate = useNavigate()
+
     return <div style={{marginBottom:"5px", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", display:"inline-block", backgroundColor: bgColor, borderRadius:"20px", padding:"15px", width:"100%", alignSelf:"left", textAlign:"left", marginLeft:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
         <div style={{display:"inline-block", float:align, backgroundColor:"rgba(0,0,0,0.1)", borderRadius:"20px", padding:"15px", width:"155px", alignSelf:"right", textAlign:"left", marginLeft:"auto", marginRight:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"5px" }}>
-            <div style={{fontSize:"15px", textAlign:"center"}}>{name}</div>
+            {(user.role === "EXPERT" && role === "Client")?
+                <div style={{fontSize:"15px", textAlign:"center", cursor:"pointer"}} onClick={()=>navigate("/profiledata/"+props.sender)}>{name}</div>:
+                <div style={{fontSize:"15px", textAlign:"center"}}>{name}</div>}
             <hr style={{marginTop:1, marginBottom:1}}/>
             <div style={{fontSize:"13px", fontWeight:"bold", textAlign:"center"}}>{role}</div>
             <div style={{fontSize:"11px", textAlign:"center", marginTop:"2px"}}>{timestamp}</div>

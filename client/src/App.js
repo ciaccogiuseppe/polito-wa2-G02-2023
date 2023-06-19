@@ -25,6 +25,7 @@ import {setAuthToken} from "./API/AuthCommon";
 import BrandsPage from "./Components/Brands/BrandsPage/BrandsPage";
 import BrandCreatePage from "./Components/Brands/BrandCreatePage/BrandCreatePage";
 import VendorCreatePage from "./Components/Admin/VendorCreatePage/VendorCreatePage";
+import ProfileInfoPageExpert from "./Components/Users/ProfileInfoPageByExpert/ProfileInfoPageExpert";
 
 export const api = axios.create({
   baseURL: APIURL,
@@ -177,6 +178,7 @@ function App() {
             <Route path='/tickets' element= {<TicketListPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
             <Route path='/tickets/:id' element= {<TicketChatPage user={user} loggedIn={loggedIn} logout={logout}/>}/>
               {user.role === "CLIENT" && <Route path='/newticket' element= {<TicketCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>}
+              {(user.role === "EXPERT" || user.role === "MANAGER") && <Route path='/profiledata/:email' element= {<ProfileInfoPageExpert user={user} loggedIn={loggedIn} logout={logout}/>}/>}
               {user.role === "MANAGER" && <>
                   <Route path='/expertcreate' element= {<ExpertCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
                   <Route path='/vendorcreate' element= {<VendorCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>

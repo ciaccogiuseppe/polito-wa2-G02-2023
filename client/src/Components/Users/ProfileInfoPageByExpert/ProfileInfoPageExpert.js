@@ -2,14 +2,17 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import { getProfileInfo } from "../../../API/Auth";
 import SuccessMessage from "../../Common/SuccessMessage";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
+import {getProfileDetails} from "../../../API/Profiles";
 
 //const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
-function ProfileInfoPage(props) {
+function ProfileInfoPageExpert(props) {
+    const params = useParams()
+    const email = params.email
     const location = useLocation()
     let message = location.state && location.state.message;
     const loggedIn = props.loggedIn
@@ -19,8 +22,9 @@ function ProfileInfoPage(props) {
     const navigate = useNavigate()
 
     useEffect(() => {
+        console.log(email)
         window.scrollTo(0, 0)
-        getProfileInfo().then(response => { setProfile(response.data) }).catch(err => console.log(err))
+        getProfileDetails(email).then(response => { setProfile(response.data) }).catch(err => console.log(err))
     }, [])
 
     useEffect(() => {
@@ -77,10 +81,8 @@ function ProfileInfoPage(props) {
 
             </div>
 
-            {successMessage && <SuccessMessage text={successMessage} close={() => setSuccessMessage("")} />}
-
             <div style={{ marginTop: "20px" }}>
-                <NavigationButton text={"Edit profile"} onClick={e => { e.preventDefault(); navigate("/profileupdate") }} />
+                <NavigationButton text={"Back"} onClick={e => { e.preventDefault(); navigate(-1) }} />
             </div>
 
 
@@ -88,4 +90,4 @@ function ProfileInfoPage(props) {
     </>
 }
 
-export default ProfileInfoPage;
+export default ProfileInfoPageExpert;
