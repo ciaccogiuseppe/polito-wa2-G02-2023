@@ -37,6 +37,19 @@ function StatusSelector(props) {
     </>
 }
 
+function getPageTitle(role) {
+    switch(role){
+        case "CLIENT":
+            return "MY TICKETS";
+        case "EXPERT":
+            return "ASSIGNED TICKETS";
+        case "MANAGER":
+            return "TICKETS";
+        default:
+            return "TICKETS";
+    }
+}
+
 function TicketListPage(props) {
     const loggedIn = props.loggedIn
     const user = props.user
@@ -164,7 +177,7 @@ function TicketListPage(props) {
         <div className="CenteredButton" style={{ marginTop: "50px" }}>
 
 
-            <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>MY TICKETS</h1>
+            <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>{getPageTitle(user.role)}</h1>
             <hr style={{ color: "white", width: "25%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "15px", marginTop: "2px" }} />
 
             <div style={{ width: "75%", alignSelf: "center", margin: "auto", borderRadius: "25px", marginTop: "15px", backgroundColor: "rgba(0,0,0,0.2)" }}>
