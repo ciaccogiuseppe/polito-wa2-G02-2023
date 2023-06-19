@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getProfileInfo } from "../../../API/Auth";
 import SuccessMessage from "../../Common/SuccessMessage";
+import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
 
 //const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
@@ -64,7 +65,7 @@ function ProfileInfoPage(props) {
                     {Profile.role === "EXPERT" && <div>
                         <h5 style={{ color: "white" }}>Assigned categories</h5>
                         <hr style={{ color: "white", width: "125px", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "4px", marginTop: "4px" }} />
-                        <h5 style={{ color: "#e3e3e3", fontSize: 13 }}>{Profile.expertCategories.toString().replaceAll(",", ", ")}</h5>
+                        <h5 style={{ color: "#e3e3e3", fontSize: 13 }}>{Profile.expertCategories.map(c => reformatCategory(c)).toString().replaceAll(",", ", ")}</h5>
                     </div>}
 
                     {Profile.address && <div>

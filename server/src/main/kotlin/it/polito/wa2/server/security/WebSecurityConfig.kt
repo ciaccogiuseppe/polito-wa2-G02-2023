@@ -15,6 +15,7 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
         const val MANAGER = "manager"
         const val CLIENT = "client"
         const val EXPERT = "expert"
+        const val VENDOR = "vendor"
     }
 
     @Bean
@@ -34,6 +35,7 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.GET, "/API/authenticated/**").hasAnyRole(CLIENT, EXPERT, MANAGER)
             .requestMatchers(HttpMethod.GET, "/API/public/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/API/public/**").permitAll()
+            .requestMatchers(HttpMethod.PUT, "/API/vendor/**").hasRole(VENDOR)
             .requestMatchers(HttpMethod.POST, "/API/login/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/attachment/**").hasAnyRole(CLIENT, EXPERT)

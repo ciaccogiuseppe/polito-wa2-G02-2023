@@ -4,6 +4,7 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnprocessableProfileException
+import it.polito.wa2.server.items.ItemDTO
 import jakarta.validation.Valid
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.validation.BindingResult
@@ -25,6 +26,12 @@ class ProfileController(private val profileService: ProfileService) {
     fun getProfile(@PathVariable email: String): ProfileDTO {
         checkEmail(email)
         return profileService.getProfile(email)
+    }
+
+    @GetMapping("/API/client/profiles/{email}/items")
+    fun getProfileItems(@PathVariable email: String): List<ItemDTO> {
+        checkEmail(email)
+        return profileService.getProfileItems(email)
     }
 
     @GetMapping("/API/manager/profiles/experts/{category}")

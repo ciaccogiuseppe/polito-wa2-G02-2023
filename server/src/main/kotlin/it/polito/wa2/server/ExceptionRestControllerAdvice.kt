@@ -74,19 +74,30 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
 
     /************** Category exception handlers **************/
     @ExceptionHandler(CategoryNotFoundException::class)
-    fun handleTicketNotFound(e: CategoryNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+    fun handleCategoryNotFound(e: CategoryNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
 
     /************** Brand exception handlers **************/
     @ExceptionHandler(BrandNotFoundException::class)
-    fun handleTicketNotFound(e: BrandNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+    fun handleBrandNotFound(e: BrandNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
 
     @ExceptionHandler(UnprocessableBrandException::class)
-    fun handleTicketNotFound(e: UnprocessableBrandException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+    fun handleUnprocessableBrand(e: UnprocessableBrandException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
 
     @ExceptionHandler(DuplicateBrandException::class)
-    fun handleTicketNotFound(e: DuplicateBrandException) = ProblemDetail.forStatusAndDetail( HttpStatus.CONFLICT, e.message!! )
+    fun handleDuplicateBrand(e: DuplicateBrandException) = ProblemDetail.forStatusAndDetail( HttpStatus.CONFLICT, e.message!! )
 
+    /************** Item exception handlers **************/
+    @ExceptionHandler(ItemNotFoundException::class)
+    fun handleItemNotFound(e: ItemNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
 
+    @ExceptionHandler(UnprocessableItemException::class)
+    fun handleUnprocessableItem(e: UnprocessableItemException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+
+    @ExceptionHandler(DuplicateItemException::class)
+    fun handleDuplicateItem(e: DuplicateItemException) = ProblemDetail.forStatusAndDetail( HttpStatus.CONFLICT, e.message!! )
+
+    @ExceptionHandler(BadRequestItemException::class)
+    fun handleBrandBadRequest(e: BadRequestItemException) = ProblemDetail.forStatusAndDetail( HttpStatus.BAD_REQUEST, e.message!! )
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message)
@@ -114,3 +125,7 @@ class BrandNotFoundException(message: String): RuntimeException(message)
 class UnprocessableBrandException(message: String): RuntimeException(message)
 class BadRequestBrandException(message: String): RuntimeException(message)
 class DuplicateBrandException(message: String): RuntimeException(message)
+class ItemNotFoundException(message: String): RuntimeException(message)
+class UnprocessableItemException(message: String): RuntimeException(message)
+class BadRequestItemException(message: String): RuntimeException(message)
+class DuplicateItemException(message: String): RuntimeException(message)

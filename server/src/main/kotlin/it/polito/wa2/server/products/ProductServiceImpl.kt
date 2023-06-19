@@ -25,7 +25,7 @@ class ProductServiceImpl(
             ?: throw ProductNotFoundException("Product with id '${productId}' not found")
     }
 
-    @Transactional
+    @Transactional(readOnly = false)
     override fun addProduct(productDTO: ProductDTO): ProductDTO {
         if (productRepository.findByIdOrNull(productDTO.productId) != null)
             throw DuplicateProductException("Product with id '${productDTO.productId}' already exists")

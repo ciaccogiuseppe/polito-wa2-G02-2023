@@ -6,8 +6,9 @@ import NavigationLink from "../../Common/NavigationLink";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { createExpertAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
+import { deformatCategory } from "../../Products/ProductsPage/ProductsPage";
 
-const categories = [{ name: "Smartphone", enum: 0 }, { name: "TV", enum: 1 }, { name: "PC", enum: 2 }, { name: "Software", enum: 3 }, { name: "Storage devices", enum: 4 }, { name: "Other", enum: 5 }]
+const categories = ["Smartphone", "TV", "PC", "Software", "Storage Device", "Other"];
 
 function ExpertCreatePage(props) {
     const [email, setEmail] = useState("");
@@ -23,8 +24,8 @@ function ExpertCreatePage(props) {
     const [expertCategories, setExpertCategories] = useState([]);
     const updateExpertCategories = (event) => {
         event.target.checked ?
-            setExpertCategories(expertCategories => [...expertCategories, Number(event.target.id)]) :
-            setExpertCategories(expertCategories => expertCategories.filter(e => e != Number(event.target.id)))
+            setExpertCategories(expertCategories => [...expertCategories, event.target.id]) :
+            setExpertCategories(expertCategories => expertCategories.filter(e => e != event.target.id))
     }
 
     function submit() {
@@ -97,10 +98,10 @@ function ExpertCreatePage(props) {
         categoryCheckboxes.push(
             <Form.Check style={{ color: "#DDDDDD", accentColor: "white", width: "200px", alignSelf: "center", textAlign: "left", margin: "auto", marginBottom: "10px" }}
                 type={"checkbox"}
-                id={category.enum}
-                key={category.enum}
-                label={category.name}
-                checked={expertCategories.includes(category.enum)}
+                id={deformatCategory(category)}
+                key={deformatCategory(category)}
+                label={category}
+                checked={expertCategories.includes(deformatCategory(category))}
                 onChange={updateExpertCategories}
             />
         );
