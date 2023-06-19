@@ -9,7 +9,8 @@ import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.CategoryService
 import it.polito.wa2.server.categories.ProductCategory
-import it.polito.wa2.server.products.Product
+import it.polito.wa2.server.items.ItemDTO
+import it.polito.wa2.server.items.toDTO
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,11 +34,17 @@ class ProfileServiceImpl(
             ?: throw ProfileNotFoundException("Profile not found")
     }
 
+    override fun getProfileItems(email: String): List<ItemDTO> {
+        val profile = profileRepository.findByEmail(email)
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
+        return profile.items.map { it.toDTO() }
+    }
+
     @Transactional(readOnly = true)
     override fun getExpertByCategory(category: String): List<ProfileDTO> {
         return profileRepository
             .findByRole(ProfileRole.EXPERT)
-            .filter{it.expertCategories.map{it.name}.filter{it.toString().equals(category)}.isNotEmpty()}
+            .filter{ it.expertCategories.any { cat -> cat.name.toString() == category } }
             .map { it.toDTO() }
     }
 

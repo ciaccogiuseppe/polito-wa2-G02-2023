@@ -40,12 +40,13 @@ alter table products
 
 create table if not exists items
 (
-    serial_num bigint       not null,
-    uuid       varchar(255),
-    product_id varchar(255) not null
+    serial_num           bigint       not null,
+    uuid                 uuid,
+    valid_from_timestamp timestamp(6),
+    product_id           varchar(255) not null
         constraint fkmtk37pxnx7d5ck7fkq2xcna4i
             references products,
-    client_id  bigint
+    client_id            bigint
         constraint fk4lcgine4ykbqt0ee7sh7hukob
             references profiles,
     primary key (product_id, serial_num)
