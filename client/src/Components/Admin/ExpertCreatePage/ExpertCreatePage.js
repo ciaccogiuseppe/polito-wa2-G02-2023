@@ -7,6 +7,7 @@ import ErrorMessage from "../../Common/ErrorMessage";
 import { createExpertAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
 import { deformatCategory } from "../../Products/ProductsPage/ProductsPage";
+import "./ExpertCreatePage.css"
 
 const categories = ["Smartphone", "TV", "PC", "Software", "Storage Device", "Other"];
 
@@ -72,7 +73,7 @@ function ExpertCreatePage(props) {
             return
         }
 
-        if (expertCategories.length == 0) {
+        if (expertCategories.length === 0) {
             setErrorMessage("Error in form: No product categories selected")
             return
         }
@@ -96,7 +97,7 @@ function ExpertCreatePage(props) {
     let categoryCheckboxes = [];
     for (let category of categories) {
         categoryCheckboxes.push(
-            <Form.Check style={{ color: "#DDDDDD", accentColor: "white", width: "200px", alignSelf: "center", textAlign: "left", margin: "auto", marginBottom: "10px" }}
+            <Form.Check className={"form-check"} style={{ color: "#DDDDDD", accentColor: "white", width: "200px", alignSelf: "center", textAlign: "left", margin: "auto", marginBottom: "10px" }}
                 type={"checkbox"}
                 id={deformatCategory(category)}
                 key={deformatCategory(category)}
