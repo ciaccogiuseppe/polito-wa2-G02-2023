@@ -6,6 +6,7 @@ import NavigationLink from "../../Common/NavigationLink";
 import { crossIcon, filterIcon, caretDownIcon, caretUpIcon, } from "../../Common/Icons"
 import TicketHistoryTable from "./TicketHistoryTable";
 import { getTicketHistoryAPI } from "../../../API/TicketHistory";
+import InfoMessage from "../../Common/InfoMessage";
 
 
 function TicketHistoryPage(props) {
@@ -104,9 +105,10 @@ function TicketHistoryPage(props) {
 
                     {
                         userEmail === "" && expertEmail === "" && ticketId === "" && initialDate === "" && finalDate === "" ?
-                            <div style={{ fontSize: "12px", color: "#550000", marginTop: "5px" }}>
+                            <InfoMessage text={"At least one filter is required to start a search"}/>
+                            /*<div style={{ fontSize: "12px", color: "#ff9d9d", backgroundColor:"rgba(255,0,0,0.2)", width:"350px", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop: "15px", padding:"10px"}}>
                                 <span>At least one filter is required to start a search.</span>
-                            </div> :
+                            </div>*/ :
                             null
                     }</>}
             </div>
