@@ -97,7 +97,7 @@ function ExpertCreatePage(props) {
     let categoryCheckboxes = [];
     for (let category of categories) {
         categoryCheckboxes.push(
-            <Form.Check className={"form-check"} style={{ color: "#DDDDDD", accentColor: "white", width: "200px", alignSelf: "center", textAlign: "left", margin: "auto", marginBottom: "10px" }}
+            <Form.Check className={"form-check"} style={{cursor:"pointer", color: "#DDDDDD", accentColor: "white", width: "200px", alignSelf: "center", textAlign: "left", margin: "auto", marginBottom: "10px" }}
                 type={"checkbox"}
                 id={deformatCategory(category)}
                 key={deformatCategory(category)}
