@@ -35,9 +35,10 @@ create table if not exists products
             references categories
 );
 
-
-alter table items
+alter table products
     owner to postgres;
+
+
 
 create table if not exists profiles
 (
@@ -55,10 +56,6 @@ create table if not exists profiles
 alter table profiles
     owner to postgres;
 
-
-alter table products
-    owner to postgres;
-
 create table if not exists items
 (
     serial_num           bigint       not null,
@@ -72,6 +69,9 @@ create table if not exists items
             references profiles,
     primary key (product_id, serial_num)
 );
+
+alter table items
+    owner to postgres;
 
 create table if not exists addresses
 (
