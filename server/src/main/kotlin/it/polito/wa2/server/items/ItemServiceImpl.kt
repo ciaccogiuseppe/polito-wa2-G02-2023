@@ -1,10 +1,7 @@
 package it.polito.wa2.server.items
 
 import io.micrometer.observation.annotation.Observed
-import it.polito.wa2.server.BadRequestItemException
-import it.polito.wa2.server.ForbiddenException
-import it.polito.wa2.server.ItemNotFoundException
-import it.polito.wa2.server.UnprocessableItemException
+import it.polito.wa2.server.*
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.products.ProductService
@@ -43,10 +40,11 @@ class ItemServiceImpl(
         if(productId != itemDTO.productId)
             throw BadRequestItemException("ProductId in path doesn't match the productId in the body")
         val product = getProduct(itemDTO.productId)
+        if(itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum) != null)
+            throw DuplicateItemException("Item with productId '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}'already exists")
         val newItem = itemDTO.toNewItem(product)
         val item = itemRepository.save(newItem)
         product.items.add(item)
-        product.serialNumGen = product.serialNumGen + 1
         productRepository.save(product)
         return item.toDTO()
     }
@@ -56,6 +54,8 @@ class ItemServiceImpl(
             throw BadRequestItemException("ProductId in path doesn't match the productId in the body")
         if(serialNum != itemDTO.serialNum)
             throw BadRequestItemException("SerialNum in path doesn't match the serialNum in the body")
+        if(itemDTO.durationMonths == null)
+            throw UnprocessableItemException("Duration cannot be null")
         val product = getProduct(itemDTO.productId)
         val item = itemRepository.findByProductAndSerialNum(product, serialNum)
             ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
@@ -63,6 +63,7 @@ class ItemServiceImpl(
             throw UnprocessableItemException("Item already has an UUID")
         item.uuid = UUID.randomUUID()
         item.validFromTimestamp = Timestamp.valueOf(LocalDateTime.now())
+        item.durationMonths = itemDTO.durationMonths
         return itemRepository.save(item).toDTO()
     }
 
