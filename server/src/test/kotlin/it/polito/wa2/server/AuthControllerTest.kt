@@ -44,12 +44,12 @@ class AuthControllerTest {
             TestUtils.testKeycloakSetup(keycloak)
         }
 
-        /*@JvmStatic
+        @JvmStatic
         @AfterAll
         fun clean(){
             keycloak.stop()
             postgres.close()
-        }*/
+        }
 
         @JvmStatic
         @DynamicPropertySource
