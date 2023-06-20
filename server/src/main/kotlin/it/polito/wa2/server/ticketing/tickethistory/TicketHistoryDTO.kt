@@ -4,6 +4,7 @@ import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketStatus
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -12,9 +13,11 @@ data class TicketHistoryDTO(
     @field:Positive
     val ticketId: Long,
     @field:NotBlank(message="email is mandatory")
-    @field:Positive
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
     val userEmail: String,
-    @field:Positive
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
     val currentExpertEmail: String?,
     val updatedTimestamp: Timestamp?,
     val oldState: TicketStatus,

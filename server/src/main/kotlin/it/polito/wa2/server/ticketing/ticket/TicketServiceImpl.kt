@@ -2,6 +2,9 @@ package it.polito.wa2.server.ticketing.ticket
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.*
+import it.polito.wa2.server.items.Item
+import it.polito.wa2.server.items.ItemRepository
+import it.polito.wa2.server.items.ItemService
 import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
@@ -12,6 +15,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Service @Transactional @Observed
 class TicketServiceImpl(
@@ -20,7 +24,9 @@ class TicketServiceImpl(
     private val productRepository: ProductRepository,
     private val ticketHistoryRepository: TicketHistoryRepository,
     private val productService: ProductService,
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
+    private val itemRepository: ItemRepository,
+    private val itemService: ItemService
 ): TicketService {
     @Transactional(readOnly = true)
     override fun managerGetTicket(ticketId: Long, managerEmail: String): TicketDTO {
@@ -34,7 +40,7 @@ class TicketServiceImpl(
     override fun clientGetTicket(ticketId: Long, clientEmail: String): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
-        if (clientEmail != ticket.customer!!.email)
+        if (clientEmail != ticket.client!!.email)
             throw ForbiddenException("The ticket is associated to a different client")
         return ticket.toDTO()
     }
@@ -50,7 +56,7 @@ class TicketServiceImpl(
 
     @Transactional(readOnly = true)
     override fun clientGetTicketsFiltered(
-        customerEmail: String?,
+        clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,
@@ -60,16 +66,16 @@ class TicketServiceImpl(
         status: List<TicketStatus>?,
         userEmail: String
     ): List<TicketDTO> {
-        val customer: Profile = getProfileByEmail(userEmail)
+        val client: Profile = getProfileByEmail(userEmail)
         val expert = if (expertEmail != null) getProfileByEmail(expertEmail) else null
         val product = if (productId != null) getProduct(productId) else null
-        return if (customerEmail != customer.email) listOf()
-            else filterTickets(customer, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
+        return if (clientEmail != client.email) listOf()
+            else filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
     }
 
     @Transactional(readOnly = true)
     override fun expertGetTicketsFiltered(
-        customerEmail: String?,
+        clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,
@@ -79,17 +85,17 @@ class TicketServiceImpl(
         status: List<TicketStatus>?,
         userEmail: String
     ): List<TicketDTO> {
-        val customer = if (customerEmail != null) getProfileByEmail(customerEmail) else null
+        val client = if (clientEmail != null) getProfileByEmail(clientEmail) else null
         val expert: Profile = getProfileByEmail(userEmail)
         val product: Product? = if (productId != null) getProduct(productId) else null
 
         return if (expertEmail != expert.email) listOf()
-            else filterTickets(customer, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
+            else filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
     }
 
     @Transactional(readOnly = true)
     override fun managerGetTicketsFiltered(
-        customerEmail: String?,
+        clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,
@@ -99,22 +105,27 @@ class TicketServiceImpl(
         status: List<TicketStatus>?,
         userEmail: String
     ): List<TicketDTO> {
-        val customer = if (customerEmail != null) getProfileByEmail(customerEmail) else null
+        val client = if (clientEmail != null) getProfileByEmail(clientEmail) else null
         val expert = if (expertEmail != null) getProfileByEmail(expertEmail) else null
         val product = if (productId != null) getProduct(productId) else null
 
-        return filterTickets(customer, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
+        return filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
     }
 
     override fun addTicket(ticketDTO: TicketDTO, userEmail: String): TicketIdDTO {
-        val product = getProduct(ticketDTO.productId)
-        val customer = getProfileByEmail(userEmail)
-        val ticket =  ticketRepository.save(ticketDTO.toNewTicket(product, customer))
+        val timestamp = Timestamp.valueOf(LocalDateTime.now())
+        val item = getItem(ticketDTO.productId, ticketDTO.serialNum)
+        val client = getProfileByEmail(userEmail)
+        if(item.client != client)
+            throw ForbiddenException("You cannot create a ticket for this item")
+        if(item.validFromTimestamp!!.toLocalDateTime().plusMonths(item.durationMonths!!).isBefore(timestamp.toLocalDateTime()))
+            throw ForbiddenException("Warranty has expired for this item")
+        val ticket =  ticketRepository.save(ticketDTO.toNewTicket(item, client, timestamp))
 
         ticketHistoryRepository.save(
             newTicketHistory(
                 ticket,
-                ticket.customer!!,
+                ticket.client!!,
                 ticket.expert,
                 TicketStatus.OPEN,
                 ticket.status
@@ -164,7 +175,7 @@ class TicketServiceImpl(
         val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
         val user = getProfileByEmail(userEmail)
-        if (user != ticket.customer)
+        if (user != ticket.client)
             throw ForbiddenException("It's not possible to set the status of tickets that are not yours")
 
         updateTicket(ticketUpdateDTO, ticket, user, false)
@@ -181,7 +192,7 @@ class TicketServiceImpl(
     }
 
     private fun filterTickets(
-        customer: Profile?,
+        client: Profile?,
         minPriority: Int?,
         maxPriority: Int?,
         product: Product?,
@@ -193,10 +204,10 @@ class TicketServiceImpl(
         return ticketRepository
             .findAll()
             .filter {
-                (customer == null || it.customer == customer) &&
+                (client == null || it.client == client) &&
                 (minPriority == null || it.priority >= minPriority) &&
                 (maxPriority == null || it.priority <= maxPriority) &&
-                (product == null || it.product == product) &&
+                (product == null || it.item!!.product == product) &&
                 (createdAfter == null || it.createdTimestamp!!.after(createdAfter) || it.createdTimestamp!!.equals(createdAfter)) &&
                 (createdBefore == null || it.createdTimestamp!!.before(createdBefore) || it.createdTimestamp!!.equals(createdBefore)) &&
                 (expert == null || it.expert == expert) &&
@@ -251,6 +262,12 @@ class TicketServiceImpl(
     private fun getProduct(productId: String): Product {
         val productDTO = productService.getProduct(productId)
         return productRepository.findByIdOrNull(productDTO.productId)!!
+    }
+
+    private fun getItem(productId: String, serialNum: Long): Item {
+        val itemDTO = itemService.getItemByProductIdAndSerialNum(productId, serialNum)
+        val product = getProduct(itemDTO.productId)
+        return itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum)!!
     }
 
     private fun isNextStateValid(newStatus: TicketStatus, validValues: HashSet<TicketStatus>) {

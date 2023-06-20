@@ -45,7 +45,7 @@ class TicketController(private val ticketService: TicketService) {
     @GetMapping("/API/manager/ticketing/filter")
     fun managerGetTicketsFiltered(
         principal: Principal,
-        @RequestParam(name="customerEmail", required=false) customerEmail: String?,
+        @RequestParam(name="clientEmail", required=false) clientEmail: String?,
         @RequestParam(name="minPriority", required=false) minPriority: Int?,
         @RequestParam(name="maxPriority", required=false) maxPriority: Int?,
         @RequestParam(name="productId", required=false) productId: String?,
@@ -56,11 +56,11 @@ class TicketController(private val ticketService: TicketService) {
     ): List<TicketDTO> {
         val userEmail = retrieveUserEmail(principal)
         checkFilterParameters(
-            customerEmail, minPriority, maxPriority, productId,
+            clientEmail, minPriority, maxPriority, productId,
             createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertEmail, status
         )
         return ticketService.managerGetTicketsFiltered(
-            customerEmail, minPriority, maxPriority, productId,
+            clientEmail, minPriority, maxPriority, productId,
             createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, expertEmail,
             status, userEmail
         )
@@ -69,7 +69,7 @@ class TicketController(private val ticketService: TicketService) {
     @GetMapping("/API/expert/ticketing/filter")
     fun expertGetTicketsFiltered(
         principal: Principal,
-        @RequestParam(name="customerEmail", required=false) customerEmail: String?,
+        @RequestParam(name="clientEmail", required=false) clientEmail: String?,
         @RequestParam(name="minPriority", required=false) minPriority: Int?,
         @RequestParam(name="maxPriority", required=false) maxPriority: Int?,
         @RequestParam(name="productId", required=false) productId: String?,
@@ -80,11 +80,11 @@ class TicketController(private val ticketService: TicketService) {
     ): List<TicketDTO> {
         val userEmail = retrieveUserEmail(principal)
         checkFilterParameters(
-            customerEmail, minPriority, maxPriority, productId,
+            clientEmail, minPriority, maxPriority, productId,
             createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, userEmail, status
         )
         return ticketService.expertGetTicketsFiltered(
-            customerEmail, minPriority, maxPriority, productId,
+            clientEmail, minPriority, maxPriority, productId,
             createdAfter?.let{Timestamp.valueOf(createdAfter)}, createdBefore?.let{Timestamp.valueOf(createdBefore)}, userEmail,
             status, userEmail
         )
@@ -93,7 +93,7 @@ class TicketController(private val ticketService: TicketService) {
     @GetMapping("/API/client/ticketing/filter")
     fun clientTicketsFiltered(
         principal: Principal,
-        @RequestParam(name="customerEmail", required=false) customerEmail: String?,
+        @RequestParam(name="clientEmail", required=false) clientEmail: String?,
         @RequestParam(name="minPriority", required=false) minPriority: Int?,
         @RequestParam(name="maxPriority", required=false) maxPriority: Int?,
         @RequestParam(name="productId", required=false) productId: String?,
@@ -151,7 +151,7 @@ class TicketController(private val ticketService: TicketService) {
     }
 
     fun checkFilterParameters(
-        customerEmail: String?,
+        clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,
@@ -160,7 +160,7 @@ class TicketController(private val ticketService: TicketService) {
         expertEmail: String?,
         status: List<TicketStatus>?
     ) {
-        if (customerEmail == null &&
+        if (clientEmail == null &&
             minPriority == null && maxPriority == null &&
             productId == null && createdAfter == null && createdBefore == null &&
             expertEmail == null && status == null)

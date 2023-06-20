@@ -5,10 +5,7 @@ import it.polito.wa2.server.BadRequestUserException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableUserException
-import it.polito.wa2.server.categories.ProductCategory
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.validation.BindingResult

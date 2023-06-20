@@ -1,7 +1,7 @@
 package it.polito.wa2.server.ticketing.ticket
 
 import it.polito.wa2.server.EntityBase
-import it.polito.wa2.server.products.Product
+import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
@@ -26,12 +26,15 @@ class Ticket:EntityBase<Long>() {
     var createdTimestamp : Timestamp? = null
 
     @ManyToOne
-    @JoinColumn(name="product_id", nullable = false)
-    var product : Product? = null
+    @JoinColumns(
+        JoinColumn(name = "product_id", nullable = false),
+        JoinColumn(name = "serial_num", nullable = false)
+    )
+    var item : Item? = null
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    var customer : Profile? = null
+    var client : Profile? = null
 
     @ManyToOne
     var expert : Profile? = null

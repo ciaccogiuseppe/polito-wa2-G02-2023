@@ -14,11 +14,11 @@ data class ProductDTO(
     @field:NotBlank
     val brand: String,
     @field:NotBlank
-    val category: String
+    val category: ProductCategory
 )
 
 fun Product.toDTO(): ProductDTO {
-    return ProductDTO(productId, name, brand!!.name, category!!.name.toString())
+    return ProductDTO(productId, name, brand!!.name, category!!.name)
 }
 
 fun ProductDTO.toNewProduct(brand:Brand, category: Category): Product {
@@ -27,7 +27,6 @@ fun ProductDTO.toNewProduct(brand:Brand, category: Category): Product {
     product.category = category
     product.productId = this.productId
     product.name = this.name
-    product.serialNumGen = 1
 
     return product
 }

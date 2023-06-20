@@ -23,14 +23,13 @@ alter table categories
 
 create table if not exists products
 (
-    product_id     varchar(255) not null
+    product_id  varchar(255) not null
         primary key,
-    name           varchar(255) not null,
-    serial_num_gen bigint       not null,
-    brand_id       bigint       not null
+    name        varchar(255) not null,
+    brand_id    bigint       not null
         constraint fka3a4mpsfdf4d2y6r8ra3sc8mv
             references brands,
-    category_id    bigint       not null
+    category_id bigint       not null
         constraint fkog2rp4qthbtt2lfyhfo32lsw9
             references categories
 );
@@ -59,6 +58,7 @@ alter table profiles
 create table if not exists items
 (
     serial_num           bigint       not null,
+    duration_months      bigint,
     uuid                 uuid,
     valid_from_timestamp timestamp(6),
     product_id           varchar(255) not null
@@ -112,15 +112,16 @@ create table if not exists tickets
     priority          integer      not null,
     status            varchar(255) not null,
     title             varchar(255) not null,
-    customer_id       bigint       not null
-        constraint fkwsg96xnnr1cobwin0fj5xtqe
+    client_id         bigint       not null
+        constraint fk87o5gt7m6d4fo8lg32o8raliw
             references profiles,
     expert_id         bigint
         constraint fk8ojtqms4badovjb5mj7w4se56
             references profiles,
-    product_id        varchar(255) not null
-        constraint fkavo2av2fyyehcvlec0vowwu1j
-            references products
+    product_id        varchar(255) not null,
+    serial_num        bigint       not null,
+    constraint fkmywnw3u4uhm5x7mcxsmnr6p37
+        foreign key (product_id, serial_num) references items
 );
 
 alter table tickets
@@ -196,6 +197,7 @@ $$
         insert into profiles(id, email, name, surname, role) values (id, 'manager@polito.it', 'Manager', 'PoliTo', 'MANAGER');
         select nextval('profiles_id_seq') into id;
         insert into profiles(id, email, name, surname, role) values (id, 'vendor@polito.it', 'Vendor', 'PoliTo', 'VENDOR');
+
 
         insert into brands(name) values ('Apple');
         insert into brands(name) values ('Samsung');
@@ -289,13 +291,13 @@ $$
 
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'SMARTPHONE');
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000001', 'iPhone 13 Pro', (select brands.id from brands where name = 'Apple'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000002', 'Galaxy S10', (select brands.id from brands where name = 'Samsung'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000004', 'Galaxy S21 Ultra', (select brands.id from brands where name = 'Samsung'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000005', 'Galaxy Note 20', (select brands.id from brands where name = 'Samsung'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000007', 'LG G8 ThinQ', (select brands.id from brands where name = 'LG'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000008', 'LG V60 ThinQ', (select brands.id from brands where name = 'LG'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000009', 'LG Gram', (select brands.id from brands where name = 'LG'), id, 1);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000001', 'iPhone 13 Pro', (select brands.id from brands where name = 'Apple'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000002', 'Galaxy S10', (select brands.id from brands where name = 'Samsung'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000004', 'Galaxy S21 Ultra', (select brands.id from brands where name = 'Samsung'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000005', 'Galaxy Note 20', (select brands.id from brands where name = 'Samsung'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000007', 'LG G8 ThinQ', (select brands.id from brands where name = 'LG'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000008', 'LG V60 ThinQ', (select brands.id from brands where name = 'LG'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000009', 'LG Gram', (select brands.id from brands where name = 'LG'), id);
 
 
         select nextval('categories_id_seq') into id;
@@ -316,3 +318,4 @@ $$
     END
 $$;
 COMMIT;
+

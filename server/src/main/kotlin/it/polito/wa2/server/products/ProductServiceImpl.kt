@@ -4,7 +4,6 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.*
 import it.polito.wa2.server.brands.BrandRepository
 import it.polito.wa2.server.categories.CategoryRepository
-import it.polito.wa2.server.categories.ProductCategory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,7 +33,7 @@ class ProductServiceImpl(
         if(brand === null)
             throw BrandNotFoundException("Brand with name '${productDTO.brand}' not found")
         try {
-            val category = categoryRepository.findByName(ProductCategory.valueOf(productDTO.category))
+            val category = categoryRepository.findByName(productDTO.category)
             if(category === null)
                 throw CategoryNotFoundException("Category with name '${productDTO.category}' not found")
             val product = productRepository.save(productDTO.toNewProduct(brand, category))

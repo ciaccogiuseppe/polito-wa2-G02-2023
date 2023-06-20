@@ -2,10 +2,7 @@ package it.polito.wa2.server.products
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProductException
-import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.UnprocessableProductException
-import it.polito.wa2.server.UnprocessableProfileException
-import it.polito.wa2.server.ticketing.ticket.TicketDTO
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.validation.BindingResult

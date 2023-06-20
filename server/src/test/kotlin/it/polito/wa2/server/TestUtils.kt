@@ -115,6 +115,11 @@ class TestUtils {
             expert.username = "expert_01"
             expert.isEnabled = true
 
+            val vendor = UserRepresentation()
+            vendor.email = "vendor@polito.it"
+            vendor.username = "vendor_01"
+            vendor.isEnabled = true
+
             val credential = CredentialRepresentation()
             credential.isTemporary = false
             credential.type = CredentialRepresentation.PASSWORD
@@ -123,6 +128,7 @@ class TestUtils {
             keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
             keycloak.keycloakAdminClient.realm(realmName).users().create(client)
             keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
+            keycloak.keycloakAdminClient.realm(realmName).users().create(vendor)
 
 
             val createdManager =
@@ -131,10 +137,13 @@ class TestUtils {
                 keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
             val createdExpert =
                 keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
+            val createdVendor =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(vendor.email)[0]
 
             val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
             val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
             val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
+            val roleVendor = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_vendor")
 
             keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
             keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
@@ -144,6 +153,9 @@ class TestUtils {
 
             keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
             keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdVendor.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdVendor.id).roles().realmLevel().add(listOf(roleVendor.toRepresentation()))
 
         }
 
@@ -190,6 +202,22 @@ class TestUtils {
                 .build()
             kcExpert.tokenManager().grantToken().expiresIn = 50000
             return kcExpert.tokenManager().accessToken.token
+        }
+
+
+        fun testKeycloakGetVendorToken (keycloak: KeycloakContainer) : String {
+            val realmName = "SpringBootKeycloak"
+            val clientId = "springboot-keycloak-client"
+            val kcVendor = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username("vendor@polito.it")
+                .password("password")
+                .build()
+            kcVendor.tokenManager().grantToken().expiresIn = 50000
+            return kcVendor.tokenManager().accessToken.token
         }
 
         fun testKeycloakGetUser (keycloak: KeycloakContainer, email:String) : UserRepresentation? {
