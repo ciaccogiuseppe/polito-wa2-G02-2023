@@ -1,6 +1,7 @@
-package it.polito.wa2.server.profiles
+package it.polito.wa2.server.addresses
 
 import it.polito.wa2.server.EntityBase
+import it.polito.wa2.server.profiles.Profile
 import jakarta.persistence.*
 
 @Entity

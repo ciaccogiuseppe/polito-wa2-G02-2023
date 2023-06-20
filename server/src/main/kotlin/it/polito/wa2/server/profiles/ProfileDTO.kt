@@ -1,5 +1,7 @@
 package it.polito.wa2.server.profiles
 
+import it.polito.wa2.server.addresses.AddressDTO
+import it.polito.wa2.server.addresses.toDTO
 import it.polito.wa2.server.categories.ProductCategory
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
@@ -21,11 +23,13 @@ data class ProfileDTO(
     @field:Positive
     val profileId: Long?,
     val expertCategories: Set<ProductCategory>?,
+    val address: AddressDTO?,
     val role: String?
 )
 
 fun Profile.toDTO(): ProfileDTO {
-    return ProfileDTO(email, name, surname, this.getId(), this.expertCategories.map { it.name }.toSet(), role.toString())
+    return ProfileDTO(email, name, surname, this.getId(), this.expertCategories.map { it.name }.toSet(),
+        this.address?.toDTO(), role.toString())
 }
 
 fun ProfileDTO.toNewProfile(profileRole: ProfileRole): Profile {
@@ -35,5 +39,6 @@ fun ProfileDTO.toNewProfile(profileRole: ProfileRole): Profile {
     profile.surname = surname
     profile.role = profileRole
     profile.expertCategories = mutableSetOf()   // Categories are set in the service, if it's an expert
+    profile.address = null
     return profile
 }

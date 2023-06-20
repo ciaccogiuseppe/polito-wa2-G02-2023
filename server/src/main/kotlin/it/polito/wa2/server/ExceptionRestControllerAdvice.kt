@@ -98,6 +98,16 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(BadRequestItemException::class)
     fun handleBrandBadRequest(e: BadRequestItemException) = ProblemDetail.forStatusAndDetail( HttpStatus.BAD_REQUEST, e.message!! )
+
+    /************** Address exception handlers **************/
+    @ExceptionHandler(AddressNotFoundException::class)
+    fun handleAddressNotFound(e: AddressNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
+
+    @ExceptionHandler(DuplicateAddressException::class)
+    fun handleDuplicateAddress(e: DuplicateAddressException) = ProblemDetail.forStatusAndDetail( HttpStatus.CONFLICT, e.message!! )
+
+    @ExceptionHandler(UnprocessableAddressException::class)
+    fun handleUnprocessableItem(e: UnprocessableAddressException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message)
@@ -129,3 +139,6 @@ class ItemNotFoundException(message: String): RuntimeException(message)
 class UnprocessableItemException(message: String): RuntimeException(message)
 class BadRequestItemException(message: String): RuntimeException(message)
 class DuplicateItemException(message: String): RuntimeException(message)
+class AddressNotFoundException(message: String): RuntimeException(message)
+class DuplicateAddressException(message: String): RuntimeException(message)
+class UnprocessableAddressException(message: String): RuntimeException(message)

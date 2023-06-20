@@ -3,7 +3,9 @@ package it.polito.wa2.server.profiles
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.ForbiddenException
+import it.polito.wa2.server.UnprocessableAddressException
 import it.polito.wa2.server.UnprocessableProfileException
+import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.items.ItemDTO
 import jakarta.validation.Valid
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -76,6 +78,9 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong profile format")
         if (profileDTO == null)
             throw BadRequestProfileException("Profile must not be NULL")
+
+        if (profileDTO.role == ProfileRole.CLIENT.toString() && profileDTO.address?.let { isAddressComplete(it) } == true)
+            throw UnprocessableAddressException("Wrong address format")
     }
 
     fun retrieveUserEmail(principal: Principal): String {
@@ -93,5 +98,10 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong email format")
         if(email != emailLogged)
             throw ForbiddenException("You cannot updated profiles that are not yours")
+    }
+
+    /* returns true if all fields are not empty */
+    private fun isAddressComplete(address: AddressDTO): Boolean {
+        return (address.country != null) && (address.region != null) && (address.city != null) && (address.address != null)
     }
 }

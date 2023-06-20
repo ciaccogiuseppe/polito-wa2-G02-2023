@@ -1,6 +1,7 @@
 package it.polito.wa2.server.profiles
 
 import it.polito.wa2.server.EntityBase
+import it.polito.wa2.server.addresses.Address
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.ticketing.message.Message
@@ -25,8 +26,8 @@ class Profile : EntityBase<Long>() {
     @Column(nullable = true)
     var phoneNumber: String? = null
 
-    @OneToMany(mappedBy = "customer")
-    val ticketsCustomer = mutableSetOf<Ticket>()
+    @OneToMany(mappedBy = "client")
+    val ticketsClient = mutableSetOf<Ticket>()
 
     @OneToMany(mappedBy = "expert")
     val ticketsExpert = mutableSetOf<Ticket>()

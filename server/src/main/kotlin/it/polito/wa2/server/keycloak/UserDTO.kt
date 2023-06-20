@@ -1,13 +1,14 @@
 package it.polito.wa2.server.keycloak
 
 import it.polito.wa2.server.categories.ProductCategory
+import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.profiles.ProfileDTO
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 
 data class UserDTO (
     @field:NotBlank(message="username is mandatory")
-    val userName: String,
+    val username: String,
     @field:NotBlank(message="email is mandatory")
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
@@ -23,6 +24,7 @@ data class UserDTO (
         message="surname must be valid")
     val lastName: String,
     val expertCategories: Set<ProductCategory>?,
+    val address: AddressDTO?,
     val role: String?
 )
 
@@ -40,15 +42,16 @@ data class UserUpdateDTO (
         message="surname must be valid")
     val lastName: String,
     val expertCategories: Set<ProductCategory>?,
+    val address: AddressDTO?,
     val role: String?
 )
 
 
 
 fun UserDTO.toProfileDTO(): ProfileDTO {
-    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories, this.role)
+    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories, this.address, this.role)
 }
 
-fun UserUpdateDTO.toProfileDTO():ProfileDTO{
-    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories, this.role)
+fun UserUpdateDTO.toProfileDTO(): ProfileDTO{
+    return ProfileDTO (this.email, this.firstName, this.lastName, null, expertCategories, this.address, this.role)
 }

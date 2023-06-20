@@ -5,6 +5,7 @@ import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.DuplicateProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import it.polito.wa2.server.UnprocessableProfileException
+import it.polito.wa2.server.addresses.*
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.CategoryService
@@ -18,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service @Transactional @Observed
 class ProfileServiceImpl(
     private val categoryRepository: CategoryRepository,
+    private val addressRepository: AddressRepository,
     private val profileRepository: ProfileRepository,
-    private val categoryService: CategoryService
+    private val categoryService: CategoryService,
+    private val addressService: AddressService
 ): ProfileService {
 
     @Transactional(readOnly = true)
@@ -51,16 +54,25 @@ class ProfileServiceImpl(
     override fun addProfile(profileDTO: ProfileDTO) {
         if (profileRepository.findByEmail(profileDTO.email) != null)
             throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
+
         profileRepository.save(profileDTO.toNewProfile(ProfileRole.CLIENT))
+        addressService.addAddress(profileDTO.email, profileDTO.address!!)
    }
 
     override fun addProfileWithRole(profileDTO: ProfileDTO, profileRole: ProfileRole) {
         if (profileRepository.findByEmail(profileDTO.email) != null)
             throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
         val profile = profileDTO.toNewProfile(profileRole)
+
         if (profileRole == ProfileRole.EXPERT)
             profile.expertCategories = profileDTO.expertCategories!!.map { getCategoryByName(it) }.toMutableSet()
+
         profileRepository.save(profile)
+        if (profileRole == ProfileRole.CLIENT) {
+            addressService.addAddress(profile.email, profileDTO.address!!)
+            profile.address = addressRepository.findByClient(profile)!!
+            profileRepository.save(profile)
+        }
     }
 
     override fun updateProfile(email: String, newProfileDTO: ProfileDTO) {
@@ -74,8 +86,17 @@ class ProfileServiceImpl(
         profile.email = newProfileDTO.email
         profile.name = newProfileDTO.name
         profile.surname = newProfileDTO.surname
-        if (profile.role == ProfileRole.EXPERT)
-            profile.expertCategories = newProfileDTO.expertCategories!!.map { getCategoryByName(it) }.toMutableSet()
+        when (profile.role) {
+            ProfileRole.EXPERT -> profile.expertCategories = newProfileDTO.expertCategories!!.map { getCategoryByName(it) }.toMutableSet()
+            ProfileRole.CLIENT -> {
+                val clientPreviousAddressDTO = addressService.getAddressOfClient(profile.email)
+                if (clientPreviousAddressDTO == null)
+                    addressService.addAddress(profile.email, newProfileDTO.address!!)
+                else
+                    addressService.updateAddressOfClient(profile.email, newProfileDTO.address!!)
+            }
+            else -> {}
+        }
         profileRepository.save(profile)
     }
 
