@@ -27,21 +27,19 @@ class ItemController(private val itemService: ItemService) {
         return itemService.getItemByProductIdAndSerialNum(productId, serialNum)
     }
 
-    @PostMapping("/API/public/products/{productId}/items/")
+    /*@PostMapping("/API/public/products/{productId}/items/")
     @ResponseStatus(HttpStatus.CREATED)
     fun addItem(@PathVariable("productId") productId: String, @RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
         checkProductId(productId)
         checkInputItem(itemDTO, br)
         return itemService.addItem(productId, itemDTO!!)
-    }
+    }*/
 
-    @PutMapping("/API/vendor/products/{productId}/items/{serialNum}/uuid")
-    fun generateUUID(@PathVariable("productId") productId: String, @PathVariable("serialNum") serialNum: Long,
-                     @RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
-        checkProductId(productId)
-        checkSerialNum(serialNum)
+    @PostMapping("/API/vendor/products/items/")
+    fun generateUUID(@RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
         checkInputItem(itemDTO, br)
-        return itemService.createUUID(productId, serialNum, itemDTO!!)
+        checkProductId(itemDTO!!.productId)
+        return itemService.createUUID(itemDTO)
     }
 
     @PutMapping("/API/client/products/{productId}/items/{serialNum}/client")

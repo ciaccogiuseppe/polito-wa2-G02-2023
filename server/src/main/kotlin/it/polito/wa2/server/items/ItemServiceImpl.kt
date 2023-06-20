@@ -49,16 +49,13 @@ class ItemServiceImpl(
         return item.toDTO()
     }
 
-    override fun createUUID(productId: String, serialNum: Long, itemDTO: ItemDTO): ItemDTO {
-        if(productId != itemDTO.productId)
-            throw BadRequestItemException("ProductId in path doesn't match the productId in the body")
-        if(serialNum != itemDTO.serialNum)
-            throw BadRequestItemException("SerialNum in path doesn't match the serialNum in the body")
+
+    override fun createUUID(itemDTO: ItemDTO): ItemDTO {
         if(itemDTO.durationMonths == null)
             throw UnprocessableItemException("Duration cannot be null")
         val product = getProduct(itemDTO.productId)
-        val item = itemRepository.findByProductAndSerialNum(product, serialNum)
-            ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
+        val item = itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum)
+            ?:  itemRepository.save(itemDTO.toNewItem(getProduct(itemDTO.productId)))
         if(item.uuid != null)
             throw UnprocessableItemException("Item already has an UUID")
         item.uuid = UUID.randomUUID()

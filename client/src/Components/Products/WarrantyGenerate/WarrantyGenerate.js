@@ -6,6 +6,7 @@ import {addProductAPI, getAllBrands, getAllCategories, getAllProducts} from "../
 import ErrorMessage from "../../Common/ErrorMessage";
 import {deformatCategory, reformatCategory} from "../ProductsPage/ProductsPage";
 import {useNavigate} from "react-router-dom";
+import {addItemAPI, getItemAPI} from "../../../API/Item";
 
 
 
@@ -23,8 +24,12 @@ function WarrantyGenerate(props) {
     const [useProductId, setUseProductId] = useState(false)
     const [product, setProduct] = useState("")
     const [products, setProducts] = useState([])
+    const [selectedProduct, setSelectedProduct] = useState("")
     const [productsList, setProductsList] = useState([])
-    const [name, setName] = useState("")
+    const [serialNumber, setSerialNumber] = useState("")
+    const [warrantyCode, setWarrantyCode] = useState("")
+    const [expiration, setExpiration] = useState("")
+    const [generated, setGenerated] = useState("")
     const [pid1, setPid1] = useState("")
     const [pid2, setPid2] = useState("")
     const [pid3, setPid3] = useState("")
@@ -60,13 +65,36 @@ function WarrantyGenerate(props) {
     }, [brand])
 
     const navigate = useNavigate()
-    function addProduct(){
-        addProductAPI({
-            productId:productId,
-            brand:brand,
-            category: deformatCategory(category),
-            name:name
-        }).then(() => navigate("/products")).catch(err => setErrorMessage(err))
+    function addItem(){
+        getItemAPI({productId:useProductId?productId:product,
+            serialNum:serialNumber})
+            .then((response) => {
+            setSelectedProduct(
+                products.filter(p => p.id === response.data.productId).map(p=>p.brand + " - " + p.name)[0])
+            setWarrantyCode(response.data.uuid)
+            let date = new Date(response.data.validFromTimestamp)
+            date.setMonth(date.getMonth()+12)
+            setExpiration(
+                date.toLocaleDateString())
+            setGenerated(new Date(response.data.validFromTimestamp).toLocaleDateString())
+        })
+            .catch(() => {
+                addItemAPI({
+                    productId:useProductId?productId:product,
+                    serialNum:serialNumber,
+                    durationMonths:12
+                }).then((response) => {
+                    setSelectedProduct(
+                        products.filter(p => p.id === useProductId?productId:product).map(p=>p.brand + " - " + p.name)[0])
+                    setWarrantyCode(response.data.uuid)
+                    let date = new Date(response.data.validFromTimestamp)
+                    date.setMonth(date.getMonth()+12)
+                    setExpiration(
+                        date.toLocaleDateString())
+                    setGenerated(new Date(response.data.validFromTimestamp).toLocaleDateString())
+                }).catch(err => setErrorMessage(err))
+            })
+
     }
 
 
@@ -79,9 +107,9 @@ function WarrantyGenerate(props) {
     return <>
 
         <div className="CenteredButton" style={{marginTop:"25px"}}>
-            <h2 style={{color:"#EEEEEE", marginTop:"50px"}}>GENERATE CODE</h2>
+            <h2 className={"no-printme"} style={{color:"#EEEEEE", marginTop:"50px"}}>GENERATE CODE</h2>
             <hr style={{color:"white", width:"15%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
-            <Form className="form" style={{marginTop:"30px"}}>
+            {!warrantyCode && <Form className="form" style={{marginTop:"30px"}}>
                 <Form.Group className="mb-3">
 
                     <Form.Select onChange={(e)=>{setUseProductId(e.target.value !== "true")}} className={"form-select:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px", fontSize:"12px"}}>
@@ -126,13 +154,36 @@ function WarrantyGenerate(props) {
 
 
                     <Form.Label style={{color:"#DDDDDD", fontSize:12, marginTop:"10px"}}>Serial Number</Form.Label>
-                    <Form.Control value={name} onChange={(e) => setName(e.target.value)}  className={"form-control:focus"} placeholder={"Serial Number"} style={{width: "300px", alignSelf:"center", margin:"auto", marginBottom:"20px", fontSize:12}}/>
+                    <Form.Control value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)}  className={"form-control:focus"} placeholder={"Serial Number"} style={{width: "300px", alignSelf:"center", margin:"auto", marginBottom:"20px", fontSize:12}}/>
                 </Form.Group>
                 {errorMessage && <><div style={{margin:"10px"}}>
                     <ErrorMessage text={errorMessage} close={()=>{setErrorMessage("")}}/> </div></>}
 
-                <NavigationButton text={"Generate"} onClick={e => {e.preventDefault(); addProduct()}}/>
-            </Form>
+                <NavigationButton text={"Generate"} onClick={e => {e.preventDefault(); addItem()}}/>
+
+            </Form>}
+            {warrantyCode && <div>
+            <h5 className={"printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px"}}>{selectedProduct}</h5>
+            <h5 className={"printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"15px", marginBottom:"15px"}}>SN: <span style={{backgroundColor:"rgba(0,0,0,0.3)", padding:"5px", borderRadius:"25px"}}>{serialNumber}</span></h5>
+            <h5 className={"printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px", backgroundColor:"rgba(0,0,0,0.3)", borderRadius:"25px", margin:"auto", width:"340px", padding:"10px"}}>{warrantyCode}</h5>
+                <h5 className={"printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px"}}>Generated: {generated}</h5>
+                <h5 className={"printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px"}}>Expiration: {expiration}</h5>
+            <h5 className={"no-printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px"}}>{selectedProduct}</h5>
+            <h5 className={"no-printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"15px", marginBottom:"15px"}}>SN: <span style={{backgroundColor:"rgba(0,0,0,0.3)", padding:"5px", borderRadius:"25px"}}>{serialNumber}</span></h5>
+            <h5 className={"no-printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px", backgroundColor:"rgba(0,0,0,0.3)", borderRadius:"25px", margin:"auto", width:"340px", padding:"10px"}}>{warrantyCode}</h5>
+                <h5 className={"no-printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px"}}>Generated: {generated}</h5>
+                <h5 className={"no-printme"} style={{color:"#DDDDDD", fontSize:15, marginTop:"10px"}}>Expiration: {expiration}</h5>
+
+                <div className={"no-printme"}><NavigationButton text={"Print warranty"}  onClick={e => {e.preventDefault(); window.print()}}/>
+
+
+                <hr style={{color:"white", width:"15%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"12px", marginTop:"12px"}}/>
+
+
+                <NavigationButton text={"Generate new code"} onClick={e => {e.preventDefault(); window.location.href="/"}}/>
+            </div>
+
+            </div>}
 
         </div>
     </>
