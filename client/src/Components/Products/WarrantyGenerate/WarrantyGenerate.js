@@ -70,7 +70,7 @@ function WarrantyGenerate(props) {
             serialNum:serialNumber})
             .then((response) => {
             setSelectedProduct(
-                products.filter(p => p.id === response.data.productId).map(p=>p.brand + " - " + p.name)[0])
+                products.filter(p => p.productId === response.data.productId).map(p=>p.brand + " - " + p.name)[0])
             setWarrantyCode(response.data.uuid)
             let date = new Date(response.data.validFromTimestamp)
             date.setMonth(date.getMonth()+12)
@@ -85,7 +85,7 @@ function WarrantyGenerate(props) {
                     durationMonths:12
                 }).then((response) => {
                     setSelectedProduct(
-                        products.filter(p => p.id === useProductId?productId:product).map(p=>p.brand + " - " + p.name)[0])
+                        products.filter(p => p.productId === response.data.productId).map(p=>p.brand + " - " + p.name)[0])
                     setWarrantyCode(response.data.uuid)
                     let date = new Date(response.data.validFromTimestamp)
                     date.setMonth(date.getMonth()+12)
