@@ -2,6 +2,9 @@ package it.polito.wa2.server.ticketing.ticket
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.*
+import it.polito.wa2.server.items.Item
+import it.polito.wa2.server.items.ItemRepository
+import it.polito.wa2.server.items.ItemService
 import it.polito.wa2.server.products.*
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
@@ -20,7 +23,9 @@ class TicketServiceImpl(
     private val productRepository: ProductRepository,
     private val ticketHistoryRepository: TicketHistoryRepository,
     private val productService: ProductService,
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
+    private val itemRepository: ItemRepository,
+    private val itemService: ItemService
 ): TicketService {
     @Transactional(readOnly = true)
     override fun managerGetTicket(ticketId: Long, managerEmail: String): TicketDTO {
@@ -107,9 +112,9 @@ class TicketServiceImpl(
     }
 
     override fun addTicket(ticketDTO: TicketDTO, userEmail: String): TicketIdDTO {
-        val product = getProduct(ticketDTO.productId)
+        val item = getItem(ticketDTO.productId, ticketDTO.serialNum)
         val customer = getProfileByEmail(userEmail)
-        val ticket =  ticketRepository.save(ticketDTO.toNewTicket(product, customer))
+        val ticket =  ticketRepository.save(ticketDTO.toNewTicket(item, customer))
 
         ticketHistoryRepository.save(
             newTicketHistory(
@@ -196,7 +201,7 @@ class TicketServiceImpl(
                 (customer == null || it.customer == customer) &&
                 (minPriority == null || it.priority >= minPriority) &&
                 (maxPriority == null || it.priority <= maxPriority) &&
-                (product == null || it.product == product) &&
+                (product == null || it.item!!.product == product) &&
                 (createdAfter == null || it.createdTimestamp!!.after(createdAfter) || it.createdTimestamp!!.equals(createdAfter)) &&
                 (createdBefore == null || it.createdTimestamp!!.before(createdBefore) || it.createdTimestamp!!.equals(createdBefore)) &&
                 (expert == null || it.expert == expert) &&
@@ -251,6 +256,12 @@ class TicketServiceImpl(
     private fun getProduct(productId: String): Product {
         val productDTO = productService.getProduct(productId)
         return productRepository.findByIdOrNull(productDTO.productId)!!
+    }
+
+    private fun getItem(productId: String, serialNum: Long): Item {
+        val itemDTO = itemService.getItemByProductIdAndSerialNum(productId, serialNum)
+        val product = getProduct(itemDTO.productId)
+        return itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum)!!
     }
 
     private fun isNextStateValid(newStatus: TicketStatus, validValues: HashSet<TicketStatus>) {

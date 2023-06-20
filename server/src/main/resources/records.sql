@@ -110,13 +110,13 @@ $$
 
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'SMARTPHONE');
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000001', 'iPhone 13 Pro', (select brands.id from brands where name = 'Apple'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000002', 'Galaxy S10', (select brands.id from brands where name = 'Samsung'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000004', 'Galaxy S21 Ultra', (select brands.id from brands where name = 'Samsung'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000005', 'Galaxy Note 20', (select brands.id from brands where name = 'Samsung'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000007', 'LG G8 ThinQ', (select brands.id from brands where name = 'LG'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000008', 'LG V60 ThinQ', (select brands.id from brands where name = 'LG'), id, 1);
-        insert into products(product_id, name, brand_id, category_id, serial_num_gen) values ('0000000000009', 'LG Gram', (select brands.id from brands where name = 'LG'), id, 1);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000001', 'iPhone 13 Pro', (select brands.id from brands where name = 'Apple'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000002', 'Galaxy S10', (select brands.id from brands where name = 'Samsung'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000004', 'Galaxy S21 Ultra', (select brands.id from brands where name = 'Samsung'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000005', 'Galaxy Note 20', (select brands.id from brands where name = 'Samsung'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000007', 'LG G8 ThinQ', (select brands.id from brands where name = 'LG'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000008', 'LG V60 ThinQ', (select brands.id from brands where name = 'LG'), id);
+        insert into products(product_id, name, brand_id, category_id) values ('0000000000009', 'LG Gram', (select brands.id from brands where name = 'LG'), id);
 
 
         select nextval('categories_id_seq') into id;

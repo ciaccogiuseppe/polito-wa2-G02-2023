@@ -2,6 +2,7 @@ package it.polito.wa2.server.items
 
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.profiles.Profile
+import it.polito.wa2.server.ticketing.ticket.Ticket
 import jakarta.persistence.*
 import java.sql.Timestamp
 import java.util.UUID
@@ -23,8 +24,8 @@ class Item {
         table="products",
         pkColumnName = "product_id",
         valueColumnName = "serial_num_gen")
-    @Column(name = "serial_num")
      */
+    @Column(name = "serial_num")
     var serialNum: Long? = null
 
     var uuid: UUID? = null
@@ -32,7 +33,12 @@ class Item {
     @Temporal(TemporalType.TIMESTAMP)
     var validFromTimestamp : Timestamp? = null
 
+    var durationMonths: Int? = null
+
     @ManyToOne
     @JoinColumn(nullable = true)
     var client: Profile? = null
+
+    @OneToMany(mappedBy = "item")
+    var tickets = mutableSetOf<Ticket>()
 }

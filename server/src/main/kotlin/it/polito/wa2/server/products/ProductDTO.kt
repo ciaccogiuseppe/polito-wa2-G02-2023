@@ -2,7 +2,6 @@ package it.polito.wa2.server.products
 
 import it.polito.wa2.server.brands.Brand
 import it.polito.wa2.server.categories.Category
-import it.polito.wa2.server.categories.ProductCategory
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
@@ -27,7 +26,6 @@ fun ProductDTO.toNewProduct(brand:Brand, category: Category): Product {
     product.category = category
     product.productId = this.productId
     product.name = this.name
-    product.serialNumGen = 1
 
     return product
 }

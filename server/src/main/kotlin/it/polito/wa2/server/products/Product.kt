@@ -3,7 +3,6 @@ package it.polito.wa2.server.products
 import it.polito.wa2.server.brands.Brand
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.items.Item
-import it.polito.wa2.server.ticketing.ticket.Ticket
 import jakarta.persistence.*
 
 @Entity
@@ -19,9 +18,6 @@ class Product {
     @JoinColumn(nullable = false)
     var brand: Brand? = null
 
-    @OneToMany(mappedBy = "product")
-    var tickets = mutableSetOf<Ticket>()
-
     @ManyToOne
     @JoinColumn(nullable = false)
     var category: Category? = null
@@ -29,6 +25,4 @@ class Product {
     @OneToMany(mappedBy = "product")
     val items = mutableSetOf<Item>()
 
-    @Column(nullable = false)
-    var serialNumGen: Long = 1
 }

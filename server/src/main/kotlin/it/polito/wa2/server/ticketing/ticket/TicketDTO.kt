@@ -1,6 +1,6 @@
 package it.polito.wa2.server.ticketing.ticket
 
-import it.polito.wa2.server.products.Product
+import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.profiles.Profile
 import jakarta.validation.constraints.*
 import java.sql.Timestamp
@@ -17,6 +17,8 @@ data class TicketDTO(
     val priority: Int?,
     @field:Size(min = 13, max = 13)
     val productId: String,
+    @field:Positive
+    val serialNum: Long,
     //@field:Positive
     val customerEmail: String?,
     //@field:Positive
@@ -46,7 +48,8 @@ fun Ticket.toDTO(): TicketDTO {
         title,
         description,
         priority,
-        product?.productId!!,
+        item?.product?.productId!!,
+        item?.serialNum!!,
         customer?.email,
         expert?.email,
         status,
@@ -55,14 +58,14 @@ fun Ticket.toDTO(): TicketDTO {
 }
 
 fun TicketDTO.toNewTicket(
-    product: Product,
+    item: Item,
     customer: Profile
 ): Ticket {
     val ticket = Ticket()
     ticket.title = title
     ticket.description = description
     ticket.priority = 0
-    ticket.product = product
+    ticket.item = item
     ticket.customer = customer
     ticket.expert = null
     ticket.status = TicketStatus.OPEN
