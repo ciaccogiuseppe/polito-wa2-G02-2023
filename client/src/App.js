@@ -26,6 +26,7 @@ import BrandsPage from "./Components/Brands/BrandsPage/BrandsPage";
 import BrandCreatePage from "./Components/Brands/BrandCreatePage/BrandCreatePage";
 import VendorCreatePage from "./Components/Admin/VendorCreatePage/VendorCreatePage";
 import ProfileInfoPageExpert from "./Components/Users/ProfileInfoPageByExpert/ProfileInfoPageExpert";
+import UsersCreatePage from './Components/Admin/UsersCreatePage/UsersCreatePage';
 
 export const api = axios.create({
   baseURL: APIURL,
@@ -180,6 +181,7 @@ function App() {
               {user.role === "CLIENT" && <Route path='/newticket' element= {<TicketCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>}
               {(user.role === "EXPERT" || user.role === "MANAGER") && <Route path='/profiledata/:email' element= {<ProfileInfoPageExpert user={user} loggedIn={loggedIn} logout={logout}/>}/>}
               {user.role === "MANAGER" && <>
+                  <Route path='/userscreate' element= {<UsersCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
                   <Route path='/expertcreate' element= {<ExpertCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
                   <Route path='/vendorcreate' element= {<VendorCreatePage user={user} loggedIn={loggedIn} logout={logout}/>}/>
                   <Route path='/tickethistory' element= {<TicketHistoryPage user={user} loggedIn={loggedIn} logout={logout}/>}/>

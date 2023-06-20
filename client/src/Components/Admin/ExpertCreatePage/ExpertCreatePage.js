@@ -110,9 +110,9 @@ function ExpertCreatePage(props) {
 
     const loggedIn = props.loggedIn
     return <>
-        <AppNavbar user={props.user} loggedIn={loggedIn} logout={props.logout} selected={"expertcreate"}/>
+        <AppNavbar user={props.user} loggedIn={loggedIn} logout={props.logout} selected="userscreate"/>
         <div className="CenteredButton" style={{ marginTop: "50px" }}>
-            <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>CREATE NEW EXPERT</h1>
+            <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>CREATE EXPERT</h1>
             <hr style={{ color: "white", width: "25%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "2px", marginTop: "2px" }} />
 
             <Row className="d-flex justify-content-center" style={{ marginBottom: "30px" }}>
