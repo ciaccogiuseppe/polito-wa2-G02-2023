@@ -310,7 +310,7 @@ To package the React application:
     "description": <description>,
     "priority": <priority>,   
     "productId": <productId>, 
-    "customerEmail": <customerEmail>,  
+    "clientEmail": <clientEmail>,  
     "expertEmail": <expertEmail>, 
     "status": <status>, 
     "createdTimestamp": <createdTimestamp> 
@@ -323,7 +323,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `customerEmail`    | customer who created the ticket |
+| `clientEmail`    | customer who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -349,7 +349,7 @@ To package the React application:
     "description": <description>,
     "priority": <priority>,   
     "productId": <productId>, 
-    "customerEmail": <customerEmail>,  
+    "clientEmail": <clientEmail>,  
     "expertEmail": <expertEmail>, 
     "status": <status>, 
     "createdTimestamp": <createdTimestamp> 
@@ -362,7 +362,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `customerEmail`    | customer who created the ticket |
+| `clientEmail`    | customer who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -388,7 +388,7 @@ To package the React application:
     "description": <description>,
     "priority": <priority>,   
     "productId": <productId>, 
-    "customerEmail": <customerEmail>,  
+    "clientEmail": <clientEmail>,  
     "expertEmail": <expertEmail>, 
     "status": <status>, 
     "createdTimestamp": <createdTimestamp> 
@@ -401,7 +401,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `customerEmail`    | customer who created the ticket |
+| `clientEmail`    | customer who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -461,7 +461,7 @@ To package the React application:
     - `minPriority` specifies the minimum priority
     - `maxPriority` specifies the maximum priority
     - `productId` to retrieve the  records associated to the corresponding product
-    - `customerEmail` to retrieve the  records associated to the corresponding customer
+    - `clientEmail` to retrieve the  records associated to the corresponding customer
     - `updatedAfter` to retrieve the records created after the given date
     - `updatedBefore` to retrieve the records created before the given date
     - `expertEmail` to retrieve the records associated to the given expertId
@@ -491,7 +491,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `customerEmail`    | customer who created the ticket |
+| `clientEmail`    | customer who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -504,7 +504,7 @@ To package the React application:
     - `minPriority` specifies the minimum priority
     - `maxPriority` specifies the maximum priority
     - `productId` to retrieve the  records associated to the corresponding product
-    - `customerEmail` to retrieve the  records associated to the corresponding customer
+    - `clientEmail` to retrieve the  records associated to the corresponding customer
     - `updatedAfter` to retrieve the records created after the given date
     - `updatedBefore` to retrieve the records created before the given date
     - `expertEmail` to retrieve the records associated to the given expertId
@@ -534,7 +534,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `customerEmail`    | customer who created the ticket |
+| `clientEmail`    | customer who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -547,7 +547,7 @@ To package the React application:
     - `minPriority` specifies the minimum priority
     - `maxPriority` specifies the maximum priority
     - `productId` to retrieve the  records associated to the corresponding product
-    - `customerEmail` to retrieve the  records associated to the corresponding customer
+    - `clientEmail` to retrieve the  records associated to the corresponding customer
     - `updatedAfter` to retrieve the records created after the given date
     - `updatedBefore` to retrieve the records created before the given date
     - `expertEmail` to retrieve the records associated to the given expertId
@@ -577,7 +577,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `customerEmail`    | customer who created the ticket |
+| `clientEmail`    | customer who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |

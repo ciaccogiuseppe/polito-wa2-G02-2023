@@ -1,6 +1,7 @@
 package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
+import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.keycloak.UserDTO
 import it.polito.wa2.server.profiles.*
 import org.junit.jupiter.api.AfterAll
@@ -84,6 +85,13 @@ class KeycloakControllerTests {
     fun postClient() {
         val uri = URI("http://localhost:$port/API/signup")
 
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
+
         val user = UserDTO(
             "MarioR_99",
             "mario.rossi@polito.it",
@@ -91,6 +99,7 @@ class KeycloakControllerTests {
             "Mario",
             "Rossi",
             setOf(),
+            address,
             "CLIENT"
         )
 
@@ -143,6 +152,13 @@ class KeycloakControllerTests {
         val profile = TestUtils.testProfile("mario.rossi@polito.it", "Profile", "Polito", ProfileRole.CLIENT)
         profileRepository.save(profile)
 
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
+
         val user = UserDTO(
             "MarioR_99",
             "mario.rossi@polito.it",
@@ -150,6 +166,7 @@ class KeycloakControllerTests {
             "Mario",
             "Rossi",
             setOf(),
+            address,
             "CLIENT"
         )
 
@@ -176,6 +193,7 @@ class KeycloakControllerTests {
             "Luigi",
             "Verdi",
             setOf(),
+            null,
             "EXPERT"
         )
 
@@ -229,6 +247,7 @@ class KeycloakControllerTests {
             "Luigi",
             "Verdi",
             setOf(),
+            null,
             "EXPERT"
         )
 

@@ -6,6 +6,7 @@ import it.polito.wa2.server.brands.BrandRepository
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.ProductCategory
+import it.polito.wa2.server.items.ItemRepository
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
@@ -31,6 +32,8 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.net.URI
 import java.sql.Timestamp
+import java.util.*
+import kotlin.collections.LinkedHashMap
 
 @Testcontainers
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -95,6 +98,8 @@ class TicketHistoryControllerTests {
     lateinit var brandRepository: BrandRepository
     @Autowired
     lateinit var categoryRepository: CategoryRepository
+    @Autowired
+    lateinit var itemRepository: ItemRepository
 
     // --------------------------- no filters
 
@@ -181,8 +186,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
@@ -207,6 +214,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history1ticket1)
         ticketRepository.delete(ticket1)
         ticketRepository.delete(ticket2)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
@@ -236,8 +244,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
@@ -287,6 +297,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history3ticket2)
         ticketRepository.delete(ticket1)
         ticketRepository.delete(ticket2)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
@@ -316,7 +327,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
 
         val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
@@ -338,6 +351,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         ticketHistoryRepository.delete(history1ticket1)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
@@ -411,7 +425,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
@@ -456,6 +472,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history2customer2)
         ticketHistoryRepository.delete(history3customer2)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
@@ -486,7 +503,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
@@ -508,6 +528,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         ticketHistoryRepository.delete(history1customer1)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(expert)
         productRepository.delete(product)
@@ -581,7 +602,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1expert2 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
@@ -626,6 +649,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history2expert3)
         ticketHistoryRepository.delete(history3expert3)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         profileRepository.delete(expert3)
@@ -656,7 +680,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
@@ -678,6 +704,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         ticketHistoryRepository.delete(history1customer1)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(expert)
         productRepository.delete(product)
@@ -749,7 +776,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
@@ -794,6 +823,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history2timestamp20)
         ticketHistoryRepository.delete(history3timestamp30)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
@@ -824,7 +854,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
@@ -861,6 +893,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history2timestamp20)
         ticketHistoryRepository.delete(history3timestamp30)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
@@ -891,7 +924,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
@@ -928,6 +964,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history2timestamp20)
         ticketHistoryRepository.delete(history3timestamp30)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
@@ -958,7 +995,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket)
 
         val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
@@ -988,6 +1028,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history2timestamp20)
         ticketHistoryRepository.delete(history3timestamp30)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer1)
         profileRepository.delete(expert2)
         productRepository.delete(product)
@@ -1064,8 +1105,13 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert4, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
+        val ticket2 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert4, 2, "Ticket sample", "Ticket description sample")
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
@@ -1119,6 +1165,8 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.delete(history5ticket1user1expert3timestamp43)
         ticketRepository.delete(ticket1)
         ticketRepository.delete(ticket2)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
         profileRepository.delete(customer1)
         profileRepository.delete(customer2)
         profileRepository.delete(expert3)

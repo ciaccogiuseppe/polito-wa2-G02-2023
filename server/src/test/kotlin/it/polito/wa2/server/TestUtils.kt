@@ -3,6 +3,7 @@ package it.polito.wa2.server
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.brands.Brand
 import it.polito.wa2.server.categories.Category
+import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRole
@@ -18,6 +19,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import java.sql.Timestamp
+import java.util.UUID
 
 class TestUtils {
     companion object {
@@ -42,11 +44,21 @@ class TestUtils {
 
             return product
         }
+        fun testItem(product:Product, client:Profile, uuid:UUID, serialNum:Long, durationMonths:Long, validFromTimestamp:Timestamp) : Item {
+            val item = Item()
+            item.product = product
+            item.client = client
+            item.uuid = uuid
+            item.serialNum = serialNum
+            item.durationMonths = durationMonths
+            item.validFromTimestamp = validFromTimestamp
+            return item
+        }
 
-        fun testTicket(createdTimestamp:Timestamp, product:Product, customer:Profile, status:TicketStatus, expert:Profile, priority:Int, title:String, description:String) : Ticket{
+        fun testTicket(createdTimestamp:Timestamp, item:Item, customer:Profile, status:TicketStatus, expert:Profile, priority:Int, title:String, description:String) : Ticket{
             val ticket = Ticket()
-            ticket.product = product
-            ticket.customer = customer
+            ticket.item = item
+            ticket.client = customer
             ticket.status = status
             ticket.expert = expert
             ticket.priority = priority

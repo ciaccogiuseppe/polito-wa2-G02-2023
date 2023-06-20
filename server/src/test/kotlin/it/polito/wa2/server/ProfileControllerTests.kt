@@ -1,6 +1,7 @@
 package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
+import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.profiles.*
 import jakarta.validation.constraints.NotBlank
 import org.junit.Ignore
@@ -260,12 +261,19 @@ class ProfileControllerTests {
     fun postProfileSuccess() {
         val uri = URI("http://localhost:$port/API/public/profiles")
 
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
             "rossi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
 
@@ -289,12 +297,19 @@ class ProfileControllerTests {
     fun postProfileRepeatedMail() {
         val uri = URI("http://localhost:$port/API/public/profiles")
 
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
         val profile = ProfileDTO(
             "mario.rossi@polito.it",
             "mario",
             "rossi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
 
@@ -318,12 +333,20 @@ class ProfileControllerTests {
     fun postProfileWrongFormat() {
         val uri = URI("http://localhost:$port/API/public/profiles")
 
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
+
         val profile1 = ProfileDTO(
             "mario.rossipolito.it",
             "mario",
             "rossi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
         val profile2 = ProfileDTO(
@@ -332,6 +355,7 @@ class ProfileControllerTests {
             "rossi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
         val profile3 = ProfileDTO(
@@ -340,6 +364,7 @@ class ProfileControllerTests {
             "rossi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
         val profile4 = ProfileDTO(
@@ -348,6 +373,7 @@ class ProfileControllerTests {
             "rossi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
 
@@ -437,6 +463,12 @@ class ProfileControllerTests {
         val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.CLIENT)
         profileRepository.save(profile)
 
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
 
         val newProfile = ProfileDTO(
             "client@polito.it",
@@ -444,6 +476,7 @@ class ProfileControllerTests {
             "Bianchi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
 
@@ -470,13 +503,19 @@ class ProfileControllerTests {
 
         val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.CLIENT)
         profileRepository.save(profile)
-
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
         val newProfile = ProfileDTO(
             "client@polito.it",
             "Mario",
             "Bianchi",
             null,
             setOf(),
+            address,
             "CLIENT"
         )
 

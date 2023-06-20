@@ -16,7 +16,7 @@ async function addTicketAPI(ticketPayload){
 
 async function getAllTicketsClient(ticketFilters){
     const  filters = "" +
-        (ticketFilters.customerEmail ? `&customerEmail=${ticketFilters.customerEmail}` : "") +
+        (ticketFilters.clientEmail ? `&clientEmail=${ticketFilters.clientEmail}` : "") +
         (ticketFilters.expertEmail ? `&expertEmail=${ticketFilters.expertEmail}` : "") +
         ((ticketFilters.status && ticketFilters.status.length > 0) ? ticketFilters.status.map(s => `&status=${s}`).reduce((a,b)=>a+b) : "") +
         (ticketFilters.productId ? `&productId=${ticketFilters.productId}` : "") +
@@ -101,7 +101,7 @@ async function getTicketManagerAPI(ticketID){
 
 async function getAllTicketsExpert(ticketFilters){
     const  filters = "" +
-        (ticketFilters.customerEmail ? `&customerEmail=${ticketFilters.customerEmail}` : "") +
+        (ticketFilters.clientEmail ? `&clientEmail=${ticketFilters.clientEmail}` : "") +
         (ticketFilters.expertEmail ? `&expertEmail=${ticketFilters.expertEmail}` : "") +
         ((ticketFilters.status && ticketFilters.status.length > 0) ? ticketFilters.status.map(s => `&status=${s}`).reduce((a,b)=>a+b) : "") +
         (ticketFilters.productId ? `&productId=${ticketFilters.productId}` : "") +
@@ -129,7 +129,7 @@ async function getAllTicketsExpert(ticketFilters){
 
 async function getAllTicketsManager(ticketFilters){
     const  filters = "" +
-        (ticketFilters.customerEmail ? `&customerEmail=${ticketFilters.customerEmail}` : "") +
+        (ticketFilters.clientEmail ? `&clientEmail=${ticketFilters.clientEmail}` : "") +
         (ticketFilters.expertEmail ? `&expertEmail=${ticketFilters.expertEmail}` : "") +
         ((ticketFilters.status && ticketFilters.status.length > 0) ? ticketFilters.status.map(s => `&status=${s}`).reduce((a,b)=>a+b) : "") +
         (ticketFilters.productId ? `&productId=${ticketFilters.productId}` : "") +

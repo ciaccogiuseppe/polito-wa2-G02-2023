@@ -76,7 +76,7 @@ function TicketListPage(props) {
         if (user.role === "CLIENT") {
             getAllTicketsClient(
                 {
-                    customerEmail: user.email
+                    clientEmail: user.email
                 }
             ).then(tickets => {
                 setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId))
@@ -121,7 +121,7 @@ function TicketListPage(props) {
         if (user.role === "CLIENT")
             getAllTicketsClient(
                 {
-                    customerEmail: user.email,
+                    clientEmail: user.email,
                     status: selectedStatus,
                     minPriority: Math.min(...priority),
                     maxPriority: Math.max(...priority),
@@ -152,7 +152,7 @@ function TicketListPage(props) {
         else if (user.role === "MANAGER")
             getAllTicketsManager(
                 {
-                    customerEmail: userEmail,
+                    clientEmail: userEmail,
                     expertEmail: expertEmail,
                     status: selectedStatus,
                     minPriority: Math.min(...priority),

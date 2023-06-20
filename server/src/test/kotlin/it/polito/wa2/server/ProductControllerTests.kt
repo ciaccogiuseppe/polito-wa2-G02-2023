@@ -706,13 +706,12 @@ class ProductControllerTests {
         category.name= ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val productEntity =
-            ProductDTO(
-                "0000000000000",
-                "PC Omen Intel i7",
-                brand.name,
-                category.name.toString()
-            )
+        val productEntity = object {
+            val productId = "0000000000000"
+            val name = "PC Omen Intel i7"
+            val brand = brand.name
+            val category = category.name.toString()
+        }
 
         val entity = TestUtils.testEntityHeader(productEntity, managerToken)
 
@@ -775,14 +774,14 @@ class ProductControllerTests {
         category.name= ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val productEntity =
-            ProductDTO(
-                "000000000000",
-                "PC Omen Intel i7",
-                brand.name,
-                category.name.toString()
-            )
 
+
+        val productEntity = object {
+            val productId = "000000000000"
+            val name = "PC Omen Intel i7"
+            val brand = brand.name
+            val category = category.name.toString()
+        }
 
         val entity = TestUtils.testEntityHeader(productEntity, managerToken)
 
@@ -810,14 +809,15 @@ class ProductControllerTests {
         category.name= ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val productEntity =
-            ProductDTO(
-                "0000000000000",
-                "PC Omen Intel i7",
-                "",
-                category.name.toString()
-            )
 
+
+
+        val productEntity = object {
+            val productId = "0000000000000"
+            val name = "PC Omen Intel i7"
+            val category = category.name.toString()
+            val brand = ""
+        }
 
         val entity = TestUtils.testEntityHeader(productEntity, managerToken)
 
@@ -845,15 +845,13 @@ class ProductControllerTests {
         category.name= ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
+        val productEntity = object {
+            val productId = "0000000000000"
+            val name = "PC Omen Intel i7"
+            val brand = "abc"
+            val category = category.name.toString()
+        }
 
-
-        val productEntity =
-            ProductDTO(
-                "0000000000000",
-                "PC Omen Intel i7",
-                "abc",
-                category.name.toString()
-            )
 
 
         val entity = TestUtils.testEntityHeader(productEntity, managerToken)
@@ -884,15 +882,12 @@ class ProductControllerTests {
         categoryRepository.save(category)
 
 
-
-        val productEntity =
-            ProductDTO(
-                "0000000000000",
-                "PC Omen Intel i7",
-                brand.name,
-                "abc"
-            )
-
+        val productEntity = object {
+            val productId = "0000000000000"
+            val name = "PC Omen Intel i7"
+            val brand = brand.name
+            val category = "abc"
+        }
 
         val entity = TestUtils.testEntityHeader(productEntity, managerToken)
 
@@ -903,7 +898,7 @@ class ProductControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
 
         categoryRepository.delete(category)
         brandRepository.delete(brand)
@@ -927,13 +922,13 @@ class ProductControllerTests {
         productRepository.save(product1)
 
 
-        val productEntity =
-            ProductDTO(
-                "0000000000000",
-                "PC Omen Intel i7",
-                brand.name,
-                category.name.toString()
-            )
+
+        val productEntity = object {
+            val productId = "0000000000000"
+            val name = "PC Omen Intel i7"
+            val brand = brand.name
+            val category = category.name.toString()
+        }
 
 
         val entity = TestUtils.testEntityHeader(productEntity, managerToken)
