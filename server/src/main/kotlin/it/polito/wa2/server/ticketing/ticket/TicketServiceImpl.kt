@@ -118,8 +118,7 @@ class TicketServiceImpl(
         val client = getProfileByEmail(userEmail)
         if(item.client != client)
             throw ForbiddenException("You cannot create a ticket for this item")
-        if(item.validFromTimestamp!!.toLocalDateTime().plusMonths(item.durationMonths!!).isBefore(timestamp.toLocalDateTime()))
-            throw ForbiddenException("Warranty has expired for this item")
+        checkWarrantyValidity(item, timestamp)
         val ticket =  ticketRepository.save(ticketDTO.toNewTicket(item, client, timestamp))
 
         ticketHistoryRepository.save(
@@ -168,7 +167,7 @@ class TicketServiceImpl(
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
         val user = getProfileByEmail(userEmail)
 
-        updateTicket(ticketUpdateDTO, ticket, user, true)
+        updateTicket(ticketUpdateDTO, ticket, user)
     }
 
     override fun clientUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
@@ -178,7 +177,7 @@ class TicketServiceImpl(
         if (user != ticket.client)
             throw ForbiddenException("It's not possible to set the status of tickets that are not yours")
 
-        updateTicket(ticketUpdateDTO, ticket, user, false)
+        updateTicket(ticketUpdateDTO, ticket, user)
     }
 
     override fun expertUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
@@ -187,8 +186,7 @@ class TicketServiceImpl(
         val user = getProfileByEmail(userEmail)
         if (user != ticket.expert)
             throw ForbiddenException("It's not possible to set the status of tickets that are not assigned to you")
-
-        updateTicket(ticketUpdateDTO, ticket, user, false)
+        updateTicket(ticketUpdateDTO, ticket, user)
     }
 
     private fun filterTickets(
@@ -215,30 +213,15 @@ class TicketServiceImpl(
             }.map { it.toDTO() }
     }
 
-    private fun updateTicket(ticketUpdateDTO: TicketUpdateDTO, ticket: Ticket, user: Profile, isManager: Boolean) {
+    private fun updateTicket(ticketUpdateDTO: TicketUpdateDTO, ticket: Ticket, user: Profile) {
         val oldState = ticket.status
         val newState = ticketUpdateDTO.newState
 
-        when (ticket.status) {
-            TicketStatus.OPEN -> {
-                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
-                if (newState == TicketStatus.IN_PROGRESS)
-                    throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS>: the expert must be assigned")
-            }
-            TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED, TicketStatus.CLOSED))
-            TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
-            TicketStatus.IN_PROGRESS -> {
-                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.OPEN))
-                if (newState == TicketStatus.OPEN) {
-                    if (isManager) ticket.expert = null
-                    else throw ForbiddenException("Only the manager can set the status to <OPEN>")
-                }
-            }
-            TicketStatus.REOPENED -> {
-                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
-                if (newState == TicketStatus.IN_PROGRESS)
-                    throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS>: the expert must be assigned")
-            }
+        when(user.role) {
+            ProfileRole.MANAGER -> checkNewStateManager(ticketUpdateDTO.newState, ticket)
+            ProfileRole.EXPERT -> checkNewStateExpert(ticketUpdateDTO.newState, ticket)
+            ProfileRole.CLIENT -> checkNewStateClient(ticketUpdateDTO.newState, ticket)
+            else -> {}
         }
 
         ticket.status = newState
@@ -252,6 +235,55 @@ class TicketServiceImpl(
                 newState
             )
         )
+    }
+
+    private fun checkNewStateClient(newState: TicketStatus, ticket: Ticket) {
+        when (ticket.status) {
+            TicketStatus.OPEN -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED))
+            TicketStatus.RESOLVED -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
+                checkWarrantyValidity(ticket.item!!, Timestamp.valueOf(LocalDateTime.now()))
+            }
+            TicketStatus.CLOSED -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
+                checkWarrantyValidity(ticket.item!!, Timestamp.valueOf(LocalDateTime.now()))
+            }
+            TicketStatus.IN_PROGRESS -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED))
+            TicketStatus.REOPENED -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED))
+        }
+    }
+
+    private fun checkNewStateExpert(newState: TicketStatus, ticket: Ticket) {
+        when (ticket.status) {
+            TicketStatus.OPEN -> isNextStateValid(newState, hashSetOf(TicketStatus.CLOSED))
+            TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.CLOSED))
+            TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf())
+            TicketStatus.IN_PROGRESS -> isNextStateValid(newState, hashSetOf(TicketStatus.CLOSED))
+            TicketStatus.REOPENED -> isNextStateValid(newState, hashSetOf(TicketStatus.CLOSED))
+        }
+    }
+
+    private fun checkNewStateManager(newState: TicketStatus, ticket: Ticket) {
+        when (ticket.status) {
+            TicketStatus.OPEN -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS)
+                    throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS>: the expert must be assigned")
+            }
+            TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.CLOSED))
+            TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf())
+            TicketStatus.IN_PROGRESS -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.OPEN))
+                if (newState == TicketStatus.OPEN) {
+                    ticket.expert = null
+                }
+            }
+            TicketStatus.REOPENED -> {
+                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                if (newState == TicketStatus.IN_PROGRESS && ticket.expert == null)
+                    throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS>: the expert must be assigned")
+            }
+        }
     }
 
     private fun getProfileByEmail(email: String): Profile {
@@ -272,6 +304,11 @@ class TicketServiceImpl(
 
     private fun isNextStateValid(newStatus: TicketStatus, validValues: HashSet<TicketStatus>) {
         if (!validValues.contains(newStatus))
-            throw UnprocessableTicketException("The new state is invalid according to the current state")
+            throw UnprocessableTicketException("The new state is invalid according to the current state and the user role")
+    }
+
+    private fun checkWarrantyValidity(item: Item, timestamp: Timestamp) {
+        if(item.validFromTimestamp!!.toLocalDateTime().plusMonths(item.durationMonths!!).isBefore(timestamp.toLocalDateTime()))
+            throw ForbiddenException("Warranty has expired for this item")
     }
 }
