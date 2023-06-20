@@ -1,5 +1,5 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {closeIcon, downArrowIcon, editIcon, xIcon} from "../../Common/Icons.js"
 import StatusIndicator from "../TicketCommon/StatusIndicator";
 import TextNewLine from "../../Common/TextNewLine";
@@ -215,6 +215,7 @@ function TicketChatPage(props) {
 
     const [editExpert, setEditExpert] = useState("")
     //let attachments = []
+    const navigate = useNavigate()
 
     const ticketID = params.id
 
@@ -436,6 +437,10 @@ function TicketChatPage(props) {
 
 
 
+                    </div>
+
+                    <div style={{marginTop: "20px"}}>
+                    <NavigationButton text={"View history"} onClick={e => {e.preventDefault(); navigate(`/tickethistory`, {state: {ticketId: ticket.ticketId}})}}/>
                     </div>
 
                     <div style={{backgroundColor:"rgba(255,255,255,0.1)", borderRadius:"20px", padding:"15px", width:"85%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"15px" }}>
