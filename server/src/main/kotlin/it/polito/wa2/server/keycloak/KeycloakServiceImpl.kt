@@ -64,7 +64,7 @@ class KeycloakServiceImpl(
         val credentials: CredentialRepresentation =
             Credentials.createPasswordCredentials(userDTO.password)
         val user = UserRepresentation()
-        user.username = userDTO.userName
+        user.username = userDTO.username
         user.firstName = userDTO.firstName
         user.lastName = userDTO.lastName
         user.email = userDTO.email

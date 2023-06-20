@@ -3,7 +3,6 @@ package it.polito.wa2.server.brands
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BrandNotFoundException
 import it.polito.wa2.server.DuplicateBrandException
-import it.polito.wa2.server.DuplicateProfileException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

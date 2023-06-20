@@ -20,9 +20,9 @@ class AttachmentServiceImpl(
         val user = profileRepository.findByEmail(userEmail)?:
             throw ForbiddenException("It's not possible to get an attachment if user is not registered")
         val ticket = attachment.message?.ticket
-        val customerOfAttachment = ticket?.customer
+        val clientOfAttachment = ticket?.client
         val expertOfAttachment = ticket?.expert
-        if(user != customerOfAttachment && user != expertOfAttachment)
+        if(user != clientOfAttachment && user != expertOfAttachment)
             throw ForbiddenException("It's not possible to get an attachment of a message belonging to a ticket in which you are not participating")
         return attachment.toDTO()
     }

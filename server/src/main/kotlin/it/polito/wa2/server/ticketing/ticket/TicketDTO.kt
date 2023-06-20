@@ -4,7 +4,6 @@ import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.profiles.Profile
 import jakarta.validation.constraints.*
 import java.sql.Timestamp
-import java.time.LocalDateTime
 
 data class TicketDTO(
     @field:Positive
@@ -19,9 +18,12 @@ data class TicketDTO(
     val productId: String,
     @field:Positive
     val serialNum: Long,
-    //@field:Positive
-    val customerEmail: String?,
-    //@field:Positive
+    @field:NotBlank
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
+    val clientEmail: String?,
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
     val expertEmail: String?,
     val status: TicketStatus?,
     val createdTimestamp: Timestamp?
@@ -30,7 +32,8 @@ data class TicketDTO(
 data class TicketAssignDTO(
     @field:Positive
     val ticketId : Long,
-    //@field:Positive
+    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message="email must be valid")
     val expertEmail: String,
     @field:PositiveOrZero
     val priority: Int
@@ -50,7 +53,7 @@ fun Ticket.toDTO(): TicketDTO {
         priority,
         item?.product?.productId!!,
         item?.serialNum!!,
-        customer?.email,
+        client?.email,
         expert?.email,
         status,
         createdTimestamp
@@ -59,17 +62,18 @@ fun Ticket.toDTO(): TicketDTO {
 
 fun TicketDTO.toNewTicket(
     item: Item,
-    customer: Profile
+    client: Profile,
+    timestamp: Timestamp
 ): Ticket {
     val ticket = Ticket()
     ticket.title = title
     ticket.description = description
     ticket.priority = 0
     ticket.item = item
-    ticket.customer = customer
+    ticket.client = client
     ticket.expert = null
     ticket.status = TicketStatus.OPEN
-    ticket.createdTimestamp = Timestamp.valueOf(LocalDateTime.now())
+    ticket.createdTimestamp = timestamp
     return ticket
 }
 

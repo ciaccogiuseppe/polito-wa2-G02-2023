@@ -33,7 +33,7 @@ class Item {
     @Temporal(TemporalType.TIMESTAMP)
     var validFromTimestamp : Timestamp? = null
 
-    var durationMonths: Int? = null
+    var durationMonths: Long? = null
 
     @ManyToOne
     @JoinColumn(nullable = true)

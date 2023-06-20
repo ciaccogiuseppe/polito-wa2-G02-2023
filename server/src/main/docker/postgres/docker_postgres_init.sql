@@ -58,7 +58,7 @@ alter table profiles
 create table if not exists items
 (
     serial_num           bigint       not null,
-    duration_months      integer,
+    duration_months      bigint,
     uuid                 uuid,
     valid_from_timestamp timestamp(6),
     product_id           varchar(255) not null
@@ -112,8 +112,8 @@ create table if not exists tickets
     priority          integer      not null,
     status            varchar(255) not null,
     title             varchar(255) not null,
-    customer_id       bigint       not null
-        constraint fkwsg96xnnr1cobwin0fj5xtqe
+    client_id         bigint       not null
+        constraint fk87o5gt7m6d4fo8lg32o8raliw
             references profiles,
     expert_id         bigint
         constraint fk8ojtqms4badovjb5mj7w4se56

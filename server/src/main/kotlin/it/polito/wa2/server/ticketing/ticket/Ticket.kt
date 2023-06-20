@@ -34,7 +34,7 @@ class Ticket:EntityBase<Long>() {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    var customer : Profile? = null
+    var client : Profile? = null
 
     @ManyToOne
     var expert : Profile? = null

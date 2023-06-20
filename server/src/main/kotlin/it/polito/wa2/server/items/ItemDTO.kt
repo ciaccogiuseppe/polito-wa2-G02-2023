@@ -18,7 +18,7 @@ data class ItemDTO(
     val clientEmail: String?,
     val validFromTimestamp: Timestamp?,
     @Positive
-    val durationMonths: Int?
+    val durationMonths: Long?
 )
 
 fun Item.toDTO(): ItemDTO {

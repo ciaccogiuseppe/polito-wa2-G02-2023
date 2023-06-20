@@ -25,8 +25,8 @@ class Profile : EntityBase<Long>() {
     @Column(nullable = true)
     var phoneNumber: String? = null
 
-    @OneToMany(mappedBy = "customer")
-    val ticketsCustomer = mutableSetOf<Ticket>()
+    @OneToMany(mappedBy = "client")
+    val ticketsClient = mutableSetOf<Ticket>()
 
     @OneToMany(mappedBy = "expert")
     val ticketsExpert = mutableSetOf<Ticket>()

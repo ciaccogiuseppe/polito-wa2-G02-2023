@@ -78,7 +78,7 @@ class MessageServiceImpl(
     private fun addMessage(messageDTO: MessageDTO, userEmail: String, ticket: Ticket){
         val attachments = messageDTO.attachments.map{getAttachment(it, userEmail)}.toMutableSet()
         val sender = getProfileByEmail(userEmail)
-        if(sender != ticket.customer && (ticket.expert != null && ticket.expert != sender))
+        if(sender != ticket.client && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
         messageRepository.save(message)
@@ -89,9 +89,9 @@ class MessageServiceImpl(
     private fun checkSender(userEmail: String, ticket: Ticket) {
         val user = profileRepository.findByEmail(userEmail)?:
         throw ForbiddenException("The user is not registered")
-        val customerOfTicket = ticket.customer!!
+        val clientOfTicket = ticket.client!!
         val expertOfTicket = ticket.expert!!
-        if(user != customerOfTicket && user != expertOfTicket)
+        if(user != clientOfTicket && user != expertOfTicket)
             throw ForbiddenException("User is not related to ticket")
     }
 }

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern
 
 data class UserDTO (
     @field:NotBlank(message="username is mandatory")
-    val userName: String,
+    val username: String,
     @field:NotBlank(message="email is mandatory")
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
