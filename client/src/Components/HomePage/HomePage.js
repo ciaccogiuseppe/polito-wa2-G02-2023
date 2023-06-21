@@ -1,8 +1,8 @@
 import { Button } from "react-bootstrap";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import AppNavbar from "../AppNavbar/AppNavbar";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import NavigationButton from "../Common/NavigationButton";
 import NavigationLink from "../Common/NavigationLink";
 import WarrantyGenerate from "../Products/WarrantyGenerate/WarrantyGenerate";
@@ -16,35 +16,45 @@ function HomePage(props) {
     }, [])
 
     return <>
-        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"home"}/>
-        <div className="CenteredButton" style={{marginTop:"50px"}}>
-            <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>TICKETING SUPPORT</h1>
-            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
-            <h5 style={{color:"#EEEEEE"}}>simple and easy ticketing</h5>
+        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"home"} />
+        <div className="CenteredButton" style={{ marginTop: "50px" }}>
+            <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>TICKETING SUPPORT</h1>
+            <hr style={{ color: "white", width: "25%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "2px", marginTop: "2px" }} />
+            <h5 style={{ color: "#EEEEEE" }}>simple and easy ticketing</h5>
         </div>
 
-        {(loggedIn && user!==null && user.role === "CLIENT") &&
-        <>
-            <div className="CenteredButton" style={{marginTop:"70px"}}>
-                <NavigationButton text={"Register a product"} onClick={(e) => { e.preventDefault(); navigate("/productregister") }}/>
-            </div>
-            <div className="CenteredButton" style={{marginTop:"25px"}}>
-                <NavigationButton text={"Open a ticket"} onClick={(e) => { e.preventDefault(); navigate("/newticket") }}/>
-            </div>
-        </>
-        }
-
-        {(loggedIn && user!==null && user.role === "EXPERT") &&
+        {(loggedIn && user !== null && user.role === "CLIENT") &&
             <>
-                <div className="CenteredButton" style={{marginTop:"70px"}}>
-                    <NavigationButton text={"View assigned tickets"} onClick={(e) => { e.preventDefault(); navigate("/tickets") }}/>
+                <div className="CenteredButton" style={{ marginTop: "50px" }}>
+                    <h5 style={{ color: "#EEEEEE" }}>Nice to see you, <span style={{ color: "#FDE0BE" }}>{user.name}</span>!</h5>
+                    <h6 style={{ color: "#EEEEEE" }}><i>We are glad to offer all the support you need.</i></h6>
+                    <h6 style={{ color: "#EEEEEE" }}><i>Contact us and we'll take care about everything else.</i></h6>
+                </div>
+                <div className="CenteredButton" style={{ marginTop: "70px" }}>
+                    <NavigationButton text={"Register a product"} onClick={(e) => { e.preventDefault(); navigate("/productregister") }} />
+                </div>
+                <div className="CenteredButton" style={{ marginTop: "25px" }}>
+                    <NavigationButton text={"Open a ticket"} onClick={(e) => { e.preventDefault(); navigate("/newticket") }} />
                 </div>
             </>
         }
 
-        {(loggedIn && user!==null && user.role === "VENDOR") &&
+        {(loggedIn && user !== null && user.role === "EXPERT") &&
             <>
-                <WarrantyGenerate/>
+                <div className="CenteredButton" style={{ marginTop: "50px" }}>
+                    <h5 style={{ color: "#EEEEEE" }}>Welcome, <span style={{ color: "#FDE0BE" }}>{user.name}</span>.</h5>
+                    <h6 style={{ color: "#EEEEEE" }}><i>This is the place where you can consult the tickets you are responsible of.</i></h6>
+                    <h6 style={{ color: "#EEEEEE" }}><i>Helping customers has never been so easy.</i></h6>
+                </div>
+                <div className="CenteredButton" style={{ marginTop: "70px" }}>
+                    <NavigationButton text={"View assigned tickets"} onClick={(e) => { e.preventDefault(); navigate("/tickets") }} />
+                </div>
+            </>
+        }
+
+        {(loggedIn && user !== null && user.role === "VENDOR") &&
+            <>
+                <WarrantyGenerate />
                 {/*<div className="CenteredButton" style={{marginTop:"70px"}}>
                     <NavigationButton text={"View assigned tickets"} onClick={(e) => { e.preventDefault(); navigate("/tickets") }}/>
                 </div>*/}
@@ -53,10 +63,10 @@ function HomePage(props) {
 
         {!loggedIn &&
             <>
-                <div className="CenteredButton" style={{marginTop:"70px"}}>
-                    <NavigationButton text={"Login"} onClick={(e) => { e.preventDefault(); navigate("/login") }}/>
-                    <div style={{fontSize:"12px", color:"#EEEEEE", marginTop:"5px" }}>
-                        <span>Don't have an account?</span> <NavigationLink href={"/signup"} text={"Sign up"}/>
+                <div className="CenteredButton" style={{ marginTop: "70px" }}>
+                    <NavigationButton text={"Login"} onClick={(e) => { e.preventDefault(); navigate("/login") }} />
+                    <div style={{ fontSize: "12px", color: "#EEEEEE", marginTop: "5px" }}>
+                        <span>Don't have an account?</span> <NavigationLink href={"/signup"} text={"Sign up"} />
                     </div>
                 </div>
             </>
