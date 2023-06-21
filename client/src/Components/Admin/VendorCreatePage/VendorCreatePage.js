@@ -71,9 +71,10 @@ function VendorCreatePage(props){
             firstName:name,
             lastName:surname,
             email:email,
-            userName:email,
+            username:email,
             password:password,
-            expertCategories:[]
+            expertCategories:[],
+            address:{}
         }).then(
             () => navigate("/")
         ).catch(err => setErrorMessage(err))

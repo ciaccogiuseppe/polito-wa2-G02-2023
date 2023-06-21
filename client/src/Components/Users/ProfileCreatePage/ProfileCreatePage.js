@@ -89,7 +89,7 @@ function ProfileCreatePage(props){
             firstName:name,
             lastName:surname,
             email:email,
-            userName:email,
+            username:email,
             password:password,
             expertCategories:[],
             address:{country:country, region:region, city:city, address:address}

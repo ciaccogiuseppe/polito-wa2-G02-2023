@@ -82,7 +82,7 @@ function ExpertCreatePage(props) {
             firstName: name,
             lastName: surname,
             email: email,
-            userName: email,
+            username: email,
             password: password,
             expertCategories: expertCategories
         }).then(
