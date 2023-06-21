@@ -108,7 +108,7 @@ create table if not exists tickets
     id                bigserial
         primary key,
     created_timestamp timestamp(6) not null,
-    description       varchar(255) not null,
+    description       VARCHAR not null,
     priority          integer      not null,
     status            varchar(255) not null,
     title             varchar(255) not null,
@@ -608,6 +608,28 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000314', 'DJI Osmo Action Camera', (SELECT brands.id FROM brands WHERE name = 'DJI'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000315', 'Sony FDR-X3000 Action Camera', (SELECT brands.id FROM brands WHERE name = 'Sony'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000316', 'Insta360 ONE R Action Camera', (SELECT brands.id FROM brands WHERE name = 'Insta360'), id);
+
+
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (203241506, 24, '9fcebd14-fa40-4f11-a11f-84391df346da', '2023-06-21 19:10:54.961201', '0000000000025', 1);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (633020516, 12, 'e559a864-d32d-49db-bc52-7182e38036bb', '2023-06-21 19:11:23.318321', '0000000000112', 1);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (203040506, 12, '72895077-097e-4e84-9917-5a57d0b56196', '2023-06-21 19:09:27.839294', '0000000000023', 1);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (213244506, 12, 'a78d44fa-6137-4b79-8d6c-afc0450267ed', '2021-06-21 19:12:05.853000', '0000000000189', 1);
+
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (1, '2023-06-21 19:47:14.726903', e'am reaching out to you regarding an issue I am experiencing with my LG Velvet smartphone\'s touch screen. I am encountering difficulties with the touch functionality and would greatly appreciate your assistance in resolving this problem.
+
+Issue Description:
+The touch screen on my LG Velvet smartphone has become unresponsive, making it impossible for me to interact with the device using touch gestures. I have tried various troubleshooting steps but have been unable to restore the touch screen functionality.', 2, 'IN_PROGRESS', 'Touch screen not working', 1, 3, '0000000000025', 203241506);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (2, '2023-06-21 20:04:23.758173', e'I am writing to report an issue that I have encountered with my Sony Bravia X70J television. I am experiencing distorted audio output, which is significantly affecting my viewing experience. I kindly request your assistance in resolving this problem promptly.
+
+Issue Description:
+While watching various programs on my Sony Bravia X70J TV, I noticed that the audio output has become distorted and unclear. The sound appears muffled, with a noticeable loss of clarity and depth. This issue persists across all audio sources, including built-in TV apps, external devices connected via HDMI, and broadcast channels.
+
+Troubleshooting Steps Taken:
+In an attempt to resolve the audio distortion problem, I have performed the following troubleshooting steps without success:
+
+    Adjusted audio settings: I have reviewed and adjusted the audio settings on my Sony Bravia X70J TV, ensuring that they are optimized for the best audio quality. However, the distortion issue remains unresolved.
+    Tested different audio sources: I have tested the TV with various audio sources, including different channels and streaming services, to rule out the possibility of a specific source causing the distortion. Unfortunately, the problem persists across all sources.
+    Checked external devices: I have disconnected all external devices connected to the TV, such as soundbars or AV receivers, to ensure that they are not causing the audio distortion. However, the issue still persists when using the TV\'s built-in speakers.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
 
     END
 $$;
