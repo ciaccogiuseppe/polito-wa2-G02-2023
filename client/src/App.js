@@ -88,7 +88,7 @@ function App() {
         }
     );
 
-    const int = setInterval(() => {
+    /*const int = setInterval(() => {
         const refreshToken = localStorage.getItem('refreshToken');
         axios
             .post(APIURL+"/API/refreshtoken", {
@@ -106,13 +106,13 @@ function App() {
                 logout()
                 console.log('Failed to refresh access token: ', error);
             });
-    }, 120000)
+    }, 120000)*/
 
     return () => {
       // Remove the request and response interceptors on component unmount
       api.interceptors.request.eject(requestInterceptor);
       api.interceptors.response.eject(responseInterceptor);
-      clearInterval(int)
+      //clearInterval(int)
     };
   }, []);
 

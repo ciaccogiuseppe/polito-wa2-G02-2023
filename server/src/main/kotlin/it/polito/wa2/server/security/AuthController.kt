@@ -25,7 +25,7 @@ class AuthController(
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
         val body = "grant_type=password&username=${loginRequest.username}&password=${loginRequest.password}" +
-                "&client_id=$clientId"
+                "&client_id=$clientId"+"&scope=openid offline_access"
 
         val entity = HttpEntity(body, headers)
 
