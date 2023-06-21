@@ -31,11 +31,11 @@ class ProfileServiceImpl(
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
 
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     override fun getProfileById(profileId: Long): ProfileDTO {
         return profileRepository.findByIdOrNull(profileId)?.toDTO()
             ?: throw ProfileNotFoundException("Profile not found")
-    }
+    }*/
 
     override fun getProfileItems(email: String): List<ItemDTO> {
         val profile = profileRepository.findByEmail(email)
@@ -51,13 +51,13 @@ class ProfileServiceImpl(
             .map { it.toDTO() }
     }
 
-    override fun addProfile(profileDTO: ProfileDTO) {
+    /*override fun addProfile(profileDTO: ProfileDTO) {
         if (profileRepository.findByEmail(profileDTO.email) != null)
             throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
 
         profileRepository.save(profileDTO.toNewProfile(ProfileRole.CLIENT))
         addressService.addAddress(profileDTO.email, profileDTO.address!!)
-   }
+   }*/
 
     override fun addProfileWithRole(profileDTO: ProfileDTO, profileRole: ProfileRole) {
         if (profileRepository.findByEmail(profileDTO.email) != null)

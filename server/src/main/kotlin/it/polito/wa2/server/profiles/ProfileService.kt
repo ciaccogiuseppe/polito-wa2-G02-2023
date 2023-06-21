@@ -7,11 +7,11 @@ interface ProfileService {
 
     fun getExpertByCategory(category: String): List<ProfileDTO>
 
-    fun getProfileById(profileId: Long): ProfileDTO
+    //fun getProfileById(profileId: Long): ProfileDTO
 
     fun getProfileItems(email: String): List<ItemDTO>
 
-    fun addProfile(profileDTO: ProfileDTO)
+    //fun addProfile(profileDTO: ProfileDTO)
 
     fun addProfileWithRole(profileDTO: ProfileDTO, profileRole: ProfileRole)
 

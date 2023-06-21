@@ -3,6 +3,7 @@ package it.polito.wa2.server
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.keycloak.UserDTO
+import it.polito.wa2.server.keycloak.UserUpdateDTO
 import it.polito.wa2.server.profiles.*
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
@@ -39,6 +40,8 @@ class KeycloakControllerTests {
         val keycloak = KeycloakContainer().withRealmImportFile("keycloak/realm-test.json")
 
         var managerToken = ""
+        var clientToken = ""
+        var expertToken = ""
 
         @JvmStatic
         @BeforeAll
@@ -46,6 +49,8 @@ class KeycloakControllerTests {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
+            clientToken = TestUtils.testKeycloakGetClientToken(keycloak)
+            expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
 
         @JvmStatic
@@ -110,6 +115,131 @@ class KeycloakControllerTests {
         val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
+
+        val createdProfile = profileRepository.findByEmail(user.email)
+
+        Assertions.assertNotNull(createdProfile)
+        Assertions.assertEquals(user.email, createdProfile?.email)
+        Assertions.assertEquals(user.firstName, createdProfile?.name)
+        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+
+
+        val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
+        Assertions.assertNotNull(createdUser)
+        Assertions.assertEquals(user.email, createdUser?.email)
+        Assertions.assertEquals(user.firstName, createdUser?.firstName)
+        Assertions.assertEquals(user.lastName, createdUser?.lastName)
+
+        profileRepository.delete(createdProfile!!)
+    }
+
+    @Test
+    //@DirtiesContext
+    fun putClient() {
+        val uri = URI("http://localhost:$port/API/client/user/client@polito.it")
+
+        val address = AddressDTO(
+            "Italy",
+            "Piemonte",
+            "Torino",
+            "Corso Duca degli Abruzzi, 24"
+        )
+
+        val user = UserDTO(
+            "MarioR_99",
+            "client@polito.it",
+            "password",
+            "Mario",
+            "Bianchi",
+            setOf(),
+            address,
+            "CLIENT"
+        )
+        val profile = TestUtils.testProfile("client@polito.it", "Profile", "Polito", ProfileRole.CLIENT)
+        profileRepository.save(profile)
+
+
+        val entity = TestUtils.testEntityHeader(user, clientToken)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val createdProfile = profileRepository.findByEmail(user.email)
+
+        Assertions.assertNotNull(createdProfile)
+        Assertions.assertEquals(user.email, createdProfile?.email)
+        Assertions.assertEquals(user.firstName, createdProfile?.name)
+        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+
+
+        val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
+        Assertions.assertNotNull(createdUser)
+        Assertions.assertEquals(user.email, createdUser?.email)
+        Assertions.assertEquals(user.firstName, createdUser?.firstName)
+        Assertions.assertEquals(user.lastName, createdUser?.lastName)
+
+        profileRepository.delete(createdProfile!!)
+    }
+
+    @Test
+    //@DirtiesContext
+    fun putManager() {
+        val uri = URI("http://localhost:$port/API/manager/user/manager@polito.it")
+
+        val user = UserUpdateDTO(
+            "manager@polito.it",
+            "Mario",
+            "Bianchi",
+            setOf(),
+            null,
+            "MANAGER"
+        )
+        val profile = TestUtils.testProfile("manager@polito.it", "Profile", "Polito", ProfileRole.MANAGER)
+        profileRepository.save(profile)
+
+
+        val entity = TestUtils.testEntityHeader(user, managerToken)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val createdProfile = profileRepository.findByEmail(user.email)
+
+        Assertions.assertNotNull(createdProfile)
+        Assertions.assertEquals(user.email, createdProfile?.email)
+        Assertions.assertEquals(user.firstName, createdProfile?.name)
+        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+
+
+        val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
+        Assertions.assertNotNull(createdUser)
+        Assertions.assertEquals(user.email, createdUser?.email)
+        Assertions.assertEquals(user.firstName, createdUser?.firstName)
+        Assertions.assertEquals(user.lastName, createdUser?.lastName)
+
+        profileRepository.delete(createdProfile!!)
+    }
+    @Test
+    //@DirtiesContext
+    fun putExpert() {
+        val uri = URI("http://localhost:$port/API/expert/user/expert@polito.it")
+
+        val user = UserUpdateDTO(
+            "expert@polito.it",
+            "Mario",
+            "Bianchi",
+            setOf(),
+            null,
+            "EXPERT"
+        )
+        val profile = TestUtils.testProfile("expert@polito.it", "Profile", "Polito", ProfileRole.EXPERT)
+        profileRepository.save(profile)
+
+
+        val entity = TestUtils.testEntityHeader(user, expertToken)
+        val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
         val createdProfile = profileRepository.findByEmail(user.email)
 
@@ -221,6 +351,44 @@ class KeycloakControllerTests {
 
     @Test
     //@DirtiesContext
+    fun postVendor() {
+        val uri = URI("http://localhost:$port/API/createVendor")
+
+        val user = UserDTO(
+            "LuigiV_99",
+            "luigi.verdi@polito.it",
+            "password",
+            "Luigi",
+            "Verdi",
+            setOf(),
+            null,
+            "VENDOR"
+        )
+
+        val entity = TestUtils.testEntityHeader(user, managerToken)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
+
+        val createdProfile = profileRepository.findByEmail(user.email)
+
+        Assertions.assertNotNull(createdProfile)
+        Assertions.assertEquals(user.email, createdProfile?.email)
+        Assertions.assertEquals(user.firstName, createdProfile?.name)
+        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+
+
+        val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
+        Assertions.assertNotNull(createdUser)
+        Assertions.assertEquals(user.email, createdUser?.email)
+        Assertions.assertEquals(user.firstName, createdUser?.firstName)
+        Assertions.assertEquals(user.lastName, createdUser?.lastName)
+
+        profileRepository.delete(createdProfile!!)
+    }
+
+    @Test
+    //@DirtiesContext
     fun postExpertBadRequest() {
         val uri = URI("http://localhost:$port/API/createExpert")
 
@@ -249,6 +417,34 @@ class KeycloakControllerTests {
             setOf(),
             null,
             "EXPERT"
+        )
+
+        val entity = TestUtils.testEntityHeader(user, managerToken)
+
+        val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
+
+        profileRepository.delete(profile)
+    }
+
+    @Test
+    //@DirtiesContext
+    fun postVendorDuplicate() {
+        val uri = URI("http://localhost:$port/API/createVendor")
+
+        val profile = TestUtils.testProfile("luigi.verdi@polito.it", "Profile", "Polito", ProfileRole.VENDOR)
+        profileRepository.save(profile)
+
+        val user = UserDTO(
+            "LuigiV_99",
+            "luigi.verdi@polito.it",
+            "password",
+            "Luigi",
+            "Verdi",
+            setOf(),
+            null,
+            "VENDOR"
         )
 
         val entity = TestUtils.testEntityHeader(user, managerToken)

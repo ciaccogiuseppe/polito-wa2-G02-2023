@@ -42,39 +42,39 @@ class ProfileController(private val profileService: ProfileService) {
         return profileService.getExpertByCategory(category)
     }
 
-    @GetMapping("/API/manager/profiles/profileId/{profileId}")
+    /*@GetMapping("/API/manager/profiles/profileId/{profileId}")
     fun getProfileById(@PathVariable profileId: Long): ProfileDTO {
         if(profileId<=0)
             throw UnprocessableProfileException("Wrong profileId values")
         return profileService.getProfileById(profileId)
-    }
+    }*/
 
-    @PutMapping("/API/manager/profiles/{email}")
+    /*@PutMapping("/API/manager/profiles/{email}")
     fun managerUpdateProfile(@PathVariable email: String, @RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
         checkEmail(email)
         checkInputProfile(profileDTO, br)
         profileService.updateProfile(email, profileDTO!!)
-    }
+    }*/
 
-    @PutMapping("/API/client/profiles/{email}")
+    /*@PutMapping("/API/client/profiles/{email}")
     fun clientUpdateProfile(principal: Principal, @PathVariable email: String, @RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         val userEmail = token.tokenAttributes["email"] as String
         checkEmailWithLoggedUser(email, userEmail)
         checkInputProfile(profileDTO, br)
         profileService.updateProfile(email, profileDTO!!)
-    }
+    }*/
 
-    @PutMapping("/API/expert/profiles/{email}")
+    /*@PutMapping("/API/expert/profiles/{email}")
     fun expertUpdateProfile(principal: Principal, @PathVariable email: String, @RequestBody @Valid profileDTO: ProfileDTO?, br: BindingResult) {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         val userEmail = token.tokenAttributes["email"] as String
         checkEmailWithLoggedUser(email, userEmail)
         checkInputProfile(profileDTO, br)
         profileService.updateProfile(email, profileDTO!!)
-    }
+    }*/
 
-    fun checkInputProfile(profileDTO: ProfileDTO?, br: BindingResult){
+    /*fun checkInputProfile(profileDTO: ProfileDTO?, br: BindingResult){
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong profile format")
         if (profileDTO == null)
@@ -82,7 +82,7 @@ class ProfileController(private val profileService: ProfileService) {
 
         if (profileDTO.role == ProfileRole.CLIENT.toString() && profileDTO.address?.let { isAddressComplete(it) } == true)
             throw UnprocessableAddressException("Wrong address format")
-    }
+    }*/
 
     fun retrieveUserEmail(principal: Principal): String {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
@@ -94,7 +94,7 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableProfileException("Wrong email format")
     }
 
-    fun checkEmailWithLoggedUser(email: String, emailLogged: String){
+    /*fun checkEmailWithLoggedUser(email: String, emailLogged: String){
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
         if(email != emailLogged)
@@ -104,5 +104,5 @@ class ProfileController(private val profileService: ProfileService) {
     /* returns true if all fields are not empty */
     private fun isAddressComplete(address: AddressDTO): Boolean {
         return (address.country != null) && (address.region != null) && (address.city != null) && (address.address != null)
-    }
+    }*/
 }
