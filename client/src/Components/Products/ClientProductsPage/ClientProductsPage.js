@@ -11,6 +11,9 @@ import {Slider} from "@mui/material";
 import PriorityIndicator from "../../Ticketing/TicketCommon/PriorityIndicator";
 import {getAllItemsAPI} from "../../../API/Item";
 
+
+
+
 export function reformatCategory(category){
     switch(category){
         case "SMARTPHONE":
@@ -104,63 +107,15 @@ function ClientProductsPage(props) {
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"20px", marginTop:"2px"}}/>
 
 
-            {/*<div style={{width:"75%", alignSelf:"center", margin:"auto", borderRadius:"25px", marginTop: "15px", backgroundColor:"rgba(0,0,0,0.2)" }}>
-                <h4 style={{color:"#EEEEEE", paddingTop:"10px" }}>FILTERS</h4>
-                {showFilters?
-                    <div onClick={()=>{setShowFilters(false)}} style={{display:"inline-block", paddingBottom:"10px", cursor:"pointer"}}>
-                        {caretUpIcon("white", 30)}
-                    </div>:
-                    <div onClick={()=>{setShowFilters(true)}} style={{display:"inline-block", paddingBottom:"10px", cursor:"pointer"}}>
-                        {caretDownIcon("white", 30)}
-                    </div>}
 
-                {showFilters && <>
-                    <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
-                    <Row className="d-flex justify-content-center" style={{ marginBottom: "10px"}}>
+            {productsList.length>0 ?<ClientProductsTable products={productsList}/>
+             : <><div className="CenteredButton" style={{marginTop:"70px"}}>
+                    <NavigationButton text={"Register a product"} onClick={(e) => { e.preventDefault(); navigate("/productregister") }}/>
+                </div></>}
 
-
-                        <div style={{display:"inline-block", maxWidth:"250px"}}>
-                            <span style={{ color: "#DDDDDD" }}>Category</span>
-                            <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                                <span style={{cursor: categoryFilter ? "pointer" : ""}} onClick={() => setCategoryFilter("")} className="input-group-text">{categoryFilter ? crossIcon("black", 17) : filterIcon()}</span>
-                                <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={categoryFilter} onChange={e => {setCategoryFilter(e.target.value); setBrandFilter("")}}>
-                                    <option></option>
-                                    {categories.map(c => <option>{reformatCategory(c)}</option>)}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div style={{display:"inline-block", maxWidth:"250px"}}>
-                            <span style={{ color: "#DDDDDD" }}>Brand</span>
-                            <div className="input-group mb-3" style={{ marginTop: "8px" }}>
-                                <span style={{cursor: brandFilter ? "pointer" : ""}} onClick={() => setBrandFilter("")} className="input-group-text">{brandFilter ? crossIcon("black", 17) : filterIcon()}</span>
-                                <select style={{ height: "40px", appearance:"searchfield"}} className="form-control" placeholder="---" value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
-                                    <option></option>
-                                    {brands.map(b => <option>{b}</option>)}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div style={{marginTop:"15px", marginBottom:"15px"}}>
-                            {(brandFilter === "" && categoryFilter === "") ?
-                                <NavigationButton text={"Reset"} onClick={e => {e.preventDefault(); applyFilter()} }/> :
-                                <NavigationButton disabled={brandFilter === "" && categoryFilter === "" } text={"Filter"} onClick={e => {e.preventDefault(); applyFilter()} }/>
-                            }
-
-                        </div>
-
-                    </Row>
-                </>}
-
-            </div>*/}
-
-
-            <ClientProductsTable products={productsList}/>
             <div style={{position:"fixed", bottom:"24px", right:"24px"}}>
-                <AddButton onClick={()=>navigate("/newproduct")}/>
+                <AddButton onClick={()=>navigate("/productregister")}/>
             </div>
-
-
         </div>
     </>
 }

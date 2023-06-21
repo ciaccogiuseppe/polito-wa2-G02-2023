@@ -22,3 +22,7 @@
     align-items:center;
     width:95%;
 }
+
+.myLink{
+    text-decoration: none;
+}

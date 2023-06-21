@@ -74,10 +74,17 @@ function ChatMessage(props){
             {TextNewLine(text)}
             <Row style={{flex:"true"}}>
                 {imageList.map((img, index) =>
-                    isImage(img) ?
+                    isImage(img.attachment) ?
                     <img onClick={() => {setAlbum(imageList); setStartPos(index); props.setOverlayShown(true)}} style={{cursor:"pointer", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", borderRadius:"20px", marginLeft:"15px", marginRight:"15px", marginTop:"15px", padding:0, height:"75px", width:"75px", objectFit:"cover"}}
-                         src={"data:image/png;base64, " + img} /> :
-                        <></>)}
+                         src={"data:image/png;base64, " + img.attachment} /> :
+                        <a
+                            className={"myLink"}
+                            download={img.name.substring(24, img.name.length)}
+                            href={"data:application;base64, " + img.attachment}
+                            style={{color:"white",cursor:"pointer", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", backgroundColor:"rgba(255,255,255,0.2)", textAlign:"center", borderRadius:"20px", marginLeft:"15px", marginRight:"15px", marginTop:"15px", height:"75px", width:"75px"}}>
+                            <div style={{marginTop:"10px"}}>{attachmentIcon("white", 25)}</div>
+                            <div style={{fontSize:10, height:"35px", width:"50px", overflow:"clip", overflowWrap:"break-word", overflowY:"hidden"}}>{img.name.substring(24, img.name.length)}</div>
+                        </a>)}
                         {/*<div
                             style={{cursor:"pointer", boxShadow:"0px 4px 8px -4px rgba(0,0,0,0.8)", backgroundColor:"rgba(255,255,255,0.2)", textAlign:"center", borderRadius:"20px", marginLeft:"15px", marginRight:"15px", marginTop:"15px", height:"75px", width:"75px"}}>
                             <div style={{marginTop:"10px"}}>{attachmentIcon("white", 25)}</div>

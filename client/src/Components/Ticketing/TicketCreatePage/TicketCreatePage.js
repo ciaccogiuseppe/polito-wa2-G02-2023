@@ -2,11 +2,12 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 import {Form} from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import {useEffect, useState} from "react";
-import {addProductAPI, getAllBrands, getAllProducts} from "../../../API/Products";
+import {addProductAPI, getAllBrands, getAllProducts, getProductByIdAPI} from "../../../API/Products";
 import {reformatCategory} from "../../Products/ProductsPage/ProductsPage";
 import ErrorMessage from "../../Common/ErrorMessage";
 import {addTicketAPI} from "../../../API/Tickets";
 import {useNavigate} from "react-router-dom";
+import {getAllItemsAPI} from "../../../API/Item";
 
 function TicketCreatePage(props) {
     const loggedIn=props.loggedIn
@@ -20,24 +21,36 @@ function TicketCreatePage(props) {
     const [brand, setBrand] = useState("")
     const [products, setProducts] = useState([])
     const [product, setProduct] = useState("")
+    const [serialNum, setSerialNum] = useState("")
+    const [serialNums, setSerialNums] = useState([])
     const [productsList, setProductsList] = useState([])
     const [warranty, setWarranty] = useState([])
 
     useEffect(() => {
         window.scrollTo(0, 0)
-        getAllProducts().then(products => {
-            setProducts(products)
-            setCategories(products.map(p => reformatCategory(p.category)).filter((v,i,a)=>a.indexOf(v)===i).sort())
-            //setBrands(products.map(p => p.brand).filter((v,i,a)=>a.indexOf(v)===i).sort())
+        getAllProducts().then((prods) => {
+            getAllItemsAPI().then(ps => {
+                const pd = ps.map( p => {
+                    return {...p, product:prods.filter(p => p.productId === p.productId)[0]}
+                })
+                setProducts(pd)
+            })
         })
+
+
     },[])
+
+    useEffect(() => {
+        if(products.length > 0)
+            setCategories(products.map(p => reformatCategory(p.product.category)).filter((v,i,a)=>a.indexOf(v)===i).sort())
+    }, [products])
 
     useEffect(() => {
         setBrand("")
         setProduct("")
         setBrands(products
-            .filter(p => reformatCategory(p.category) === category)
-            .map(p => p.brand)
+            .filter(p => reformatCategory(p.product.category) === category)
+            .map(p => p.product.brand)
             .filter((v,i,a)=>a.indexOf(v)===i).sort())
     }, [category])
 
@@ -45,21 +58,33 @@ function TicketCreatePage(props) {
         setProduct("")
         setProductsList(
             products
-                .filter(p => reformatCategory(p.category) === category && p.brand === brand)
-                .map(p => {return{name:p.name, id:p.productId}})
-                .filter((v,i,a)=>a.indexOf(v)===i)
+                .filter(p => reformatCategory(p.product.category) === category && p.product.brand === brand)
+                .map(p => {return{name:p.product.name, id:p.productId}})
+                .filter((v,i,a)=>a.findIndex(v=>v.id)===i)
                 .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
         )
     }, [brand])
 
+    useEffect(() => {
+        setSerialNum("")
+        setSerialNums(
+            products
+                .filter(p => reformatCategory(p.product.category) === category && p.product.brand === brand && p.productId === product)
+                .map(p => p.serialNum)
+                .filter((v,i,a)=>a.indexOf(v)===i)
+                .sort((a, b) => a<b)
+        )
+    }, [product])
+
 
     const navigate = useNavigate()
     function addTicket(){
+        console.log(product)
         addTicketAPI({
             title:title,
             description:description,
             productId:product,
-            warranty: warranty
+            serialNum:parseInt(serialNum)
         })
             .then(response => {
                 navigate("/tickets/"+response.data.ticketId)})
@@ -112,15 +137,18 @@ function TicketCreatePage(props) {
                         {productsList.map(p => <option value={p.id}>{p.name}</option>)}
                     </Form.Select>
 
-                    <h5 style={{color:"#DDDDDD", fontSize:12, marginTop:"10px"}}>Warranty code</h5>
-                    <Form.Control value={warranty} className={"form-control:focus"} style={{width: "300px", fontSize:"12px", alignSelf:"center", margin:"auto", marginTop:" 10px"}} type="input" placeholder="" onChange={e => setWarranty(e.target.value)}/>
+                    <h5 style={{color:"#DDDDDD", fontSize:12, marginTop:"10px"}}>Serial Number</h5>
 
+                    <Form.Select disabled={category==="" || brand==="" || product===""} value={serialNum} onChange={(e) => {setSerialNum(e.target.value)}} className={"form-select:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px", fontSize:"12px"}}>
+                        <option></option>
+                        {serialNums.map(p => <option value={p}>{p}</option>)}
+                    </Form.Select>
                 </Form.Group>
                 {errorMessage && <><div style={{margin:"10px"}}>
                     <ErrorMessage text={errorMessage} close={()=>{setErrorMessage("")}}/> </div></>}
 
                 <NavigationButton
-                    disabled={category === "" || brand === ""|| warranty === "" || product === "" || title === "" || description ===""}
+                    disabled={category === "" || brand === ""|| product === "" || title === "" || description ==="" || serialNum === ""}
                     text={"Create Ticket"}
                     onClick={e => {e.preventDefault(); addTicket()}}/>
             </Form>

@@ -153,22 +153,29 @@ function StatusEdit(props){
 
 function StatusEditList(props){
     const type = props.type
+    const role = props.role
     let types=[]
     switch(type){
         case("IN_PROGRESS"):
-            types=["OPEN", "CLOSED", "RESOLVED"]
+            if(role === "MANAGER") types=["OPEN", "CLOSED", "RESOLVED"]
+            else if (role === "CLIENT") types=["RESOLVED"]
+            else if (role === "EXPERT") types=["CLOSED"]
             break;
         case("OPEN"):
-            types=["CLOSED", "RESOLVED"]
+            if(role === "MANAGER") types=["CLOSED", "RESOLVED"]
+            else if (role === "CLIENT") types=["RESOLVED"]
+            else if (role === "EXPERT") types=["CLOSED"]
             break;
         case("REOPENED"):
-            types=["CLOSED", "RESOLVED"]
+            if(role === "MANAGER") types=["CLOSED", "RESOLVED"]
+            else if (role === "CLIENT") types=["RESOLVED"]
+            else if (role === "EXPERT") types=["CLOSED"]
             break;
         case("CLOSED"):
-            types=["REOPENED"]
+            if (role === "CLIENT" || role === "MANAGER") types=["REOPENED"]
             break;
         case("RESOLVED"):
-            types=["REOPENED", "CLOSED"]
+            if(role === "EXPERT" || role === "MANAGER") types=["REOPENED", "CLOSED"]
             break;
     }
     return types.map(t => <StatusEdit type={t} onClick={()=>{props.onClick(t)}}/>)
@@ -403,7 +410,7 @@ function TicketChatPage(props) {
 
 
                         {editingStatus && <div style={{borderRadius:"15px", backgroundColor:"rgba(0,0,0,0.2)", marginTop:"10px", marginBottom:"10px", width:"130px", display: "inline-block", alignSelf:"center"}}>
-                            <StatusEditList type={ticket.status} onClick={(t)=>{setNewStatus(t); setEditingStatus(false)}}/>
+                            <StatusEditList role={user.role} type={ticket.status} onClick={(t)=>{setNewStatus(t); setEditingStatus(false)}}/>
                         </div>}
                         <div style={{marginTop:"7px", width:"150px", display:"inline-block", paddingLeft:(user.role==="MANAGER"&& (ticket.status === "OPEN" || ticket.status === "REOPENED"))?"20px":"10px",  paddingRight:(user.role==="MANAGER"&& (ticket.status === "OPEN" || ticket.status === "REOPENED"))?"0px":"10px"}}>
                             {PriorityIndicator(priorityMap(ticket.priority))}
@@ -439,9 +446,10 @@ function TicketChatPage(props) {
 
                     </div>
 
+                    {user.role === "MANAGER" &&
                     <div style={{marginTop: "20px"}}>
                     <NavigationButton text={"View history"} onClick={e => {e.preventDefault(); navigate(`/tickethistory`, {state: {ticketId: ticket.ticketId}})}}/>
-                    </div>
+                    </div>}
 
                     <div style={{backgroundColor:"rgba(255,255,255,0.1)", borderRadius:"20px", padding:"15px", width:"85%", alignSelf:"left", textAlign:"left", margin:"auto", fontSize:"14px", color:"#EEEEEE", marginTop:"15px" }}>
                         {TextNewLine(ticket.description)}
@@ -497,7 +505,7 @@ function TicketChatPage(props) {
 
                         {chat.map(c => <ChatMessage
                             user={props.user}
-                            imageList={c.attachments.map(c => c.attachment)}
+                            imageList={c.attachments}
                             setAlbum={setAlbum}
                             setStartPos={setStartPos}
                             setOverlayShown={setOverlayShown}

@@ -3,8 +3,28 @@ import {useNavigate} from "react-router-dom";
 import {reformatCategory} from "./ClientProductsPage";
 import {getProductByIdAPI} from "../../../API/Products";
 
-function reformatId(id){
-    return id.substring(0,4) + " " + id.substring(4,8) + " " + id.substring(8,11) + " " + id.substring(11,13)
+
+
+function WarrantyIndicator(date) {
+    const curDate = new Date()
+    const warDate = new Date(date)
+    console.log(curDate)
+    console.log(warDate)
+    let valid = false
+    if(curDate.getTime() <= warDate.getTime())
+        valid = true
+    return <div style={{
+        alignSelf:"center",
+        margin:"auto",
+        borderRadius: "25px",
+        width:"90px",
+        color: "white",
+        backgroundColor: valid?"#7dab2b":"#b02d1b",
+        fontSize: 12,
+        textAlign: "center",
+        verticalAlign: "middle",
+        padding: 5
+    }}>{warDate.toLocaleDateString()}</div>
 }
 
 
@@ -31,12 +51,14 @@ function ProductsTableTR(props){
     //const name = props.name
     const regDate = props.from
     const expDate = props.to
+    const serial = props.serialNum
     return <tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")} onClick={()=>{}}>
         <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{category}</td>
         <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{brand}</td>
         <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{product}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{serial}</td>
         <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{regDate}</td>
-        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{expDate}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{WarrantyIndicator(expDate)}</td>
     </tr>
 }
 
@@ -46,7 +68,7 @@ function ClientProductsTable(props){
     function expDate(from, duration){
         let date = new Date(from)
         date.setMonth(date.getMonth()+duration)
-        return date.toLocaleDateString()
+        return date.toUTCString()
     }
 
     return <>
@@ -57,8 +79,9 @@ function ClientProductsTable(props){
                     <tr className="text-light">
 
                         <th width={"15%"}><h5>CATEGORY</h5></th>
-                        <th width={"15%"}><h5>BRAND</h5></th>
+                        <th width={"10%"}><h5>BRAND</h5></th>
                         <th width={"25%"}><h5>PRODUCT</h5></th>
+                        <th width={"15%"}><h5>SN</h5></th>
                         <th width={"15%"}><h5>REGISTERED</h5></th>
                         <th width={"15%"}><h5>EXPIRATION</h5></th>
                     </tr>
@@ -73,6 +96,7 @@ function ClientProductsTable(props){
                         category={p.category}
                         brand={p.brand}
                         name={p.name}
+                        serialNum={p.serialNum}
                         from={new Date(p.validFromTimestamp).toLocaleDateString()}
                         to={expDate(p.validFromTimestamp, p.durationMonths)}
                         />)}

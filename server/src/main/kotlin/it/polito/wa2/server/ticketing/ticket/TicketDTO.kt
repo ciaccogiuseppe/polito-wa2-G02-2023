@@ -18,7 +18,7 @@ data class TicketDTO(
     val productId: String,
     @field:Positive
     val serialNum: Long,
-    @field:NotBlank
+
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
     val clientEmail: String?,
