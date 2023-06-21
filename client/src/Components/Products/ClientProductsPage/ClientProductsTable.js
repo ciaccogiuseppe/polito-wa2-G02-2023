@@ -1,6 +1,7 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {reformatCategory} from "./ClientProductsPage";
+import {getProductByIdAPI} from "../../../API/Products";
 
 function reformatId(id){
     return id.substring(0,4) + " " + id.substring(4,8) + " " + id.substring(8,11) + " " + id.substring(11,13)
@@ -10,20 +11,43 @@ function reformatId(id){
 
 function ProductsTableTR(props){
     const [BGcolor, setBGcolor] = useState("");
-    const category = reformatCategory(props.category)
-    const id = reformatId(props.id)
-    const brand = props.brand
-    const name = props.name
+    //const category = reformatCategory(props.category)
+    const id = props.id
+
+    const [category, setCategory] = useState("")
+    const [brand, setBrand] = useState("")
+    const [product, setProduct] = useState("")
+
+    useEffect(() => {
+        getProductByIdAPI(id)
+            .then(response => {
+                setCategory(reformatCategory(response.category))
+                setBrand(response.brand)
+                setProduct(response.name)
+            })
+    }, [])
+
+    //const brand = props.brand
+    //const name = props.name
+    const regDate = props.from
+    const expDate = props.to
     return <tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")} onClick={()=>{}}>
-        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{id}</td>
-        <td className="text-light" style={{fontSize:15, verticalAlign:"middle"}}>{category}</td>
-        <td className="text-light" style={{fontSize:15, verticalAlign:"middle"}}>{brand}</td>
-        <td className="text-light" style={{fontSize:15, verticalAlign:"middle"}}>{name}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{category}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{brand}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{product}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{regDate}</td>
+        <td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>{expDate}</td>
     </tr>
 }
 
 function ClientProductsTable(props){
     const products=props.products
+
+    function expDate(from, duration){
+        let date = new Date(from)
+        date.setMonth(date.getMonth()+duration)
+        return date.toLocaleDateString()
+    }
 
     return <>
         {products.length >= 0  &&
@@ -41,12 +65,17 @@ function ClientProductsTable(props){
                     </thead>
                     <tbody>
                     {/*<tr className="text-light" style={{cursor:"pointer", backgroundColor:BGcolor}} onMouseOver={() => setBGcolor("rgba(0, 0, 0, 0.1)")} onMouseLeave={()=>setBGcolor("")}><td className="text-light">Can't use touchscreen on my phone</td><td style={{verticalAlign:"middle"}}><div  style={{borderRadius:"25px", color:"white", backgroundColor:"#dc8429", fontSize:10, textAlign:"center", verticalAlign:"middle", padding:5}}>IN PROGRESS</div></td><td className="text-light" style={{fontSize:12, verticalAlign:"middle"}}>05/02/2022</td></tr>*/}
-                    {products.map(p =>
+                    {products
+                        .sort((a,b) => a.validFromTimestamp < b.validFromTimestamp)
+                        .map(p =>
                         <ProductsTableTR
                         id={p.productId}
                         category={p.category}
                         brand={p.brand}
-                        name={p.name}/>)}
+                        name={p.name}
+                        from={new Date(p.validFromTimestamp).toLocaleDateString()}
+                        to={expDate(p.validFromTimestamp, p.durationMonths)}
+                        />)}
 
                     </tbody>
                 </table>

@@ -104,7 +104,7 @@ function ClientProductsPage(props) {
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"20px", marginTop:"2px"}}/>
 
 
-            <div style={{width:"75%", alignSelf:"center", margin:"auto", borderRadius:"25px", marginTop: "15px", backgroundColor:"rgba(0,0,0,0.2)" }}>
+            {/*<div style={{width:"75%", alignSelf:"center", margin:"auto", borderRadius:"25px", marginTop: "15px", backgroundColor:"rgba(0,0,0,0.2)" }}>
                 <h4 style={{color:"#EEEEEE", paddingTop:"10px" }}>FILTERS</h4>
                 {showFilters?
                     <div onClick={()=>{setShowFilters(false)}} style={{display:"inline-block", paddingBottom:"10px", cursor:"pointer"}}>
@@ -152,7 +152,7 @@ function ClientProductsPage(props) {
                     </Row>
                 </>}
 
-            </div>
+            </div>*/}
 
 
             <ClientProductsTable products={productsList}/>

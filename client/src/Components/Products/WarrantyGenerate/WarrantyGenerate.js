@@ -29,6 +29,7 @@ function WarrantyGenerate(props) {
     const [serialNumber, setSerialNumber] = useState("")
     const [warrantyCode, setWarrantyCode] = useState("")
     const [expiration, setExpiration] = useState("")
+    const [duration, setDuration] = useState("")
     const [generated, setGenerated] = useState("")
     const [pid1, setPid1] = useState("")
     const [pid2, setPid2] = useState("")
@@ -73,7 +74,7 @@ function WarrantyGenerate(props) {
                 products.filter(p => p.productId === response.data.productId).map(p=>p.brand + " - " + p.name)[0])
             setWarrantyCode(response.data.uuid)
             let date = new Date(response.data.validFromTimestamp)
-            date.setMonth(date.getMonth()+12)
+            date.setMonth(date.getMonth()+response.data.durationMonths)
             setExpiration(
                 date.toLocaleDateString())
             setGenerated(new Date(response.data.validFromTimestamp).toLocaleDateString())
@@ -82,13 +83,13 @@ function WarrantyGenerate(props) {
                 addItemAPI({
                     productId:useProductId?productId:product,
                     serialNum:serialNumber,
-                    durationMonths:12
+                    durationMonths:duration
                 }).then((response) => {
                     setSelectedProduct(
                         products.filter(p => p.productId === response.data.productId).map(p=>p.brand + " - " + p.name)[0])
                     setWarrantyCode(response.data.uuid)
                     let date = new Date(response.data.validFromTimestamp)
-                    date.setMonth(date.getMonth()+12)
+                    date.setMonth(date.getMonth()+response.data.durationMonths)
                     setExpiration(
                         date.toLocaleDateString())
                     setGenerated(new Date(response.data.validFromTimestamp).toLocaleDateString())
@@ -155,6 +156,8 @@ function WarrantyGenerate(props) {
 
                     <Form.Label style={{color:"#DDDDDD", fontSize:12, marginTop:"10px"}}>Serial Number</Form.Label>
                     <Form.Control value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)}  className={"form-control:focus"} placeholder={"Serial Number"} style={{width: "300px", alignSelf:"center", margin:"auto", marginBottom:"20px", fontSize:12}}/>
+                <Form.Label style={{color:"#DDDDDD", fontSize:12, marginTop:"10px"}}>Duration (months)</Form.Label>
+                    <Form.Control value={duration} onChange={(e) => setDuration(e.target.value)} type={"number"} min={0}  className={"form-control:focus"} placeholder={"Duration"} style={{width: "300px", alignSelf:"center", margin:"auto", marginBottom:"20px", fontSize:12}}/>
                 </Form.Group>
                 {errorMessage && <><div style={{margin:"10px"}}>
                     <ErrorMessage text={errorMessage} close={()=>{setErrorMessage("")}}/> </div></>}
