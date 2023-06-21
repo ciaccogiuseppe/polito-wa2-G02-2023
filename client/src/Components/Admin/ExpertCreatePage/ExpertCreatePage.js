@@ -1,4 +1,4 @@
-import { Button, Form, Spinner, Col, Row } from "react-bootstrap";
+import {Button, Form, Spinner, Col, Row, InputGroup} from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import React, { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
@@ -120,17 +120,18 @@ function ExpertCreatePage(props) {
                     <Form className="form" style={{ marginTop: "30px" }}>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label style={{ color: "#DDDDDD" }}>Expert Details</Form.Label>
-                            <Form.Control value={name} className={"form-control:focus"} style={{ width: "250px", alignSelf: "center", margin: "auto" }} type="input" placeholder="First Name" onChange={e => setName(e.target.value)} />
-                            <Form.Control value={surname} className={"form-control:focus"} style={{ width: "250px", alignSelf: "center", margin: "auto", marginTop: "10px" }} type="input" placeholder="Last Name" onChange={e => setSurname(e.target.value)} />
-                        </Form.Group>
+                            <div style={{width:"300px", margin:"auto"}}>
+                                <Form.Control value={name} className={"form-control:focus"} style={{display:"inline-block",  marginRight:"10px", width: "140px", alignSelf:"center", marginTop:"5px", fontSize:12}} type="input" placeholder="First Name" onChange={e => setName(e.target.value)}/>
+                                <Form.Control value={surname} className={"form-control:focus"} style={{display:"inline-block", marginLeft:"10px", width: "140px", alignSelf:"center", marginTop:"5px", fontSize:12}} type="input" placeholder="Last Name" onChange={e => setSurname(e.target.value)}/>
+                            </div></Form.Group>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label style={{ color: "#DDDDDD" }}>Email address</Form.Label>
-                            <Form.Control value={email} className={"form-control:focus"} style={{ width: "250px", alignSelf: "center", margin: "auto" }} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)} />
+                            <Form.Control value={email} className={"form-control:focus"} style={{fontSize:12, width: "300px", alignSelf: "center", margin: "auto" }} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
-                            <Form.Control value={password} style={{ width: "250px", alignSelf: "center", margin: "auto" }} type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
-                            <Form.Control value={password2} style={{ width: "250px", alignSelf: "center", margin: "auto", marginTop: "10px" }} type="password" placeholder="Confirm Password" onChange={e => setPassword2(e.target.value)} />
+                            <Form.Control value={password} style={{fontSize:12, width: "300px", alignSelf: "center", margin: "auto" }} type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+                            <Form.Control value={password2} style={{fontSize:12, width: "300px", alignSelf: "center", margin: "auto", marginTop: "10px" }} type="password" placeholder="Confirm Password" onChange={e => setPassword2(e.target.value)} />
                         </Form.Group>
                     </Form>
                 </Col>
@@ -144,7 +145,9 @@ function ExpertCreatePage(props) {
                 </Col>
             </Row>
             <NavigationButton text={"Create new expert"} onClick={e => { e.preventDefault(); submit() }} />
-
+            <div style={{marginTop:"20px"}}>
+                <NavigationButton text={"Back"} onClick={e => {e.preventDefault(); navigate(-1)}}/>
+            </div>
             {errorMessage && <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />}
 
         </div>

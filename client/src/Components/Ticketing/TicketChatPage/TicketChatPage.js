@@ -176,6 +176,7 @@ function StatusEditList(props){
             break;
         case("RESOLVED"):
             if(role === "EXPERT" || role === "MANAGER") types=["REOPENED", "CLOSED"]
+            else if(role === "CLIENT") types=["REOPENED"]
             break;
     }
     return types.map(t => <StatusEdit type={t} onClick={()=>{props.onClick(t)}}/>)

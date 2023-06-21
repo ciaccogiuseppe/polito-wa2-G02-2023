@@ -1,6 +1,6 @@
 import {Button, Form, Spinner} from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {addNewProfile} from "../../../API/Profiles";
 import NavigationButton from "../../Common/NavigationButton";
 import NavigationLink from "../../Common/NavigationLink";
@@ -105,7 +105,11 @@ function VendorCreatePage(props){
                         <Form.Control value={password2} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px", fontSize:12}} type="password" placeholder="Confirm Password" onChange={e => setPassword2(e.target.value)}/>
                     </Form.Group>
                     <NavigationButton text={"Create vendor"} onClick={e => {e.preventDefault(); submit()}}/>
+                    <div style={{marginTop:"20px"}}>
+                        <NavigationButton text={"Back"} onClick={e => {e.preventDefault(); navigate(-1)}}/>
+                    </div>
                 </Form>
+
 
                 {errorMessage && <ErrorMessage close={()=>setErrorMessage("")} text={errorMessage}/>}
 

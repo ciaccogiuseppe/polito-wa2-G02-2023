@@ -102,14 +102,14 @@ function TicketHistoryPage(props) {
                                 <span style={{ color: "#DDDDDD" }}>User Email</span>
                                 <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                                     <span style={{ cursor: userEmail ? "pointer" : "" }} onClick={() => setUserEmail("")} className="input-group-text">{userEmail ? crossIcon("black", 17) : filterIcon()}</span>
-                                    <input style={{ height: "40px" }} type="text" className="form-control" placeholder="---" value={userEmail} onChange={e => setUserEmail(e.target.value)} />
+                                    <input style={{ height: "40px" }} type="text" className="form-control" placeholder="user@email.com" value={userEmail} onChange={e => setUserEmail(e.target.value)} />
                                 </div>
                             </Col>
                             <Col xs={3}>
                                 <span style={{ color: "#DDDDDD" }}>Expert Email</span>
                                 <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                                     <span style={{ cursor: expertEmail ? "pointer" : "" }} onClick={() => setExpertEmail("")} className="input-group-text">{expertEmail ? crossIcon("black", 17) : filterIcon()}</span>
-                                    <input style={{ height: "40px" }} type="text" className="form-control" placeholder="---" value={expertEmail} onChange={e => setExpertEmail(e.target.value)} />
+                                    <input style={{ height: "40px" }} type="text" className="form-control" placeholder="expert@email.com" value={expertEmail} onChange={e => setExpertEmail(e.target.value)} />
                                 </div>
                             </Col>
                         </Row>

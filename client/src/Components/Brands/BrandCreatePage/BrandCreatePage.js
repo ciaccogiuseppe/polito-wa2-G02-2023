@@ -41,6 +41,9 @@ function BrandCreatePage(props) {
                     <ErrorMessage text={errorMessage} close={()=>{setErrorMessage("")}}/> </div></>}
 
                 <NavigationButton text={"Insert"} onClick={e => {e.preventDefault(); addProduct()}}/>
+                <div style={{marginTop:"20px"}}>
+                    <NavigationButton text={"Back"} onClick={e => {e.preventDefault(); navigate(-1)}}/>
+                </div>
             </Form>
 
         </div>

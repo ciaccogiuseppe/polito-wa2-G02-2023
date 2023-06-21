@@ -221,17 +221,17 @@ function TicketListPage(props) {
 
                         {user.role === "MANAGER" && <>
                             <div style={{ display: "inline-block", maxWidth: "250px" }}>
-                                <span style={{ color: "#DDDDDD" }}>User Email</span>
+                                <span style={{ color: "#DDDDDD" }}>Client Email</span>
                                 <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                                     <span style={{ cursor: userEmail ? "pointer" : "" }} onClick={() => setUserEmail("")} className="input-group-text">{userEmail ? crossIcon("black", 17) : filterIcon()}</span>
-                                    <input style={{ fontSize: 13 }} type="text" className="form-control" placeholder="---" value={userEmail} onChange={e => setUserEmail(e.target.value)} />
+                                    <input style={{ fontSize: 13 }} type="text" className="form-control" placeholder="client@email.com" value={userEmail} onChange={e => setUserEmail(e.target.value)} />
                                 </div>
                             </div>
                             <div style={{ display: "inline-block", maxWidth: "250px" }}>
                                 <span style={{ color: "#DDDDDD" }}>Expert Email</span>
                                 <div className="input-group mb-3" style={{ marginTop: "8px" }}>
                                     <span style={{ cursor: expertEmail ? "pointer" : "" }} onClick={() => setExpertEmail("")} className="input-group-text">{expertEmail ? crossIcon("black", 17) : filterIcon()}</span>
-                                    <input style={{ fontSize: 13 }} type="text" className="form-control" placeholder="---" value={expertEmail} onChange={e => setExpertEmail(e.target.value)} />
+                                    <input style={{ fontSize: 13 }} type="text" className="form-control" placeholder="expert@email.com" value={expertEmail} onChange={e => setExpertEmail(e.target.value)} />
                                 </div>
                             </div>
                         </>}

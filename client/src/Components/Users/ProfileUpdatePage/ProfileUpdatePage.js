@@ -100,6 +100,9 @@ function ProfileUpdatePage(props) {
             <div style={{marginTop:"20px"}}>
                 <NavigationButton text={"Submit"} onClick={e => {e.preventDefault(); updateProfile()}}/>
             </div>
+            <div style={{marginTop:"20px"}}>
+                <NavigationButton text={"Back"} onClick={e => {e.preventDefault(); navigate("/profileinfo")}}/>
+            </div>
 
 
         </div>
