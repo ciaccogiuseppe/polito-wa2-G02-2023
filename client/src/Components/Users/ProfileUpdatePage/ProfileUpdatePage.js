@@ -5,12 +5,13 @@ import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {updateClientAPI, updateExpertAPI, updateManagerAPI} from "../../../API/Profiles";
 import ErrorMessage from "../../Common/ErrorMessage";
+import {getProfileInfo} from "../../../API/Auth";
 
 //const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
 function ProfileUpdatePage(props) {
     const loggedIn=props.loggedIn
-    const Profile = props.user
+    const [Profile, setProfile] = useState({})
     const navigate = useNavigate()
 
     const [firstName,setFirstName] = useState(Profile.name || "")
@@ -33,19 +34,34 @@ function ProfileUpdatePage(props) {
                 .catch(err => setErrorMessage(err))
         }
         else if(Profile.role === "EXPERT"){
-            updateExpertAPI({firstName:firstName, lastName:lastName, address:address, email:Profile.email, userName:Profile.email, expertCategories: Profile.expertCategories}, Profile.email)
+            updateExpertAPI({firstName:firstName, lastName:lastName, address: {}, email:Profile.email, userName:Profile.email, expertCategories: Profile.expertCategories}, Profile.email)
                 .then(()=>navigate("/profileinfo",  {replace:true, state:{message:"Profile updated successfully"}}))
                 .catch(err => setErrorMessage(err))
         }
         else if(Profile.role === "MANAGER"){
-            updateManagerAPI({firstName:firstName, lastName:lastName, address:address, email:Profile.email, userName:Profile.email, expertCategories:[]}, Profile.email)
+            updateManagerAPI({firstName:firstName, lastName:lastName, address: {}, email:Profile.email, userName:Profile.email, expertCategories:[]}, Profile.email)
                 .then(()=>navigate("/profileinfo",  {replace:true, state:{message:"Profile updated successfully"}}))
                 .catch(err => setErrorMessage(err))
         }
     }
     useEffect(() => {
         window.scrollTo(0, 0)
+        getProfileInfo()
+            .then(response => { setProfile(response.data) })
+            .catch(err => console.log(err))
+
     }, [])
+
+    useEffect(() => {
+        setFirstName(Profile.name)
+        setLastName(Profile.surname)
+        if (Profile.address) {
+            setCountry(Profile.address.country)
+            setRegion(Profile.address.region)
+            setCity(Profile.address.city)
+            setAddress(Profile.address.address)
+        }
+    }, [Profile])
 
     return <>
         <AppNavbar user={props.user} loggedIn={loggedIn} selected={"profile"} logout={props.logout}/>
@@ -71,10 +87,10 @@ function ProfileUpdatePage(props) {
 
                 {Profile.role === "CLIENT" && <div style={{marginTop:"15px"}}>
                     <h5 style={{color:"white"}}>Address</h5>
-                    <Form.Control value={country} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="Country" onChange={e => setCountry(e.target.value)}/>
-                    <Form.Control value={region} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="Region" onChange={e => setRegion(e.target.value)}/>
-                    <Form.Control value={city} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="City" onChange={e => setCity(e.target.value)}/>
-                    <Form.Control value={address} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="Address" onChange={e => setAddress(e.target.value)}/>
+                    <Form.Control value={country || ""} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12}} placeholder="Country" onChange={e => setCountry(e.target.value)}/>
+                    <Form.Control value={region || ""} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="Region" onChange={e => setRegion(e.target.value)}/>
+                    <Form.Control value={city || ""} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="City" onChange={e => setCity(e.target.value)}/>
+                    <Form.Control value={address || ""} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", fontSize:12, marginTop:"15px"}} placeholder="Address" onChange={e => setAddress(e.target.value)}/>
                 </div>}
 
 
