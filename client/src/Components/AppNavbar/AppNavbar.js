@@ -29,23 +29,14 @@ function AppNavbar(props){
                                     <NavbarLink href={"/userscreate"} text={"USERS"}  selected={selected==="userscreate"}/>
                                 </>
                             }
+                            {(props.user !== null && props.user.role === "CLIENT") &&
+                                <>
+                                    <NavbarLink href={"/products"} text={"PRODUCTS"}  selected={selected==="products"}/>
+                                </>
+                            }
                         </>}
                         {/*<NavbarLink href={"/"} text={"CONTACTS"}  selected={selected==="contacts"}/>*/}
                         <NavbarLink href={"/aboutus"} text={"ABOUT US"}  selected={selected==="aboutus"}/>
-                        {/*<NavDropdown
-                        style={{backgroundColor:color2, height:"100%", fontWeight:"bold", color:textColor2}}
-                        title="PRODUCTS"
-                        onMouseOver={()=> {setColor2("#bf730f"); setTextColor2("#666666")}}
-                        onMouseLeave={()=> {setColor2("#CBB279"); setTextColor2("#222222")}}
-                        id="basic-nav-dropdown">
-                        <NavDropdown.Item href="/products" onClick={(e)=>{e.preventDefault(); navigate("/products");}}>Get all products</NavDropdown.Item>
-                        <NavDropdown.Item href="/productid" onClick={(e)=>{e.preventDefault(); navigate("/productid");}}>Get product by ID</NavDropdown.Item>
-                    </NavDropdown>
-                    <NavDropdown title="Profile" id="basic-nav-dropdown">
-                        <NavDropdown.Item href="/userinfo" onClick={(e)=>{e.preventDefault(); navigate("/userinfo");}}>Get profile info</NavDropdown.Item>
-                        <NavDropdown.Item href="/usercreate" onClick={(e)=>{e.preventDefault(); navigate("/usercreate");}}>Create profile</NavDropdown.Item>
-                        <NavDropdown.Item href="/usercreate" onClick={(e)=>{e.preventDefault(); navigate("/userupdate");}}>Update profile</NavDropdown.Item>
-                    </NavDropdown>*/}
                     </Nav>
 
 

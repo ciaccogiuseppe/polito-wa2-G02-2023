@@ -30,9 +30,10 @@ class ProfileController(private val profileService: ProfileService) {
         return profileService.getProfile(email)
     }
 
-    @GetMapping("/API/client/profiles/{email}/items")
-    fun getProfileItems(@PathVariable email: String): List<ItemDTO> {
-        checkEmail(email)
+    @GetMapping("/API/client/profiles/items")
+    fun getProfileItems(principal: Principal): List<ItemDTO> {
+        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
+        val email = token.tokenAttributes["email"] as String
         return profileService.getProfileItems(email)
     }
 

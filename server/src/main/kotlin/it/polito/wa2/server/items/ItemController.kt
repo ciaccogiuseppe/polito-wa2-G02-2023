@@ -42,15 +42,15 @@ class ItemController(private val itemService: ItemService) {
         return itemService.createUUID(itemDTO)
     }
 
-    @PutMapping("/API/client/products/{productId}/items/{serialNum}/client")
-    fun assignClient(principal: Principal, @PathVariable("productId") productId: String, @PathVariable("serialNum") serialNum: Long,
+    @PutMapping("/API/client/products/items/register")
+    fun assignClient(principal: Principal,
                      @RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         val userEmail = token.tokenAttributes["email"] as String
-        checkProductId(productId)
-        checkSerialNum(serialNum)
         checkInputItem(itemDTO, br)
-        return itemService.assignClient(userEmail, productId, serialNum, itemDTO!!)
+        checkProductId(itemDTO!!.productId)
+        checkSerialNum(itemDTO.serialNum)
+        return itemService.assignClient(userEmail, itemDTO)
     }
 
     private fun checkProductId(productId: String) {

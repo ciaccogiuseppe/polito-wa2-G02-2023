@@ -64,17 +64,13 @@ class ItemServiceImpl(
         return itemRepository.save(item).toDTO()
     }
 
-    override fun assignClient(userEmail: String, productId: String, serialNum: Long, itemDTO: ItemDTO): ItemDTO {
-        if(productId != itemDTO.productId)
-            throw BadRequestItemException("ProductId in path doesn't match the productId in the body")
-        if(serialNum != itemDTO.serialNum)
-            throw BadRequestItemException("SerialNum in path doesn't match the serialNum in the body")
+    override fun assignClient(userEmail: String, itemDTO: ItemDTO): ItemDTO {
         if(itemDTO.uuid == null) {
             throw BadRequestItemException("UUID cannot be null")
         }
         val product = getProduct(itemDTO.productId)
-        val item = itemRepository.findByProductAndSerialNum(product, serialNum)
-            ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
+        val item = itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum)
+            ?: throw ItemNotFoundException("Item with productIid '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}' not found")
         if(itemDTO.uuid != item.uuid)
             throw ForbiddenException("Impossible to be linked to the product")
         item.client = getProfileByEmail(userEmail)

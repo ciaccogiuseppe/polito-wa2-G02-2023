@@ -9,5 +9,5 @@ interface ItemService {
 
     fun createUUID(itemDTO: ItemDTO): ItemDTO
 
-    fun assignClient(userEmail: String, productId: String, serialNum: Long, itemDTO: ItemDTO): ItemDTO
+    fun assignClient(userEmail: String, itemDTO: ItemDTO): ItemDTO
 }
