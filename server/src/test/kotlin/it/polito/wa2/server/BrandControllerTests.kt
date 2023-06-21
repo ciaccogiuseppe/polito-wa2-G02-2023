@@ -355,5 +355,34 @@ class BrandControllerTests {
         brandRepository.delete(brand)
     }
 
+    @Test
+    fun addBrandWrongFormat() {
+        val uri = URI("http://localhost:$port/API/manager/brand/")
+
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val brandEntity = object {
+            val value = "Apple"
+        }
+
+
+        val entity = TestUtils.testEntityHeader(brandEntity, managerToken)
+
+
+        val result = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            entity,
+            String::class.java
+        )
+
+        brandRepository.delete(brand)
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
+    }
+
 }
 

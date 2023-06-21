@@ -2,11 +2,13 @@ package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.security.LoginRequest
+import it.polito.wa2.server.security.RefreshRequest
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.json.BasicJsonParser
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -29,6 +31,7 @@ import java.net.URI
 @AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
 class AuthControllerTest {
 
+    val json = BasicJsonParser()
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -234,6 +237,71 @@ class AuthControllerTest {
 
         val requestEntity : HttpEntity<LoginRequest> = HttpEntity(loginRequest, headers)
         val result = restTemplateE.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+    }
+
+    @Test
+    fun loginClientRefreshTokenSuccessful() {
+        val url = "http://localhost:$port/API/login"
+        val uri = URI(url)
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val loginRequest = LoginRequest("client@polito.it", "password")
+
+        val requestEntity : HttpEntity<LoginRequest> = HttpEntity(loginRequest, headers)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val url2 = "http://localhost:$port/API/refreshtoken"
+        val uri2 = URI(url2)
+
+        val refreshToken = json.parseMap(result.body)["refreshToken"] as String
+
+        val headers2 = HttpHeaders()
+        headers2.contentType = MediaType.APPLICATION_JSON
+         val refreshRequest = RefreshRequest(refreshToken)
+
+        val requestEntity2 : HttpEntity<RefreshRequest> = HttpEntity(refreshRequest, headers2)
+        val result2 = restTemplate.exchange(uri2, HttpMethod.POST, requestEntity2, String::class.java)
+
+        Assertions.assertEquals(HttpStatus.OK, result2.statusCode)
+    }
+
+    @Test
+    fun loginClientRefreshTokenFailed() {
+        val url = "http://localhost:$port/API/refreshtoken"
+        val uri = URI(url)
+
+        val refreshToken = "wrongToken"
+
+        val reqFactory = SimpleClientHttpRequestFactory()
+        reqFactory.setOutputStreaming(false)
+
+        restTemplateE.restTemplate.requestFactory = reqFactory
+        restTemplateE.restTemplate.errorHandler = object:ResponseErrorHandler{
+            override fun hasError(response: ClientHttpResponse): Boolean {
+                return response.statusCode.isError
+            }
+
+            override fun handleError(response: ClientHttpResponse) {
+                if(response.statusCode.is4xxClientError){
+                    if(response.statusCode.value() == 401){
+                        println("unauthorized")
+                    }
+                }
+            }
+        }
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        val refreshRequest = RefreshRequest(refreshToken)
+
+        val requestEntity : HttpEntity<RefreshRequest> = HttpEntity(refreshRequest, headers)
+        val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
     }
