@@ -251,6 +251,8 @@ class TicketServiceImpl(
             TicketStatus.IN_PROGRESS -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED))
             TicketStatus.REOPENED -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED))
         }
+        if(newState == TicketStatus.REOPENED)
+            ticket.expert = null
     }
 
     private fun checkNewStateExpert(newState: TicketStatus, ticket: Ticket) {
