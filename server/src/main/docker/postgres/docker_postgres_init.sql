@@ -184,15 +184,22 @@ DO
 $$
     DECLARE
         id bigint;
+        id2 bigint;
+        id_e1 bigint;
+        id_e2 bigint;
     BEGIN
         select nextval('profiles_id_seq') into id;
         insert into profiles(id, email, name, surname, role) values (id, 'client1@polito.it', 'ClientA', 'PoliTo', 'CLIENT');
+        select nextval('addresses_id_seq') into id2;
+        insert into addresses(id, address, city, country, region, client_id) values (id2, 'Corso Duca degli Abruzzi, 24', 'Turin', 'Italy', 'Piedmont', id);
         select nextval('profiles_id_seq') into id;
         insert into profiles(id, email, name, surname, role) values (id, 'client2@polito.it', 'ClientB', 'PoliTo', 'CLIENT');
-        select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role) values (id, 'expert1@polito.it', 'ExpertA', 'PoliTo', 'EXPERT');
-        select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role) values (id, 'expert2@polito.it', 'ExpertB', 'PoliTo', 'EXPERT');
+        select nextval('addresses_id_seq') into id2;
+        insert into addresses(id, address, city, country, region, client_id) values (id2, 'Piazza Leonardo da Vinci, 32', 'Milan', 'Italy', 'Lombardy', id);
+        select nextval('profiles_id_seq') into id_e1;
+        insert into profiles(id, email, name, surname, role) values (id_e1, 'expert1@polito.it', 'ExpertA', 'PoliTo', 'EXPERT');
+        select nextval('profiles_id_seq') into id_e2;
+        insert into profiles(id, email, name, surname, role) values (id_e2, 'expert2@polito.it', 'ExpertB', 'PoliTo', 'EXPERT');
         select nextval('profiles_id_seq') into id;
         insert into profiles(id, email, name, surname, role) values (id, 'manager@polito.it', 'Manager', 'PoliTo', 'MANAGER');
         select nextval('profiles_id_seq') into id;
@@ -345,6 +352,7 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000062', 'Huawei Nova 7', (SELECT brands.id FROM brands WHERE name = 'Huawei'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000063', 'Huawei P30 Lite', (SELECT brands.id FROM brands WHERE name = 'Huawei'), id);
 
+        insert into category_assigned(expert_id, category_id) values (id_e1, id);
 
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'TV');
@@ -414,6 +422,9 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000158', 'MSI Trident X', (SELECT brands.id FROM brands WHERE name = 'MSI'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000159', 'MSI Creator 17', (SELECT brands.id FROM brands WHERE name = 'MSI'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000160', 'MSI Optix MAG341CQ', (SELECT brands.id FROM brands WHERE name = 'MSI'), id);
+
+        insert into category_assigned(expert_id, category_id) values (id_e1, id);
+        insert into category_assigned(expert_id, category_id) values (id_e2, id);
 
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'SOFTWARE');
@@ -503,6 +514,8 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000254', 'Intel 545s SSD', (SELECT brands.id FROM brands WHERE name = 'Intel'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000255', 'Intel Optane Memory', (SELECT brands.id FROM brands WHERE name = 'Intel'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000256', 'Intel DC P4510 NVMe SSD', (SELECT brands.id FROM brands WHERE name = 'Intel'), id);
+
+        insert into category_assigned(expert_id, category_id) values (id_e2, id);
 
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'OTHER');
