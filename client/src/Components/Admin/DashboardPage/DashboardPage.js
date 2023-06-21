@@ -7,8 +7,11 @@ import { getAllTicketsManager } from "../../../API/Tickets";
 
 
 function DashboardPage(props) {
-    const [dataAssigned, setDataAssigned] = useState([]);
-    const [dataUnassigned, setDataUnassigned] = useState([]);
+    const [dataOpen, setDataOpen] = useState([]);
+    const [dataClosed, setDataClosed] = useState([]);
+    const [dataReopened, setDataReopened] = useState([]);
+    const [dataInProgress, setDataInProgress] = useState([]);
+    const [dataResolved, setDataResolved] = useState([]);
 
     let horizontalLabels = getHorizontalLabels();
     var initialDate = horizontalLabels[0];
@@ -17,17 +20,35 @@ function DashboardPage(props) {
         labels: horizontalLabels.map(date => date.toDateString().substring(4, 10)),
         datasets: [
             {
-                label: 'Assigned',
-                backgroundColor: '#A2F1A2',
-                borderColor: '#00FF00',
-                data: dataAssigned,
+                label: 'OPEN',
+                backgroundColor: '#FFFFFF',
+                borderColor: '#000000',
+                data: dataOpen,
             },
             {
-                label: 'Unassigned',
-                backgroundColor: '#F47E7E',
-                borderColor: '#FF0000',
-                data: [0, 0, 0, 0, 0, 0, 0],
+                label: 'CLOSED',
+                backgroundColor: '#000000',
+                borderColor: '#000000',
+                data: dataClosed,
             },
+            {
+                label: 'REOPENED',
+                backgroundColor: '#9a9a9a',
+                borderColor: '#000000',
+                data: dataReopened,
+            },
+            {
+                label: 'IN PROGRESS',
+                backgroundColor: '#b087c7',
+                borderColor: '#000000',
+                data: dataInProgress,
+            },
+            {
+                label: 'RESOLVED',
+                backgroundColor: '#53b02f',
+                borderColor: '#000000',
+                data: dataResolved,
+            }
         ],
     };
 
@@ -47,16 +68,34 @@ function DashboardPage(props) {
                 // .sort((a, b) => a.createdTimestamp > b.createdTimestamp)
                 .reduce((r, t) => {
                     let formattedDate = new Date(t.createdTimestamp).toDateString().substring(4, 10);
-                    r[formattedDate] = r[formattedDate] || 0;
-                    r[formattedDate] += 1;
+                    let status = t.status;
+                    r[formattedDate] = r[formattedDate] || {};
+                    r[formattedDate][status] = r[formattedDate][status] || 0;
+                    r[formattedDate][status] += 1;
                     return r;
                 }, Object.create(null))
-            // console.log(ticketsData)
-            let values = [];
+            let values = {
+                open: [],
+                closed: [],
+                reopened: [],
+                inProgress: [],
+                resolved: []
+            };
             for (let i = 0; i < 7; ++i) {
-                values.push(ticketsData[data.labels[i]])
+                let currDate = data.labels[i];
+                let dataOfDay = ticketsData[currDate];
+                values.open.push(dataOfDay ? dataOfDay["OPEN"] ? dataOfDay["OPEN"] : 0 : 0)
+                values.closed.push(dataOfDay ? dataOfDay["CLOSED"] ? dataOfDay["CLOSED"] : 0 : 0)
+                values.reopened.push(dataOfDay ? dataOfDay["REOPENED"] ? dataOfDay["REOPENED"] : 0 : 0)
+                values.inProgress.push(dataOfDay ? dataOfDay["IN_PROGRESS"] ? dataOfDay["IN_PROGRESS"] : 0 : 0)
+                values.resolved.push(dataOfDay ? dataOfDay["RESOLVED"] ? dataOfDay["RESOLVED"] : 0 : 0)
             }
-            setDataAssigned(values);
+            // console.log(values)
+            setDataOpen(values.open);
+            setDataClosed(values.closed);
+            setDataReopened(values.reopened);
+            setDataInProgress(values.inProgress);
+            setDataResolved(values.resolved);
         })
     }, []);
 
