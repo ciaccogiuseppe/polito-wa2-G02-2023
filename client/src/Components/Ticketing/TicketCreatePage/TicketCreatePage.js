@@ -31,7 +31,7 @@ function TicketCreatePage(props) {
         getAllProducts().then((prods) => {
             getAllItemsAPI().then(ps => {
                 const pd = ps.map( p => {
-                    return {...p, product:prods.filter(p => p.productId === p.productId)[0]}
+                    return {...p, product:prods.filter(pd => p.productId === pd.productId)[0]}
                 })
                 setProducts(pd)
             })
