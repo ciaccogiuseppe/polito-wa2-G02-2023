@@ -630,6 +630,142 @@ In an attempt to resolve the audio distortion problem, I have performed the foll
     Adjusted audio settings: I have reviewed and adjusted the audio settings on my Sony Bravia X70J TV, ensuring that they are optimized for the best audio quality. However, the distortion issue remains unresolved.
     Tested different audio sources: I have tested the TV with various audio sources, including different channels and streaming services, to rule out the possibility of a specific source causing the distortion. Unfortunately, the problem persists across all sources.
     Checked external devices: I have disconnected all external devices connected to the TV, such as soundbars or AV receivers, to ensure that they are not causing the audio distortion. However, the issue still persists when using the TV\'s built-in speakers.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (4, '2023-06-20 20:04:23.758000', e'I am reaching out to you regarding a pressing concern with my Sony Bravia X70J television. Unfortunately, I have been experiencing consistent audio distortion, severely impacting my viewing enjoyment. I humbly request your prompt assistance in resolving this matter.
+
+Issue Description:
+I have noticed persistent audio distortion on my Sony Bravia X70J TV, causing the sound to become muffled and unclear. This problem persists regardless of the audio source, encompassing both built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+To address the audio distortion, I have undertaken the following troubleshooting steps, but have been unable to resolve the issue:
+
+    Adjusted audio settings: I carefully reviewed and optimized the TV\'s audio settings, aiming to enhance the sound quality. Unfortunately, the distortion problem persists despite these adjustments.
+
+    Tested different audio sources: I conducted tests using various audio sources to eliminate the possibility of a specific source causing the distortion. Regrettably, the issue persists across all sources, indicating an underlying concern.
+
+    Checked external devices: As a precautionary measure, I disconnected all external devices connected to the TV, such as soundbars or AV receivers. However, even when relying solely on the TV\'s internal speakers, the audio distortion persists.
+
+Given the urgency and adverse impact on my viewing experience, I sincerely seek your expertise and support in promptly resolving this matter. Your prompt attention would be greatly appreciated.
+
+Thank you for your understanding and assistance.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (5, '2023-06-20 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+
+Issue Description:
+The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+I have attempted to address the audio distortion issue with the following unsuccessful troubleshooting steps:
+
+    Adjusted audio settings: I reviewed and optimized the TV\'s audio settings for better quality, but the distortion remains unresolved.
+
+    Tested different audio sources: I tested various audio sources to rule out any specific source causing the issue, but the distortion persists across all sources.
+
+    Checked external devices: I disconnected all external devices to eliminate them as potential causes, yet the distortion persists when using the TV\'s built-in speakers.
+
+I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
+
+Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (6, '2023-06-20 20:04:23.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
+
+Issue Description:
+I have encountered persistent audio distortion on my Sony Bravia X70J TV, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+Despite my efforts to troubleshoot the issue, the audio distortion problem remains unresolved. Here are the steps I have taken:
+
+    Adjusted audio settings: I thoroughly reviewed and optimized the TV\'s audio settings to ensure the best sound quality. However, the distortion persists despite these adjustments.
+
+    Tested different audio sources: I extensively tested various audio sources to identify any specific cause of the distortion. Unfortunately, the problem persists across all sources.
+
+    Checked external devices: I disconnected all external devices connected to the TV, such as soundbars or AV receivers, to eliminate potential interference. However, the audio distortion persists when using the TV\'s built-in speakers.
+
+Given the urgency and negative impact on my entertainment experience, I humbly request your expert assistance in promptly resolving this matter. Your prompt attention would be greatly appreciated.
+
+Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (17, '2023-06-19 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+
+Issue Description:
+The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+I have attempted to address the audio distortion issue with the following unsuccessful troubleshooting steps:
+
+    Adjusted audio settings: I reviewed and optimized the TV\'s audio settings for better quality, but the distortion remains unresolved.
+
+    Tested different audio sources: I tested various audio sources to rule out any specific source causing the issue, but the distortion persists across all sources.
+
+    Checked external devices: I disconnected all external devices to eliminate them as potential causes, yet the distortion persists when using the TV\'s built-in speakers.
+
+I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
+
+Thank you for your assistance.', 1, 'CLOSED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (7, '2023-06-20 20:04:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
+
+Description of the Issue:
+During my regular usage of the Sony Bravia X70J TV, I have noticed a distressing audio distortion that affects the quality of the sound. The audio output exhibits a muffled and unclear nature, depriving me of the clarity and depth I expect from my viewing sessions. This frustrating problem persists across all audio sources, encompassing the TV\'s built-in apps, external devices connected via HDMI, and even the broadcast channels.
+
+Steps Taken for Troubleshooting:
+In my sincere efforts to address the audio distortion concern, I have undertaken the following troubleshooting measures, unfortunately without success:
+
+    Adjusted audio settings: I diligently reviewed and optimized the audio settings on my Sony Bravia X70J TV, striving to achieve the finest audio quality possible. However, regrettably, these adjustments did not resolve the distortion issue.
+
+    Tested different audio sources: To eliminate the possibility of a specific source causing the problem, I conscientiously tested the TV with various audio sources, including different channels and streaming services. Sadly, the audio distortion persisted across all sources, indicating a more intrinsic problem.
+
+    Checked external devices: In an attempt to isolate the root cause, I meticulously disconnected all external devices connected to the TV, such as soundbars or AV receivers. Despite this precautionary measure, the audio distortion remains prevalent even when utilizing the TV\'s internal speakers.
+
+Considering the urgency and impact of this issue on my entertainment experience, I kindly implore your expertise and support in resolving this matter at the earliest convenience. Your swift assistance would be greatly appreciated.
+
+Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (8, '2023-06-20 20:04:23.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
+
+Issue Description:
+I have encountered persistent audio distortion on my Sony Bravia X70J TV, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+Despite my efforts to troubleshoot the issue, the audio distortion problem remains unresolved. Here are the steps I have taken:
+
+    Adjusted audio settings: I thoroughly reviewed and optimized the TV\'s audio settings to ensure the best sound quality. However, the distortion persists despite these adjustments.
+
+    Tested different audio sources: I extensively tested various audio sources to identify any specific cause of the distortion. Unfortunately, the problem persists across all sources.
+
+    Checked external devices: I disconnected all external devices connected to the TV, such as soundbars or AV receivers, to eliminate potential interference. However, the audio distortion persists when using the TV\'s built-in speakers.
+
+Given the urgency and negative impact on my entertainment experience, I humbly request your expert assistance in promptly resolving this matter. Your prompt attention would be greatly appreciated.
+
+Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (9, '2023-06-20 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+
+Issue Description:
+The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+I have attempted to address the audio distortion issue with the following unsuccessful troubleshooting steps:
+
+    Adjusted audio settings: I reviewed and optimized the TV\'s audio settings for better quality, but the distortion remains unresolved.
+
+    Tested different audio sources: I tested various audio sources to rule out any specific source causing the issue, but the distortion persists across all sources.
+
+    Checked external devices: I disconnected all external devices to eliminate them as potential causes, yet the distortion persists when using the TV\'s built-in speakers.
+
+I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
+
+Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (3, '2023-06-20 20:04:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
+
+Description of the Issue:
+During my regular usage of the Sony Bravia X70J TV, I have noticed a distressing audio distortion that affects the quality of the sound. The audio output exhibits a muffled and unclear nature, depriving me of the clarity and depth I expect from my viewing sessions. This frustrating problem persists across all audio sources, encompassing the TV\'s built-in apps, external devices connected via HDMI, and even the broadcast channels.
+
+Steps Taken for Troubleshooting:
+In my sincere efforts to address the audio distortion concern, I have undertaken the following troubleshooting measures, unfortunately without success:
+
+    Adjusted audio settings: I diligently reviewed and optimized the audio settings on my Sony Bravia X70J TV, striving to achieve the finest audio quality possible. However, regrettably, these adjustments did not resolve the distortion issue.
+
+    Tested different audio sources: To eliminate the possibility of a specific source causing the problem, I conscientiously tested the TV with various audio sources, including different channels and streaming services. Sadly, the audio distortion persisted across all sources, indicating a more intrinsic problem.
+
+    Checked external devices: In an attempt to isolate the root cause, I meticulously disconnected all external devices connected to the TV, such as soundbars or AV receivers. Despite this precautionary measure, the audio distortion remains prevalent even when utilizing the TV\'s internal speakers.
+
+Considering the urgency and impact of this issue on my entertainment experience, I kindly implore your expertise and support in resolving this matter at the earliest convenience. Your swift assistance would be greatly appreciated.
+
+Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
 
     END
 $$;
