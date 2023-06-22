@@ -1,28 +1,26 @@
-.imageModal{
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 10px;
-    align-content: center;
-    align-items:center;
-    --bs-modal-width: 60%;
+.imageModal {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  align-content: center;
+  align-items: center;
+  --bs-modal-width: 60%;
 }
 
-
-.modal-content{
-    background-color: transparent;
-    align-content: center;
-    align-items:center;
-    border-width: 0;
+.modal-content {
+  background-color: transparent;
+  align-content: center;
+  align-items: center;
+  border-width: 0;
 }
 
-
-.modal-body{
-    display: flex;
-    background-color: transparent;
-    align-content: center;
-    align-items:center;
-    width:95%;
+.modal-body {
+  display: flex;
+  background-color: transparent;
+  align-content: center;
+  align-items: center;
+  width: 95%;
 }
 
-.myLink{
-    text-decoration: none;
+.myLink {
+  text-decoration: none;
 }
