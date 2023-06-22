@@ -91,6 +91,9 @@ function LoginPage(props) {
           <span>Don't have an account?</span>{" "}
           <NavigationLink href={"/signup"} text={"Sign up"} />
         </div>
+        <div style={{ fontSize: "12px", color: "#EEEEEE", marginTop: "5px" }}>
+          <NavigationLink href={"/passwordreset"} text={"Forgot your password?"} />
+        </div>
 
         {errorMessage && (
           <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />
