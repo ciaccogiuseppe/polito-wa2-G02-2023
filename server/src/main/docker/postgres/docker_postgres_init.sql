@@ -629,7 +629,7 @@ In an attempt to resolve the audio distortion problem, I have performed the foll
 
     Adjusted audio settings: I have reviewed and adjusted the audio settings on my Sony Bravia X70J TV, ensuring that they are optimized for the best audio quality. However, the distortion issue remains unresolved.
     Tested different audio sources: I have tested the TV with various audio sources, including different channels and streaming services, to rule out the possibility of a specific source causing the distortion. Unfortunately, the problem persists across all sources.
-    Checked external devices: I have disconnected all external devices connected to the TV, such as soundbars or AV receivers, to ensure that they are not causing the audio distortion. However, the issue still persists when using the TV\'s built-in speakers.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+    Checked external devices: I have disconnected all external devices connected to the TV, such as soundbars or AV receivers, to ensure that they are not causing the audio distortion. However, the issue still persists when using the TV\'s built-in speakers.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3, '0000000000112', 633020516);
         INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (4, '2023-06-20 20:04:23.758000', e'I am reaching out to you regarding a pressing concern with my Sony Bravia X70J television. Unfortunately, I have been experiencing consistent audio distortion, severely impacting my viewing enjoyment. I humbly request your prompt assistance in resolving this matter.
 
 Issue Description:
@@ -663,7 +663,7 @@ I have attempted to address the audio distortion issue with the following unsucc
 
 I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
 
-Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3, '0000000000112', 633020516);
         INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (6, '2023-06-20 20:04:23.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
 
 Issue Description:
@@ -748,7 +748,7 @@ I have attempted to address the audio distortion issue with the following unsucc
 
 I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
 
-Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3, '0000000000112', 633020516);
         INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (3, '2023-06-20 20:04:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
 
 Description of the Issue:
@@ -765,7 +765,7 @@ In my sincere efforts to address the audio distortion concern, I have undertaken
 
 Considering the urgency and impact of this issue on my entertainment experience, I kindly implore your expertise and support in resolving this matter at the earliest convenience. Your swift assistance would be greatly appreciated.
 
-Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3, '0000000000112', 633020516);
 
     END
 $$;
