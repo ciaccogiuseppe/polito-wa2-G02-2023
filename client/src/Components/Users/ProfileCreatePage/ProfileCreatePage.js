@@ -98,7 +98,10 @@ function ProfileCreatePage(props) {
           setLoading(false)
           navigate("/")
       })
-      .catch((err) => setErrorMessage(err));
+      .catch((err) => {
+          setLoading(false)
+          setErrorMessage(err)
+      });
   }
   useEffect(() => {
     window.scrollTo(0, 0);
