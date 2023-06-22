@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { reformatCategory } from "./ClientProductsPage";
 import { getProductByIdAPI } from "../../../API/Products";
 
@@ -45,7 +44,7 @@ function ProductsTableTR(props) {
       setBrand(response.brand);
       setProduct(response.name);
     });
-  }, []);
+  }, [id]);
 
   //const brand = props.brand
   //const name = props.name

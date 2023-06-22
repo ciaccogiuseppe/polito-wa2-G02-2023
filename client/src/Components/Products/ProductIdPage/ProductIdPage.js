@@ -8,7 +8,7 @@ function ProductIdPage(props) {
   const [errMessage, setErrMessage] = useState("");
   const [response, setResponse] = useState("");
   function getProduct() {
-    if (productID == "") {
+    if (productID === "") {
       setErrMessage("Product ID must not be empty");
       return;
     } else if (productID.includes("/")) {

@@ -1,16 +1,5 @@
 import { useState } from "react";
 
-function reformatId(id) {
-  return (
-    id.substring(0, 4) +
-    " " +
-    id.substring(4, 8) +
-    " " +
-    id.substring(8, 11) +
-    " " +
-    id.substring(11, 13)
-  );
-}
 
 function BrandsTableTR(props) {
   const [BGcolor, setBGcolor] = useState("");

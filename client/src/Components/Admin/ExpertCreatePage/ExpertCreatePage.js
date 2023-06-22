@@ -24,8 +24,6 @@ function ExpertCreatePage(props) {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const [expertCategories, setExpertCategories] = useState([]);
@@ -36,7 +34,7 @@ function ExpertCreatePage(props) {
           event.target.id,
         ])
       : setExpertCategories((expertCategories) =>
-          expertCategories.filter((e) => e != event.target.id)
+          expertCategories.filter((e) => e !== event.target.id)
         );
   };
 
@@ -276,51 +274,6 @@ function ExpertCreatePage(props) {
       </div>
     </>
   );
-
-  {
-    /*function createExpert(){
-        setLoading(true);
-        addNewProfile({email:email, name:name, surname:surname}).then(
-            res => {
-                setErrMessage("");
-                setResponse("Profile added succesfully");
-                setLoading(false);
-                setEmail("");
-                setName("");
-                setSurname("");
-                //console.log(res);
-            }
-        ).catch(err => {
-            //console.log(err);
-            setResponse("");
-            setErrMessage(err.message);
-            setLoading(false);
-        })
-    }
-
-    return <>
-            <div className="CenteredButton">
-
-                <Form className="form">
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label className="text-info">Email address</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={email} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Name</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={name} type="text" placeholder="Name" onChange={e => setName(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Surname</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={surname} type="text" placeholder="Surname" onChange={e => setSurname(e.target.value)}/>
-                    </Form.Group>
-                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); createProfile();}}>Create Profile</Button>
-                </Form>
-                <hr style={{color:"white", width:"90%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}/>
-                {loading? <Spinner style={{alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}} animation="border" variant="info" /> :
-                    <>
-                        {response?<h4 className="text-success" style={{marginTop:"10px"}}>{response}</h4>:<></>}
-                        {errMessage?<h5 className="text-danger" style={{marginTop:"10px"}}>{errMessage}</h5>:<></>}</>}
-
-            </div>
-    </>*/
-  }
 }
 
 export default ExpertCreatePage;

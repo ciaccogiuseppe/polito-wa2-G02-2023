@@ -1,11 +1,9 @@
-import { Button, Form, Spinner } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import React, { useEffect, useState } from "react";
-import { addNewProfile } from "../../../API/Profiles";
 import NavigationButton from "../../Common/NavigationButton";
-import NavigationLink from "../../Common/NavigationLink";
 import ErrorMessage from "../../Common/ErrorMessage";
-import { createVendorAPI, loginAPI, signupAPI } from "../../../API/Auth";
+import { createVendorAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
 
 function VendorCreatePage(props) {
@@ -15,8 +13,6 @@ function VendorCreatePage(props) {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const loggedIn = props.loggedIn;

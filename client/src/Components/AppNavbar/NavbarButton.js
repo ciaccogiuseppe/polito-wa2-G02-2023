@@ -1,12 +1,9 @@
-import AppNavbar from "./AppNavbar";
 import { Nav } from "react-bootstrap";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function NavbarButton(props) {
   const [color, setColor] = useState("#FDE0BE");
   const [textColor, setTextColor] = useState("#222222");
-  const navigate = useNavigate();
   const selected = props.selected;
   const onClick = props.onClick;
 

@@ -1,7 +1,6 @@
 import { Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { crossIcon, plusIcon, sendIcon } from "./Icons";
+import { sendIcon } from "./Icons";
 
 function SendButton(props) {
   const [color, setColor] = useState("#5fa960");

@@ -1,7 +1,6 @@
 import { Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { crossIcon, plusIcon } from "./Icons";
+import { crossIcon } from "./Icons";
 
 function DeleteButton(props) {
   const [color, setColor] = useState("#d26363");

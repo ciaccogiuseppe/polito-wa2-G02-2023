@@ -1,10 +1,6 @@
-import { crossIcon, xIcon } from "./Icons";
-import { useState } from "react";
 
 function InfoMessage(props) {
   const text = props.text;
-  const [color, setColor] = useState("#faecc4");
-  const close = props.close;
   return (
     <div
       style={{

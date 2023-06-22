@@ -1,8 +1,7 @@
-import { Button } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import AppNavbar from "../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NavigationButton from "../Common/NavigationButton";
 import NavigationLink from "../Common/NavigationLink";
 import WarrantyGenerate from "../Products/WarrantyGenerate/WarrantyGenerate";

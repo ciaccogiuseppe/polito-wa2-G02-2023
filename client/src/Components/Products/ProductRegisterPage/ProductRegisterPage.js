@@ -3,28 +3,19 @@ import { Form } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useEffect, useState } from "react";
 import {
-  addProductAPI,
-  getAllBrands,
-  getAllCategories,
   getAllProducts,
 } from "../../../API/Products";
 import ErrorMessage from "../../Common/ErrorMessage";
 import {
-  deformatCategory,
   reformatCategory,
 } from "../ProductsPage/ProductsPage";
 import { useNavigate } from "react-router-dom";
 import { assignItemAPI } from "../../../API/Item";
 
 function ProductRegisterPage(props) {
-  const loggedIn = props.loggedIn;
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [file, setFile] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const loggedIn = props.loggedIn;const [categories, setCategories] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [brands, setBrands] = useState([]);
-  const [productId, setProductId] = useState("");
   const [brand, setBrand] = useState("");
   const [serialNum, setSerialNum] = useState("");
   const [category, setCategory] = useState("");
@@ -61,7 +52,7 @@ function ProductRegisterPage(props) {
         .filter((v, i, a) => a.indexOf(v) === i)
         .sort()
     );
-  }, [category]);
+  }, [category, products]);
 
   useEffect(() => {
     setProduct("");
@@ -78,7 +69,7 @@ function ProductRegisterPage(props) {
           a.name.localeCompare(b.name, undefined, { numeric: true })
         )
     );
-  }, [brand]);
+  }, [brand, category, products]);
 
   const navigate = useNavigate();
   function addProduct() {
@@ -89,23 +80,6 @@ function ProductRegisterPage(props) {
     })
       .then(() => navigate("/products"))
       .catch((err) => setErrorMessage(err));
-  }
-
-  function formElement(val, setVal) {
-    return (
-      <Form.Control
-        value={val}
-        className={"form-control:focus"}
-        style={{
-          width: "300px",
-          alignSelf: "center",
-          margin: "auto",
-          marginTop: "10px",
-        }}
-        type="file"
-        onChange={(e) => setVal(e.target.value)}
-      />
-    );
   }
 
   useEffect(() => {

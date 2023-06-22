@@ -54,7 +54,6 @@ export function deformatCategory(category) {
 }
 
 function ProductsPage(props) {
-  const [errMessage, setErrMessage] = useState("");
   const [productsList, setProductsList] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);

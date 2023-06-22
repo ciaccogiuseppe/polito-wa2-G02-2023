@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { reformatCategory } from "./ProductsPage";
 
 function reformatId(id) {

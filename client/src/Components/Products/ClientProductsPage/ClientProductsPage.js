@@ -47,61 +47,17 @@ export function deformatCategory(category) {
 }
 
 function ClientProductsPage(props) {
-  const [errMessage, setErrMessage] = useState("");
   const [productsList, setProductsList] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     getAllItemsAPI().then((products) => {
-      console.log(products);
       setProductsList(products);
-      setAllProducts(products);
     });
   }, []);
 
-  useEffect(
-    () => {
-      setCategories(
-        allProducts
-          .map((p) => p.category)
-          .filter((v, i, a) => a.indexOf(v) === i)
-          .sort()
-      );
-    },
-    // eslint-disable-next-line
-    [productsList]
-  );
-
   const loggedIn = props.loggedIn;
   const navigate = useNavigate();
-
-  const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [categoryFilter, setCategoryFilter] = useState("");
-
-  useEffect(
-    () => {
-      setBrands(
-        allProducts
-          .map((p) => {
-            return { category: p.category, brand: p.brand };
-          })
-          .filter((v, i, a) => a.indexOf(v) === i)
-          .sort()
-          .filter(
-            (v) =>
-              deformatCategory(categoryFilter) === "" ||
-              v.category === deformatCategory(categoryFilter)
-          )
-          .map((p) => p.brand)
-          .filter((v, i, a) => a.indexOf(v) === i)
-          .sort()
-      );
-    },
-    // eslint-disable-next-line
-    [productsList, categoryFilter]
-  );
 
   return (
     <>

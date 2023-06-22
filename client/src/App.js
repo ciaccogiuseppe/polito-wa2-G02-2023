@@ -121,7 +121,7 @@ function App() {
       api.interceptors.response.eject(responseInterceptor);
       //clearInterval(int)
     };
-  }, []);
+  }, [loggedIn]);
 
   useEffect(() => {
     if (localStorage.token) {

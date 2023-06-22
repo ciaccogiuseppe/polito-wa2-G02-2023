@@ -1,4 +1,4 @@
-import { crossIcon, xIcon } from "./Icons";
+import { crossIcon } from "./Icons";
 import { useState } from "react";
 
 function SuccessMessage(props) {
@@ -37,6 +37,7 @@ function SuccessMessage(props) {
         }}
       >
         <a
+            href={"/"}
           style={{ cursor: "pointer" }}
           onClick={(e) => {
             e.preventDefault();

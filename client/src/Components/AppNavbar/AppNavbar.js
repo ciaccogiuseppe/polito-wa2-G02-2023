@@ -1,11 +1,8 @@
-import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Nav, Navbar } from "react-bootstrap";
 import NavbarLink from "./NavbarLink";
 import NavbarButton from "./NavbarButton";
 
 function AppNavbar(props) {
-  const navigate = useNavigate();
   const selected = props.selected;
   const logout = props.logout;
   return (

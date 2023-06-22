@@ -1,15 +1,10 @@
-import { Button, Col, Row, Spinner } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NavigationButton from "../../Common/NavigationButton";
-import NavigationLink from "../../Common/NavigationLink";
-import ErrorMessage from "../../Common/ErrorMessage";
 import { useNavigate } from "react-router-dom";
 
 function UsersCreatePage(props) {
-  const [errorMessage, setErrorMessage] = useState("");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const loggedIn = props.loggedIn;

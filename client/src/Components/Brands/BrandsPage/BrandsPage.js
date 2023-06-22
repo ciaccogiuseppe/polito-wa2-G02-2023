@@ -1,9 +1,7 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import { useEffect, useState } from "react";
-import NavigationButton from "../../Common/NavigationButton";
 import { useNavigate } from "react-router-dom";
 import AddButton from "../../Common/AddButton";
-import { Row } from "react-bootstrap";
 import { getAllBrands } from "../../../API/Products";
 import BrandsTable from "./BrandsTable";
 
