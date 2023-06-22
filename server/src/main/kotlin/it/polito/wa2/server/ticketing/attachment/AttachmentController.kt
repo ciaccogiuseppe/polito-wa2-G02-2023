@@ -18,15 +18,18 @@ class AttachmentController (private val attachmentService : AttachmentService) {
     fun getAttachment(principal: Principal, @PathVariable attachmentId: Long) : AttachmentDTO {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         val userEmail = token.tokenAttributes["email"] as String
-        if(attachmentId <= 0)
-            throw UnprocessableAttachmentException("Wrong attachment id value")
+        checkAttachmentId(attachmentId)
         return attachmentService.getAttachment(attachmentId, userEmail)
     }
 
     @GetMapping("/API/manager/attachment/{attachmentId}")
     fun getAttachmentManager(principal: Principal, @PathVariable attachmentId: Long) : AttachmentDTO {
+        checkAttachmentId(attachmentId)
+        return attachmentService.getAttachmentManager(attachmentId)
+    }
+
+    private fun checkAttachmentId(attachmentId: Long) {
         if(attachmentId <= 0)
             throw UnprocessableAttachmentException("Wrong attachment id value")
-        return attachmentService.getAttachmentManager(attachmentId)
     }
 }

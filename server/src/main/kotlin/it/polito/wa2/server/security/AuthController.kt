@@ -31,29 +31,10 @@ class AuthController(
         val tokenUrl = "$authServerUrl/realms/$realm/protocol/openid-connect/token"
         println(tokenUrl)
         println(body)
-        val json = BasicJsonParser()
-        try {
-            val response = restTemplate.exchange(
-                tokenUrl,
-                HttpMethod.POST,
-                entity,
-                String::class.java)
-            println(response)
-            val responseBody = response.body ?: throw IllegalStateException("Unable to retrieve access token")
-            val tokenResponse = TokenResponse(
-                json.parseMap(responseBody)["refresh_token"]!!.toString(),
-                json.parseMap(responseBody)["access_token"]!!.toString(),
-                json.parseMap(responseBody)["expires_in"]!! as Long
-            )
-            return LoginResponse(tokenResponse.refreshToken, tokenResponse.token, tokenResponse.expiresIn)
-
-        } catch(e: RuntimeException){
-            println(e)
-            throw LoginFailedException("Login failed")
-        }
+        return sendRequest(entity, tokenUrl)
     }
 
-    @PostMapping("/API/refreshtoken")
+    @PostMapping("/API/refreshToken")
     fun refreshToken(@RequestBody refreshRequest: RefreshRequest): LoginResponse {
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
@@ -62,6 +43,12 @@ class AuthController(
         val entity = HttpEntity(body, headers)
 
         val tokenUrl = "$authServerUrl/realms/$realm/protocol/openid-connect/token"
+        println(tokenUrl)
+        println(body)
+        return sendRequest(entity, tokenUrl)
+    }
+
+    private fun sendRequest(entity: HttpEntity<String>, tokenUrl: String): LoginResponse {
         val json = BasicJsonParser()
         try {
             val response = restTemplate.exchange(
@@ -83,8 +70,6 @@ class AuthController(
             throw LoginFailedException("Login failed")
         }
     }
-
-
 
 }
 

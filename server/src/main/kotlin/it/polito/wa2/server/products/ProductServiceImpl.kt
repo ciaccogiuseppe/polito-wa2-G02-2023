@@ -9,7 +9,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.IllegalArgumentException
 
 @Service @Transactional(readOnly = true) @Observed
 class ProductServiceImpl(
@@ -33,19 +32,11 @@ class ProductServiceImpl(
             throw DuplicateProductException("Product with id '${productDTO.productId}' already exists")
 
         val brand = brandRepository.findByName(productDTO.brand)
-        if(brand === null)
-            throw BrandNotFoundException("Brand with name '${productDTO.brand}' not found")
-        try {
-            val category = categoryRepository.findByName(productDTO.category)
-            if(category === null)
-                throw CategoryNotFoundException("Category with name '${productDTO.category}' not found")
-            val product = productRepository.save(productDTO.toNewProduct(brand, category))
-            return product.toDTO()
-        }
-        catch (e:IllegalArgumentException){
-            throw CategoryNotFoundException("Category with name '${productDTO.category}' not found")
-        }
-
+            ?: throw BrandNotFoundException("Brand with name '${productDTO.brand}' not found")
+        val category = categoryRepository.findByName(productDTO.category)
+            ?: throw CategoryNotFoundException("Category with name '${productDTO.category}' not found")
+        val product = productRepository.save(productDTO.toNewProduct(brand, category))
+        return product.toDTO()
 
     }
 }

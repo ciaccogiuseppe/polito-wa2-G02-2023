@@ -16,7 +16,6 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.*
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.SimpleClientHttpRequestFactory
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.client.ResponseErrorHandler
@@ -256,7 +255,7 @@ class AuthControllerTest {
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val url2 = "http://localhost:$port/API/refreshtoken"
+        val url2 = "http://localhost:$port/API/refreshToken"
         val uri2 = URI(url2)
 
         val refreshToken = json.parseMap(result.body)["refreshToken"] as String
@@ -273,7 +272,7 @@ class AuthControllerTest {
 
     @Test
     fun loginClientRefreshTokenFailed() {
-        val url = "http://localhost:$port/API/refreshtoken"
+        val url = "http://localhost:$port/API/refreshToken"
         val uri = URI(url)
 
         val refreshToken = "wrongToken"

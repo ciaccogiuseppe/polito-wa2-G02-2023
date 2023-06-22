@@ -26,18 +26,37 @@ class ItemServiceImpl(
     private val itemRepository: ItemRepository
 ): ItemService {
     @Transactional(readOnly = true)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.MANAGER}', '${WebSecurityConfig.VENDOR}')")
     override fun getItemByProductId(productId: String): List<ItemDTO> {
         val product = getProduct(productId)
         return itemRepository.findAllByProduct(product).map { it.toDTO() }
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.MANAGER}', '${WebSecurityConfig.VENDOR}')")
     override fun getItemByProductIdAndSerialNum(productId: String, serialNum: Long): ItemDTO {
         val product = getProduct(productId)
         return itemRepository.findByProductAndSerialNum(product, serialNum)?.toDTO()
             ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
+    override fun getItemClient(productId: String, serialNum: Long, email: String): ItemDTO {
+        val product = getProduct(productId)
+        val item = itemRepository.findByProductAndSerialNum(product, serialNum)
+            ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
+        if(item.client != getProfileByEmail(email))
+            throw ForbiddenException("You cannot access to this item")
+        return item.toDTO()
+    }
+
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.MANAGER}')")
+    override fun getProfileItems(userEmail: String): List<ItemDTO> {
+        val profile = profileRepository.findByEmail(userEmail)!!
+        return profile.items.map { it.toDTO() }
     }
 
     override fun addItem(productId: String, itemDTO: ItemDTO): ItemDTO {
@@ -60,7 +79,7 @@ class ItemServiceImpl(
             throw UnprocessableItemException("Duration cannot be null")
         val product = getProduct(itemDTO.productId)
         val item = itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum)
-            ?:  itemRepository.save(itemDTO.toNewItem(getProduct(itemDTO.productId)))
+            ?:  itemRepository.save(itemDTO.toNewItem(product))
         if(item.uuid != null)
             throw UnprocessableItemException("Item already has an UUID")
         item.uuid = UUID.randomUUID()

@@ -13,6 +13,7 @@ import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.items.ItemDTO
 import it.polito.wa2.server.items.toDTO
 import it.polito.wa2.server.security.WebSecurityConfig
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,16 +29,22 @@ class ProfileServiceImpl(
 
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
+    /*
+    @PostAuthorize("hasRole('${WebSecurityConfig.MANAGER}') or " +
+            "(hasRole('${WebSecurityConfig.CLIENT}') and ()) or " +
+            "(hasRole('${WebSecurityConfig.EXPERT}') and ())")
+     */
     override fun getProfile(email: String): ProfileDTO {
         return profileRepository.findByEmail(email)?.toDTO()
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
 
-    /*@Transactional(readOnly = true)
-    override fun getProfileById(profileId: Long): ProfileDTO {
-        return profileRepository.findByIdOrNull(profileId)?.toDTO()
-            ?: throw ProfileNotFoundException("Profile not found")
-    }*/
+    @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
+    override fun getProfileInfo(email: String): ProfileDTO {
+        return profileRepository.findByEmail(email)?.toDTO()
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
+    }
 
     @Transactional(readOnly = true)
     override fun getProfileItems(email: String): List<ItemDTO> {
@@ -48,20 +55,12 @@ class ProfileServiceImpl(
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
-    override fun getExpertByCategory(category: String): List<ProfileDTO> {
+    override fun getExpertByCategory(category: ProductCategory): List<ProfileDTO> {
         return profileRepository
             .findByRole(ProfileRole.EXPERT)
-            .filter{ it.expertCategories.any { cat -> cat.name.toString() == category } }
+            .filter{ it.expertCategories.any { cat -> cat.name == category } }
             .map { it.toDTO() }
     }
-
-    /*override fun addProfile(profileDTO: ProfileDTO) {
-        if (profileRepository.findByEmail(profileDTO.email) != null)
-            throw DuplicateProfileException("Profile with email '${profileDTO.email}' already exists")
-
-        profileRepository.save(profileDTO.toNewProfile(ProfileRole.CLIENT))
-        addressService.addAddress(profileDTO.email, profileDTO.address!!)
-   }*/
 
     override fun addProfileWithRole(profileDTO: ProfileDTO, profileRole: ProfileRole) {
         if (profileRepository.findByEmail(profileDTO.email) != null)
@@ -81,10 +80,10 @@ class ProfileServiceImpl(
 
     @PreAuthorize("isAuthenticated()")
     override fun updateProfile(email: String, newProfileDTO: ProfileDTO) {
-        val profile = profileRepository.findByEmail(email)
-            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
         if (email != newProfileDTO.email)
             throw BadRequestProfileException("Email in path doesn't match the email in the body")
+        val profile = profileRepository.findByEmail(email)
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
         if (profile.role != ProfileRole.EXPERT && newProfileDTO.expertCategories!!.isNotEmpty())
             throw UnprocessableProfileException("Only the experts can be assigned to categories")
 

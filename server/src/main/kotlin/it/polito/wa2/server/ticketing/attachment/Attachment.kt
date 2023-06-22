@@ -12,7 +12,6 @@ class Attachment :EntityBase<Long>(){
     @Column(nullable = false)
     var name : String = ""
 
-    //@Lob
     @Column(columnDefinition="bytea", nullable = false)
     var attachment: ByteArray = byteArrayOf()
 

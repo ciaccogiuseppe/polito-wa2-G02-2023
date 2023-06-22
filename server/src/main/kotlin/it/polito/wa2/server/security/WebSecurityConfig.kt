@@ -3,6 +3,7 @@ package it.polito.wa2.server.security
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -10,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled=true, securedEnabled = true)
 class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
     companion object {
         const val MANAGER = "manager"
@@ -38,8 +40,9 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.GET, "/API/authenticated/**").hasAnyRole(CLIENT, EXPERT, MANAGER, VENDOR)
             .requestMatchers(HttpMethod.GET, "/API/public/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/API/public/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/API/private/**").hasAnyRole(MANAGER, VENDOR)
             .requestMatchers(HttpMethod.POST, "/API/login/**").permitAll()
-            .requestMatchers(HttpMethod.POST,"/API/refreshtoken/**").permitAll()
+            .requestMatchers(HttpMethod.POST,"/API/refreshToken/**").permitAll()
             .requestMatchers(HttpMethod.POST,"/API/signup/**").permitAll()
             .requestMatchers(HttpMethod.POST,"/API/createExpert").hasRole(MANAGER)
             .requestMatchers(HttpMethod.POST,"/API/createVendor").hasRole(MANAGER)
