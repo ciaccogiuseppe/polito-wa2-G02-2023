@@ -4,7 +4,7 @@ import {closeIcon, downArrowIcon, editIcon, xIcon} from "../../Common/Icons.js"
 import StatusIndicator from "../TicketCommon/StatusIndicator";
 import TextNewLine from "../../Common/TextNewLine";
 import ChatMessage from "./ChatMessage";
-import {Button, CloseButton, Form} from "react-bootstrap";
+import {Form} from "react-bootstrap";
 import AddButton from "../../Common/AddButton";
 import AttachmentOverlay from "./AttachmentOverlay";
 import {useEffect, useRef, useState} from "react";
@@ -27,14 +27,7 @@ import InfoMessage from "../../Common/InfoMessage";
 import {addMessageAPI, getChatClient, getChatExpert, getChatManager} from "../../../API/Chat";
 
 
-const imageList = [
-    "https://media.istockphoto.com/id/500430432/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=Eopt1H8m3N6h_1luxq-u76dKXHcY5t_WA2zMqvGsJ14=",
-    "https://media.istockphoto.com/id/500431088/it/foto/broken-iphone-6.jpg?s=170667a&w=0&k=20&c=TwYYyEs-Plul9pe55A792htJJveexY0sdaXAaKpIhpE="
-
-]
-
 function UploadButton(props) {
-    const [uploadedFileName, setUploadedFileName] = useState(null);
     const inputRef = useRef(null);
     const addFile = props.addFile
     const enabled = props.enabled
@@ -93,8 +86,6 @@ function DeleteAttachmentButton(props){
 }
 
 function AddAttachment(props) {
-    const attachment_old = props.attachment
-    const [color, setColor] = useState("#d98080")
     //const [attachment, setAttachment] = useState(attachment_old)
     const attachments = props.attachments
     const setAttachments=props.setAttachments;
@@ -178,6 +169,8 @@ function StatusEditList(props){
             if(role === "EXPERT" || role === "MANAGER") types=["REOPENED", "CLOSED"]
             else if(role === "CLIENT") types=["REOPENED"]
             break;
+        default:
+            break;
     }
     return types.map(t => <StatusEdit type={t} onClick={()=>{props.onClick(t)}}/>)
 }
@@ -194,8 +187,6 @@ function TicketChatPage(props) {
     const loggedIn = props.loggedIn
     const user = props.user
     const [album, setAlbum] = useState([])
-    const maxAttachments = 5
-    const [curAttachments, setCurAttachments] = useState(0)
     const params = useParams()
     const [overlayShown, setOverlayShown] = useState(false)
     const [startPos, setStartPos] = useState(0)
@@ -220,9 +211,6 @@ function TicketChatPage(props) {
     const [newStatus, setNewStatus] = useState("")
     const [newExpert, setNewExpert] = useState("")
 
-
-    const [editExpert, setEditExpert] = useState("")
-    //let attachments = []
     const navigate = useNavigate()
 
     const ticketID = params.id
@@ -288,7 +276,9 @@ function TicketChatPage(props) {
                 .then(response=>setChat(response.sort((a,b) => a.messageId > b.messageId)))
                 .catch(err => setChatErrorMessage(err))
         }
-    }, [])
+    }, 
+    // eslint-disable-next-line
+    [])
 
     useEffect(()=>{
         if(updateAttachments){
@@ -306,7 +296,9 @@ function TicketChatPage(props) {
         if(category && user.role==="MANAGER"){
             getExpertsByCategory(category).then(a => setNewExperts(a.data))
         }
-    }, [category])
+    }, 
+    // eslint-disable-next-line
+    [category])
 
     function addMessage(){
         addMessageAPI({
@@ -356,6 +348,8 @@ function TicketChatPage(props) {
             case "HIGH":
                 priority = 3
                 break;
+            default:
+                priority = 0
         }
         if(user.role === "MANAGER"){
             assignTicketManagerAPI({

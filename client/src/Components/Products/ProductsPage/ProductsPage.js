@@ -7,8 +7,6 @@ import AddButton from "../../Common/AddButton";
 import ProductsTable from "./ProductsTable";
 import {caretDownIcon, caretUpIcon, crossIcon, filterIcon} from "../../Common/Icons";
 import {Row} from "react-bootstrap";
-import {Slider} from "@mui/material";
-import PriorityIndicator from "../../Ticketing/TicketCommon/PriorityIndicator";
 
 export function reformatCategory(category){
     switch(category){
@@ -24,6 +22,8 @@ export function reformatCategory(category){
             return "Storage Device"
         case "OTHER":
             return "Other"
+            default:
+                return ""
     }
 }
 
@@ -43,6 +43,8 @@ export function deformatCategory(category){
             return "STORAGE_DEVICE"
         case "Other":
             return "OTHER"
+            default:
+                return ""
     }
 }
 
@@ -63,7 +65,9 @@ function ProductsPage(props) {
 
     useEffect(() => {
         setCategories(allProducts.map(p => p.category).filter((v,i,a)=>a.indexOf(v)===i).sort())
-    }, [productsList])
+    }, 
+    // eslint-disable-next-line
+    [productsList])
 
 
 
@@ -84,7 +88,10 @@ function ProductsPage(props) {
                 .filter(v => (deformatCategory(categoryFilter) === "" || v.category === deformatCategory(categoryFilter)))
                 .map(p => p.brand)
                 .filter((v,i,a)=>a.indexOf(v)===i).sort())
-    }, [productsList, categoryFilter])
+               
+    }, 
+     // eslint-disable-next-line
+    [productsList, categoryFilter])
 
     function applyFilter(){
         setProductsList(allProducts.filter(a =>

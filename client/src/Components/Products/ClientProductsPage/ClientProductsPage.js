@@ -1,21 +1,16 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import { useEffect, useState } from "react";
-import { getAllProducts } from "../../../API/Products";
 import NavigationButton from "../../Common/NavigationButton";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AddButton from "../../Common/AddButton";
 import ClientProductsTable from "./ClientProductsTable";
-import {caretDownIcon, caretUpIcon, crossIcon, filterIcon} from "../../Common/Icons";
-import {Row} from "react-bootstrap";
-import {Slider} from "@mui/material";
-import PriorityIndicator from "../../Ticketing/TicketCommon/PriorityIndicator";
-import {getAllItemsAPI} from "../../../API/Item";
+import { getAllItemsAPI } from "../../../API/Item";
 
 
 
 
-export function reformatCategory(category){
-    switch(category){
+export function reformatCategory(category) {
+    switch (category) {
         case "SMARTPHONE":
             return "Smartphone"
         case "PC":
@@ -28,11 +23,13 @@ export function reformatCategory(category){
             return "Storage Device"
         case "OTHER":
             return "Other"
+        default:
+            return ""
     }
 }
 
-export function deformatCategory(category){
-    switch(category){
+export function deformatCategory(category) {
+    switch (category) {
         case "":
             return ""
         case "Smartphone":
@@ -47,6 +44,8 @@ export function deformatCategory(category){
             return "STORAGE_DEVICE"
         case "Other":
             return "OTHER"
+        default:
+            return ""
     }
 }
 
@@ -54,7 +53,6 @@ function ClientProductsPage(props) {
     const [errMessage, setErrMessage] = useState("");
     const [productsList, setProductsList] = useState([]);
     const [allProducts, setAllProducts] = useState([])
-    const [showFilters, setShowFilters] = useState(false)
 
 
     useEffect(() => {
@@ -64,18 +62,19 @@ function ClientProductsPage(props) {
             setProductsList(products)
             setAllProducts(products)
         })
-    },[])
+    }, [])
 
     useEffect(() => {
         setCategories(allProducts.map(p => p.category).filter((v,i,a)=>a.indexOf(v)===i).sort())
-    }, [productsList])
+    }, 
+        // eslint-disable-next-line
+    [productsList])
 
 
 
     const loggedIn = props.loggedIn
     const navigate = useNavigate()
 
-    const [brandFilter, setBrandFilter] = useState("")
     const [categories, setCategories] = useState([])
     const [brands, setBrands] = useState([])
     const [categoryFilter, setCategoryFilter] = useState("")
@@ -84,37 +83,33 @@ function ClientProductsPage(props) {
 
         setBrands(
             allProducts
-                .map(p => { return {category:p.category, brand:p.brand}})
-                .filter((v,i,a)=>a.indexOf(v)===i).sort()
+                .map(p => { return { category: p.category, brand: p.brand } })
+                .filter((v, i, a) => a.indexOf(v) === i).sort()
                 .filter(v => (deformatCategory(categoryFilter) === "" || v.category === deformatCategory(categoryFilter)))
                 .map(p => p.brand)
-                .filter((v,i,a)=>a.indexOf(v)===i).sort())
-    }, [productsList, categoryFilter])
-
-    function applyFilter(){
-        setProductsList(allProducts.filter(a =>
-            (categoryFilter === "" || reformatCategory(a.category) === categoryFilter) &&
-            (brandFilter === "" || a.brand === brandFilter)
-        ))
-    }
+                .filter((v, i, a) => a.indexOf(v) === i).sort())
+                
+    }, 
+    // eslint-disable-next-line
+    [productsList, categoryFilter])
 
     return <>
-        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"products"}/>
+        <AppNavbar user={props.user} logout={props.logout} loggedIn={loggedIn} selected={"products"} />
 
 
-        <div className="CenteredButton" style={{marginTop:"50px"}}>
-            <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>MY PRODUCTS</h1>
-            <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"20px", marginTop:"2px"}}/>
+        <div className="CenteredButton" style={{ marginTop: "50px" }}>
+            <h1 style={{ color: "#EEEEEE", marginTop: "80px" }}>MY PRODUCTS</h1>
+            <hr style={{ color: "white", width: "25%", alignSelf: "center", marginLeft: "auto", marginRight: "auto", marginBottom: "20px", marginTop: "2px" }} />
 
 
 
-            {productsList.length>0 ?<ClientProductsTable products={productsList}/>
-             : <><div className="CenteredButton" style={{marginTop:"70px"}}>
-                    <NavigationButton text={"Register a product"} onClick={(e) => { e.preventDefault(); navigate("/productregister") }}/>
+            {productsList.length > 0 ? <ClientProductsTable products={productsList} />
+                : <><div className="CenteredButton" style={{ marginTop: "70px" }}>
+                    <NavigationButton text={"Register a product"} onClick={(e) => { e.preventDefault(); navigate("/productregister") }} />
                 </div></>}
 
-            <div style={{position:"fixed", bottom:"24px", right:"24px"}}>
-                <AddButton onClick={()=>navigate("/productregister")}/>
+            <div style={{ position: "fixed", bottom: "24px", right: "24px" }}>
+                <AddButton onClick={() => navigate("/productregister")} />
             </div>
         </div>
     </>

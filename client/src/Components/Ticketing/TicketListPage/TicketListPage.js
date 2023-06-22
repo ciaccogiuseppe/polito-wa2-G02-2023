@@ -1,14 +1,12 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Col, Form, Row } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import NavigationLink from "../../Common/NavigationLink";
 import TicketListTable from "./TicketListTable";
 import { useEffect, useState } from "react";
 import { caretDownIcon, caretUpIcon, crossIcon, filterIcon } from "../../Common/Icons";
-import { Checkbox, ListItemText, MenuItem, OutlinedInput, Slider } from "@mui/material";
+import { Slider } from "@mui/material";
 import StatusIndicator from "../TicketCommon/StatusIndicator";
 import PriorityIndicator from "../TicketCommon/PriorityIndicator";
-import Select from 'react-select';
 import AddButton from "../../Common/AddButton";
 import { useNavigate } from "react-router-dom";
 import { getAllProducts } from "../../../API/Products";
@@ -55,7 +53,6 @@ function TicketListPage(props) {
     const user = props.user
     const [userEmail, setUserEmail] = useState("");
     const [expertEmail, setExpertEmail] = useState("");
-    const [productId, setProductId] = useState("");
     const [initialDate, setInitialDate] = useState("");
     const [finalDate, setFinalDate] = useState("");
     const [errMessage, setErrMessage] = useState("");
@@ -64,7 +61,6 @@ function TicketListPage(props) {
     const [ticketList, setTicketList] = useState([])
     const [priority, setPriority] = useState([0, 3]);
     const [selectedStatus, setSelectedStatus] = useState([])
-    const [selectedOption, setSelectedOption] = useState("")
     const [showFilters, setShowFilters] = useState(user.role === "MANAGER" ? true : false)
     const [products, setProducts] = useState([])
     const [product, setProduct] = useState(null)
@@ -115,7 +111,9 @@ function TicketListPage(props) {
                         .map(p => { return { productId: p.productId, name: p.name } })
                         .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))))
         }
-    }, [])
+    }, 
+    // eslint-disable-next-line
+    [])
 
     function applyFilters() {
         if (user.role === "CLIENT")

@@ -1,8 +1,10 @@
 import { Col, Row, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { Bar, Doughnut } from 'react-chartjs-2';
-import _Chart from 'chart.js/auto'; // needed to correctly compile!
 import { getAllTicketsManager } from "../../../API/Tickets";
+
+// eslint-disable-next-line
+import _Chart from 'chart.js/auto'; // needed to correctly compile!
 
 
 function DashboardPage() {
@@ -170,22 +172,24 @@ function DashboardPage() {
                 ticketsData["0"] || 0
             ])
         })
-    }, [numDays]);
+    }, 
+    // eslint-disable-next-line
+    [numDays]);
 
 
     return <>
         <div className="CenteredButton">
-            <div style={{ padding: "10px", marginTop: "50px", paddingBottom: "50px", padding: "10px", width: "90%", height: "500px", margin: "auto", borderRadius: "25px", backgroundColor: "rgba(0,0,0,0.2)" }}>
+            <div style={{ padding: "10px", marginTop: "50px", paddingBottom: "50px", width: "90%", height: "500px", margin: "auto", borderRadius: "25px", backgroundColor: "rgba(0,0,0,0.2)" }}>
                 <Row className="d-flex justify-content-center g-0" style={{ marginBottom: "15px" }}>
                     <Col xs={2}>
                         <h4 style={{ color: "#EEEEEE" }}>Recent tickets</h4>
                     </Col>
                     &nbsp;&nbsp;
                     <Col xs={1}>
-                        <Form.Select value={numDays == 1 ?"Today" : "Last " + numDays + " days"} onChange={(e) => { setNumDays(getNumDaysFromString(e.target.value)) }}
+                        <Form.Select value={numDays === 1 ?"Today" : "Last " + numDays + " days"} onChange={(e) => { setNumDays(getNumDaysFromString(e.target.value)) }}
                         className={"form-select:focus"} style={{ width: "150px", height: "30px", alignSelf: "center", margin: "auto", fontSize: "12px" }}>
                         <option></option>
-                        {[1, 3, 7, 14, 30].map(c => c == 1 ?
+                        {[1, 3, 7, 14, 30].map(c => c === 1 ?
                             <option>Today</option> :
                             <option>Last {c} days</option>)}
                     </Form.Select>
