@@ -271,7 +271,6 @@ To package the React application:
 
 
 - **METHOD** `GET` **URL**: `/API/manager/ticketing/filter`
-
   - **Description**: Get all tickets satisfying the given filters
   - **Permissions allowed**: Manager
   - **Request query parameter**: Required filters (only needed ones to be specified)
@@ -284,7 +283,7 @@ To package the React application:
     - `expertEmail` to retrieve the records associated to the given expertId
     - `status`: list of the desired states of the records
   - **Request body**: _None_
- - **Response**: `200 OK` (success)
+  - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
     - `403 Forbidden`
@@ -370,23 +369,23 @@ To package the React application:
     - `expertEmail` to retrieve the records associated to the given expertId
     - `status`: list of the desired states of the records
   - **Request body**: _None_
-- **Response**: `200 OK` (success)
-- **Error responses**:
-  - `400 Bad Request`
-  - `403 Forbidden`
-  - `404 Not Found` (ticket with ticketId `ticketId` not existing, expert associated to the given `expertId` not existing, customer associated to the given `customerId` not existing,  product associated to the given `productId` not existing)
-  - `422 Unprocessable Entity` (wrong format for `request query parameters` or `updatedAfter` is after `updatedBefore`)
-  - `500 Internal Server Error`
-- **Response body**: list of tickets satisfying the given filtering conditions / Error message in case of error
-  ```
-  {
-    [
-      <ticket_1>,
-      <ticket_2>,
-      ...
-    ]
-  }
-  ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (ticket with ticketId `ticketId` not existing, expert associated to the given `expertId` not existing, customer associated to the given `customerId` not existing,  product associated to the given `productId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `request query parameters` or `updatedAfter` is after `updatedBefore`)
+    - `500 Internal Server Error`
+  - **Response body**: list of tickets satisfying the given filtering conditions / Error message in case of error
+    ```
+    {
+      [
+        <ticket_1>,
+        <ticket_2>,
+        ...
+      ]
+    }
+    ```
 | Field              | Content                         |
 |--------------------|---------------------------------|
 | `ticketId`         | ticket id                       |
@@ -405,7 +404,6 @@ To package the React application:
   - **Permissions allowed**: Client
   - **Request query parameter**: _None_
   - **Request body**: Ticket to be inserted
-
     ```
     {
       "title": <title>,
@@ -413,14 +411,14 @@ To package the React application:
       "productId": <productId>,
     }
     ```
-    - **Response**: `201 Created` (success)
-    - **Error responses**:
-      - `400 Bad Request`
-      - `403 Forbidden`
-      - `404 Not Found` (product with id `productId` not existing, the customer that performs the request does not exist)
-      - `422 Unprocessable Entity` (wrong format for request body)
-      - `500 Internal Server Error`
-    - **Response body**: id assigned to the created ticket / Error message in case of errors
+  - **Response**: `201 Created` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (product with id `productId` not existing, the customer that performs the request does not exist)
+    - `422 Unprocessable Entity` (wrong format for request body)
+    - `500 Internal Server Error`
+  - **Response body**: id assigned to the created ticket / Error message in case of errors
     ```
       {
         "ticketId": <ticketId>
@@ -1215,13 +1213,13 @@ To package the React application:
       "surname": <surname>,
     }
     ```
-    - **Response**: `201 Created` (success)
-    - **Error responses**:
-      - `400 Bad Request`
-      - `409 Conflict` (Profile with the given email already exists)
-      - `422 Unprocessable Entity` (wrong format for request body)
-      - `500 Internal Server Error`
-    - **Response body**: _None_ / Error message in case of errors
+  - **Response**: `201 Created` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `409 Conflict` (Profile with the given email already exists)
+    - `422 Unprocessable Entity` (wrong format for request body)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of errors
 
 
 | Field     | Content         |
