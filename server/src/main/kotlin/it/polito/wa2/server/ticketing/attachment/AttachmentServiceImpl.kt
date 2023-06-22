@@ -5,7 +5,9 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.AttachmentNotFoundException
 import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.profiles.ProfileRepository
+import it.polito.wa2.server.security.WebSecurityConfig
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,6 +16,7 @@ class AttachmentServiceImpl(
     private val attachmentRepository: AttachmentRepository, private val profileRepository: ProfileRepository
 ): AttachmentService {
     @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}')")
     override fun getAttachment(attachmentID: Long, userEmail: String): AttachmentDTO {
         val attachment = attachmentRepository.findByIdOrNull(attachmentID)?:
             throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
@@ -28,12 +31,14 @@ class AttachmentServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun getAttachmentManager(attachmentID: Long): AttachmentDTO {
         val attachment = attachmentRepository.findByIdOrNull(attachmentID)?:
             throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
         return attachment.toDTO()
     }
 
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}', '${WebSecurityConfig.MANAGER}')")
     override fun addAttachment(attachmentDTO: AttachmentDTO): Long {
         return attachmentRepository.save(attachmentDTO.toNewAttachment()).getId()!!
     }

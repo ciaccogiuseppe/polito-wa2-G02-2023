@@ -150,7 +150,7 @@ class TicketController(private val ticketService: TicketService) {
         ticketService.expertUpdateTicket(ticketUpdateDTO!!, userEmail)
     }
 
-    fun checkFilterParameters(
+    private fun checkFilterParameters(
         clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
@@ -173,28 +173,28 @@ class TicketController(private val ticketService: TicketService) {
             throw UnprocessableTicketException("<created_after> is after <created_before>")
     }
 
-    fun checkAddParameters(ticketDTO: TicketDTO?, br: BindingResult) {
+    private fun checkAddParameters(ticketDTO: TicketDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
         if (ticketDTO == null)
             throw BadRequestProfileException("Ticket must not be NULL")
     }
 
-    fun checkAssignParameters(ticketAssignDTO: TicketAssignDTO?, br: BindingResult) {
+    private fun checkAssignParameters(ticketAssignDTO: TicketAssignDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
         if (ticketAssignDTO == null)
             throw BadRequestProfileException("Ticket must not be NULL")
     }
 
-    fun checkUpdateParameters(ticketUpdateDTO: TicketUpdateDTO?, br: BindingResult) {
+    private fun checkUpdateParameters(ticketUpdateDTO: TicketUpdateDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProfileException("Wrong ticket format")
         if (ticketUpdateDTO == null)
             throw BadRequestProfileException("Ticket must not be NULL")
     }
 
-    fun retrieveUserEmail(principal: Principal): String {
+    private fun retrieveUserEmail(principal: Principal): String {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         return token.tokenAttributes["email"] as String
     }

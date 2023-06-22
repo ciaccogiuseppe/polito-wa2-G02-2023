@@ -41,7 +41,7 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
         )
     }
 
-    fun checkFilterParameters(
+    private fun checkFilterParameters(
         ticketId: Long?,
         userEmail: String?,
         updatedAfter: Timestamp?,
@@ -64,7 +64,7 @@ class TicketHistoryController(private val ticketHistoryService: TicketHistorySer
         }
     }
 
-    fun checkEmail(email: String){
+    private fun checkEmail(email: String){
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
     }

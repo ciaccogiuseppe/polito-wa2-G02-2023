@@ -31,7 +31,7 @@ class ProductController(private val productService: ProductService) {
     }
 
 
-    fun checkAddParameters(productDTO: ProductDTO?, br: BindingResult) {
+    private fun checkAddParameters(productDTO: ProductDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableProductException("Wrong product format")
         if (productDTO == null)

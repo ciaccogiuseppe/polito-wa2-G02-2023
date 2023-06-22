@@ -32,6 +32,7 @@ data class TicketDTO(
 data class TicketAssignDTO(
     @field:Positive
     val ticketId : Long,
+    @field:NotBlank(message = "expert email is required")
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
         message="email must be valid")
     val expertEmail: String,

@@ -7,13 +7,13 @@ import jakarta.persistence.*
 @Entity
 @Table(name="addresses")
 class Address: EntityBase<Long>() {
-    @Column(nullable = true)
+    @Column(nullable = false)
     var country: String? = null
-    @Column(nullable = true)
+    @Column(nullable = false)
     var region: String? = null
-    @Column(nullable = true)
+    @Column(nullable = false)
     var city: String? = null
-    @Column(nullable = true)
+    @Column(nullable = false)
     var address: String? = null
 
     @OneToOne

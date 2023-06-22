@@ -12,7 +12,6 @@ import java.security.Principal
 @CrossOrigin(origins =["http://localhost:3001"])
 @RestController
 @Observed
-
 class BrandController (private val brandService : BrandService) {
     @GetMapping("/API/public/brands/")
     fun getAllBrands(): List<BrandDTO> {
@@ -27,7 +26,7 @@ class BrandController (private val brandService : BrandService) {
     }
 
 
-    fun checkAddParameters(brandDTO: BrandDTO?, br: BindingResult) {
+    private fun checkAddParameters(brandDTO: BrandDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableBrandException("Wrong brand format")
         if (brandDTO == null)

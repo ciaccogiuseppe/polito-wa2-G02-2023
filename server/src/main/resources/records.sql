@@ -1,3 +1,184 @@
+create table if not exists brands
+(
+    id   bigserial
+        primary key,
+    name varchar(255) not null
+        constraint uk_oce3937d2f4mpfqrycbr0l93m
+            unique
+);
+
+alter table brands
+    owner to postgres;
+
+
+create table if not exists categories
+(
+    id   bigserial
+        primary key,
+    name varchar(255) not null
+);
+
+alter table categories
+    owner to postgres;
+
+create table if not exists products
+(
+    product_id  varchar(255) not null
+        primary key,
+    name        varchar(255) not null,
+    brand_id    bigint       not null
+        constraint fka3a4mpsfdf4d2y6r8ra3sc8mv
+            references brands,
+    category_id bigint       not null
+        constraint fkog2rp4qthbtt2lfyhfo32lsw9
+            references categories
+);
+
+alter table products
+    owner to postgres;
+
+
+
+create table if not exists profiles
+(
+    id           bigserial
+        primary key,
+    email        varchar(255) not null
+        constraint uk_lnk8iosvsrn5614xw3lgnybgk
+            unique,
+    name         varchar(255) not null,
+    phone_number varchar(255),
+    role         varchar(255) not null,
+    surname      varchar(255) not null
+);
+
+alter table profiles
+    owner to postgres;
+
+create table if not exists items
+(
+    serial_num           bigint       not null,
+    duration_months      bigint,
+    uuid                 uuid,
+    valid_from_timestamp timestamp(6),
+    product_id           varchar(255) not null
+        constraint fkmtk37pxnx7d5ck7fkq2xcna4i
+            references products,
+    client_id            bigint
+        constraint fk4lcgine4ykbqt0ee7sh7hukob
+            references profiles,
+    primary key (product_id, serial_num)
+);
+
+alter table items
+    owner to postgres;
+
+create table if not exists addresses
+(
+    id        bigserial
+        primary key,
+    address   varchar(255) not null,
+    city      varchar(255) not null,
+    country   varchar(255) not null,
+    region    varchar(255) not null,
+    client_id bigint       not null
+        constraint fkdois8l22rrsfm4w5l13wuaamy
+            references profiles
+);
+
+alter table addresses
+    owner to postgres;
+
+create table if not exists category_assigned
+(
+    expert_id   bigint not null
+        constraint fkhaj7tcvv98any2j4kjnrwnc3s
+            references profiles,
+    category_id bigint not null
+        constraint fkh2e1cphdejxr5wx7q9hllsjyx
+            references categories,
+    primary key (expert_id, category_id)
+);
+
+alter table category_assigned
+    owner to postgres;
+
+create table if not exists tickets
+(
+    id                bigserial
+        primary key,
+    created_timestamp timestamp(6) not null,
+    description       varchar not null,
+    priority          integer      not null,
+    status            varchar(255) not null,
+    title             varchar(255) not null,
+    client_id         bigint       not null
+        constraint fk87o5gt7m6d4fo8lg32o8raliw
+            references profiles,
+    expert_id         bigint
+        constraint fk8ojtqms4badovjb5mj7w4se56
+            references profiles,
+    product_id        varchar(255) not null,
+    serial_num        bigint       not null,
+    constraint fkmywnw3u4uhm5x7mcxsmnr6p37
+        foreign key (product_id, serial_num) references items
+);
+
+alter table tickets
+    owner to postgres;
+
+create table if not exists tickets_history
+(
+    id                bigserial
+        primary key,
+    new_state         varchar(255) not null,
+    old_state         varchar(255) not null,
+    updated_timestamp timestamp(6) not null,
+    current_expert_id bigint
+        constraint fk17muy6m28qespxgus32o6rtj
+            references profiles,
+    ticket_id         bigint       not null
+        constraint fkc7awrpdvaei350mm2hlabffra
+            references tickets,
+    user_id           bigint       not null
+        constraint fks5x4fttcy87h5hqqheeriml2p
+            references profiles
+);
+
+alter table tickets_history
+    owner to postgres;
+
+create table if not exists messages
+(
+    id             bigserial
+        primary key,
+    sent_timestamp timestamp(6) not null,
+    text           varchar(255) not null,
+    sender_id      bigint       not null
+        constraint fk79kgt6oyju1ma9ly4qmax5933
+            references profiles,
+    ticket_id      bigint       not null
+        constraint fk6iv985o3ybdk63srj731en4ba
+            references tickets
+);
+
+alter table messages
+    owner to postgres;
+
+create table if not exists attachments
+(
+    id         bigserial
+        primary key,
+    attachment bytea        not null,
+    name       varchar(255) not null,
+    message_id bigint
+        constraint fkcf4ta8qdkixetfy7wnqfv3vkv
+            references messages
+);
+
+alter table attachments
+    owner to postgres;
+
 BEGIN;
 DO
 $$
@@ -427,6 +608,164 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000314', 'DJI Osmo Action Camera', (SELECT brands.id FROM brands WHERE name = 'DJI'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000315', 'Sony FDR-X3000 Action Camera', (SELECT brands.id FROM brands WHERE name = 'Sony'), id);
         INSERT INTO products(product_id, name, brand_id, category_id) VALUES ('0000000000316', 'Insta360 ONE R Action Camera', (SELECT brands.id FROM brands WHERE name = 'Insta360'), id);
+
+
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (203241506, 24, '9fcebd14-fa40-4f11-a11f-84391df346da', '2023-06-21 19:10:54.961201', '0000000000025', 1);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (633020516, 12, 'e559a864-d32d-49db-bc52-7182e38036bb', '2023-06-21 19:11:23.318321', '0000000000112', 1);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (203040506, 12, '72895077-097e-4e84-9917-5a57d0b56196', '2023-06-21 19:09:27.839294', '0000000000023', 1);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id) VALUES (213244506, 12, 'a78d44fa-6137-4b79-8d6c-afc0450267ed', '2021-06-21 19:12:05.853000', '0000000000189', 1);
+
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (1, '2023-06-21 19:47:14.726903', e'am reaching out to you regarding an issue I am experiencing with my LG Velvet smartphone\'s touch screen. I am encountering difficulties with the touch functionality and would greatly appreciate your assistance in resolving this problem.
+
+Issue Description:
+The touch screen on my LG Velvet smartphone has become unresponsive, making it impossible for me to interact with the device using touch gestures. I have tried various troubleshooting steps but have been unable to restore the touch screen functionality.', 2, 'IN_PROGRESS', 'Touch screen not working', 1, 3, '0000000000025', 203241506);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (2, '2023-06-21 20:04:23.758173', e'I am writing to report an issue that I have encountered with my Sony Bravia X70J television. I am experiencing distorted audio output, which is significantly affecting my viewing experience. I kindly request your assistance in resolving this problem promptly.
+
+Issue Description:
+While watching various programs on my Sony Bravia X70J TV, I noticed that the audio output has become distorted and unclear. The sound appears muffled, with a noticeable loss of clarity and depth. This issue persists across all audio sources, including built-in TV apps, external devices connected via HDMI, and broadcast channels.
+
+Troubleshooting Steps Taken:
+In an attempt to resolve the audio distortion problem, I have performed the following troubleshooting steps without success:
+
+    Adjusted audio settings: I have reviewed and adjusted the audio settings on my Sony Bravia X70J TV, ensuring that they are optimized for the best audio quality. However, the distortion issue remains unresolved.
+    Tested different audio sources: I have tested the TV with various audio sources, including different channels and streaming services, to rule out the possibility of a specific source causing the distortion. Unfortunately, the problem persists across all sources.
+    Checked external devices: I have disconnected all external devices connected to the TV, such as soundbars or AV receivers, to ensure that they are not causing the audio distortion. However, the issue still persists when using the TV\'s built-in speakers.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (4, '2023-06-20 20:04:23.758000', e'I am reaching out to you regarding a pressing concern with my Sony Bravia X70J television. Unfortunately, I have been experiencing consistent audio distortion, severely impacting my viewing enjoyment. I humbly request your prompt assistance in resolving this matter.
+
+Issue Description:
+I have noticed persistent audio distortion on my Sony Bravia X70J TV, causing the sound to become muffled and unclear. This problem persists regardless of the audio source, encompassing both built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+To address the audio distortion, I have undertaken the following troubleshooting steps, but have been unable to resolve the issue:
+
+    Adjusted audio settings: I carefully reviewed and optimized the TV\'s audio settings, aiming to enhance the sound quality. Unfortunately, the distortion problem persists despite these adjustments.
+
+    Tested different audio sources: I conducted tests using various audio sources to eliminate the possibility of a specific source causing the distortion. Regrettably, the issue persists across all sources, indicating an underlying concern.
+
+    Checked external devices: As a precautionary measure, I disconnected all external devices connected to the TV, such as soundbars or AV receivers. However, even when relying solely on the TV\'s internal speakers, the audio distortion persists.
+
+Given the urgency and adverse impact on my viewing experience, I sincerely seek your expertise and support in promptly resolving this matter. Your prompt attention would be greatly appreciated.
+
+Thank you for your understanding and assistance.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (5, '2023-06-20 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+
+Issue Description:
+The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+I have attempted to address the audio distortion issue with the following unsuccessful troubleshooting steps:
+
+    Adjusted audio settings: I reviewed and optimized the TV\'s audio settings for better quality, but the distortion remains unresolved.
+
+    Tested different audio sources: I tested various audio sources to rule out any specific source causing the issue, but the distortion persists across all sources.
+
+    Checked external devices: I disconnected all external devices to eliminate them as potential causes, yet the distortion persists when using the TV\'s built-in speakers.
+
+I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
+
+Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (6, '2023-06-20 20:04:23.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
+
+Issue Description:
+I have encountered persistent audio distortion on my Sony Bravia X70J TV, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+Despite my efforts to troubleshoot the issue, the audio distortion problem remains unresolved. Here are the steps I have taken:
+
+    Adjusted audio settings: I thoroughly reviewed and optimized the TV\'s audio settings to ensure the best sound quality. However, the distortion persists despite these adjustments.
+
+    Tested different audio sources: I extensively tested various audio sources to identify any specific cause of the distortion. Unfortunately, the problem persists across all sources.
+
+    Checked external devices: I disconnected all external devices connected to the TV, such as soundbars or AV receivers, to eliminate potential interference. However, the audio distortion persists when using the TV\'s built-in speakers.
+
+Given the urgency and negative impact on my entertainment experience, I humbly request your expert assistance in promptly resolving this matter. Your prompt attention would be greatly appreciated.
+
+Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (17, '2023-06-19 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+
+Issue Description:
+The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+I have attempted to address the audio distortion issue with the following unsuccessful troubleshooting steps:
+
+    Adjusted audio settings: I reviewed and optimized the TV\'s audio settings for better quality, but the distortion remains unresolved.
+
+    Tested different audio sources: I tested various audio sources to rule out any specific source causing the issue, but the distortion persists across all sources.
+
+    Checked external devices: I disconnected all external devices to eliminate them as potential causes, yet the distortion persists when using the TV\'s built-in speakers.
+
+I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
+
+Thank you for your assistance.', 1, 'CLOSED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (7, '2023-06-20 20:04:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
+
+Description of the Issue:
+During my regular usage of the Sony Bravia X70J TV, I have noticed a distressing audio distortion that affects the quality of the sound. The audio output exhibits a muffled and unclear nature, depriving me of the clarity and depth I expect from my viewing sessions. This frustrating problem persists across all audio sources, encompassing the TV\'s built-in apps, external devices connected via HDMI, and even the broadcast channels.
+
+Steps Taken for Troubleshooting:
+In my sincere efforts to address the audio distortion concern, I have undertaken the following troubleshooting measures, unfortunately without success:
+
+    Adjusted audio settings: I diligently reviewed and optimized the audio settings on my Sony Bravia X70J TV, striving to achieve the finest audio quality possible. However, regrettably, these adjustments did not resolve the distortion issue.
+
+    Tested different audio sources: To eliminate the possibility of a specific source causing the problem, I conscientiously tested the TV with various audio sources, including different channels and streaming services. Sadly, the audio distortion persisted across all sources, indicating a more intrinsic problem.
+
+    Checked external devices: In an attempt to isolate the root cause, I meticulously disconnected all external devices connected to the TV, such as soundbars or AV receivers. Despite this precautionary measure, the audio distortion remains prevalent even when utilizing the TV\'s internal speakers.
+
+Considering the urgency and impact of this issue on my entertainment experience, I kindly implore your expertise and support in resolving this matter at the earliest convenience. Your swift assistance would be greatly appreciated.
+
+Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (8, '2023-06-20 20:04:23.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
+
+Issue Description:
+I have encountered persistent audio distortion on my Sony Bravia X70J TV, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+Despite my efforts to troubleshoot the issue, the audio distortion problem remains unresolved. Here are the steps I have taken:
+
+    Adjusted audio settings: I thoroughly reviewed and optimized the TV\'s audio settings to ensure the best sound quality. However, the distortion persists despite these adjustments.
+
+    Tested different audio sources: I extensively tested various audio sources to identify any specific cause of the distortion. Unfortunately, the problem persists across all sources.
+
+    Checked external devices: I disconnected all external devices connected to the TV, such as soundbars or AV receivers, to eliminate potential interference. However, the audio distortion persists when using the TV\'s built-in speakers.
+
+Given the urgency and negative impact on my entertainment experience, I humbly request your expert assistance in promptly resolving this matter. Your prompt attention would be greatly appreciated.
+
+Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (9, '2023-06-20 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+
+Issue Description:
+The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
+
+Troubleshooting Steps Taken:
+I have attempted to address the audio distortion issue with the following unsuccessful troubleshooting steps:
+
+    Adjusted audio settings: I reviewed and optimized the TV\'s audio settings for better quality, but the distortion remains unresolved.
+
+    Tested different audio sources: I tested various audio sources to rule out any specific source causing the issue, but the distortion persists across all sources.
+
+    Checked external devices: I disconnected all external devices to eliminate them as potential causes, yet the distortion persists when using the TV\'s built-in speakers.
+
+I urgently seek your expertise and support in resolving this matter. Your prompt attention to this issue would be highly appreciated.
+
+Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
+        INSERT INTO tickets (id, created_timestamp, description, priority, status, title, client_id, expert_id, product_id, serial_num) VALUES (3, '2023-06-20 20:04:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
+
+Description of the Issue:
+During my regular usage of the Sony Bravia X70J TV, I have noticed a distressing audio distortion that affects the quality of the sound. The audio output exhibits a muffled and unclear nature, depriving me of the clarity and depth I expect from my viewing sessions. This frustrating problem persists across all audio sources, encompassing the TV\'s built-in apps, external devices connected via HDMI, and even the broadcast channels.
+
+Steps Taken for Troubleshooting:
+In my sincere efforts to address the audio distortion concern, I have undertaken the following troubleshooting measures, unfortunately without success:
+
+    Adjusted audio settings: I diligently reviewed and optimized the audio settings on my Sony Bravia X70J TV, striving to achieve the finest audio quality possible. However, regrettably, these adjustments did not resolve the distortion issue.
+
+    Tested different audio sources: To eliminate the possibility of a specific source causing the problem, I conscientiously tested the TV with various audio sources, including different channels and streaming services. Sadly, the audio distortion persisted across all sources, indicating a more intrinsic problem.
+
+    Checked external devices: In an attempt to isolate the root cause, I meticulously disconnected all external devices connected to the TV, such as soundbars or AV receivers. Despite this precautionary measure, the audio distortion remains prevalent even when utilizing the TV\'s internal speakers.
+
+Considering the urgency and impact of this issue on my entertainment experience, I kindly implore your expertise and support in resolving this matter at the earliest convenience. Your swift assistance would be greatly appreciated.
+
+Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
 
     END
 $$;

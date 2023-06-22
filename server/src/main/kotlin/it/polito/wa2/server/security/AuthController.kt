@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 
 
+@CrossOrigin(origins =["http://localhost:3001"])
 @RestController
 @Observed
 class AuthController(
@@ -18,9 +19,7 @@ class AuthController(
 ) {
     private val restTemplate = RestTemplate()
 
-    @CrossOrigin(origins =["http://localhost:3001"])
     @PostMapping("/API/login")
-    @ResponseBody
     fun login(@RequestBody loginRequest: LoginRequest): LoginResponse {
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
@@ -54,9 +53,7 @@ class AuthController(
         }
     }
 
-    @CrossOrigin(origins =["http://localhost:3001"])
     @PostMapping("/API/refreshtoken")
-    @ResponseBody
     fun refreshToken(@RequestBody refreshRequest: RefreshRequest): LoginResponse {
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")

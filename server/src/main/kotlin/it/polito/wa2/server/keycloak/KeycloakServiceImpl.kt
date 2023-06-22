@@ -5,8 +5,10 @@ import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.ProfileNotFoundException
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
+import it.polito.wa2.server.security.WebSecurityConfig
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -30,6 +32,7 @@ class KeycloakServiceImpl(
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.CLIENT)
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun addExpert(userDTO: UserDTO) {
         val user = createUser(userDTO)
         addUser(user)
@@ -37,6 +40,7 @@ class KeycloakServiceImpl(
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.EXPERT)
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun addVendor(userDTO: UserDTO) {
         val user = createUser(userDTO)
         addUser(user)
@@ -44,6 +48,7 @@ class KeycloakServiceImpl(
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.VENDOR)
     }
 
+    @PreAuthorize("isAuthenticated()")
     override fun updateUser(email: String, userDTO: UserUpdateDTO) {
         if (email != userDTO.email)
             throw BadRequestProfileException("Email in path doesn't match the email in the body")

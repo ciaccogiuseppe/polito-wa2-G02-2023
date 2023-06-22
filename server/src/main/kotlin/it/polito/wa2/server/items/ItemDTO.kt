@@ -17,7 +17,7 @@ data class ItemDTO(
         message="email must be valid")
     val clientEmail: String?,
     val validFromTimestamp: Timestamp?,
-    @Positive
+    @field:Positive
     val durationMonths: Long?
 )
 

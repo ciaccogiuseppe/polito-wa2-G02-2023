@@ -42,11 +42,11 @@ class MessageController(private val messageService: MessageService) {
     }
 
 
-    fun checkTicketId(ticketId: Long){
+    private fun checkTicketId(ticketId: Long){
         if(ticketId <= 0)
             throw UnprocessableTicketException("Wrong ticket id value")
     }
-    fun checkInputMessage(messageDTO: MessageDTO?, br: BindingResult){
+    private fun checkInputMessage(messageDTO: MessageDTO?, br: BindingResult){
         if (br.hasErrors())
             throw UnprocessableMessageException("Wrong message format")
         if (messageDTO == null)

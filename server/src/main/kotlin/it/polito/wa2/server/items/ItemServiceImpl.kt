@@ -8,7 +8,9 @@ import it.polito.wa2.server.products.ProductService
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
+import it.polito.wa2.server.security.WebSecurityConfig
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
@@ -24,12 +26,14 @@ class ItemServiceImpl(
     private val itemRepository: ItemRepository
 ): ItemService {
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     override fun getItemByProductId(productId: String): List<ItemDTO> {
         val product = getProduct(productId)
         return itemRepository.findAllByProduct(product).map { it.toDTO() }
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     override fun getItemByProductIdAndSerialNum(productId: String, serialNum: Long): ItemDTO {
         val product = getProduct(productId)
         return itemRepository.findByProductAndSerialNum(product, serialNum)?.toDTO()
@@ -50,6 +54,7 @@ class ItemServiceImpl(
     }
 
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.VENDOR}')")
     override fun createUUID(itemDTO: ItemDTO): ItemDTO {
         if(itemDTO.durationMonths == null)
             throw UnprocessableItemException("Duration cannot be null")
@@ -64,6 +69,7 @@ class ItemServiceImpl(
         return itemRepository.save(item).toDTO()
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
     override fun assignClient(userEmail: String, itemDTO: ItemDTO): ItemDTO {
         if(itemDTO.uuid == null) {
             throw BadRequestItemException("UUID cannot be null")

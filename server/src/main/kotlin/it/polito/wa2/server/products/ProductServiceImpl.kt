@@ -4,7 +4,9 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.*
 import it.polito.wa2.server.brands.BrandRepository
 import it.polito.wa2.server.categories.CategoryRepository
+import it.polito.wa2.server.security.WebSecurityConfig
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.lang.IllegalArgumentException
@@ -25,6 +27,7 @@ class ProductServiceImpl(
     }
 
     @Transactional(readOnly = false)
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun addProduct(productDTO: ProductDTO): ProductDTO {
         if (productRepository.findByIdOrNull(productDTO.productId) != null)
             throw DuplicateProductException("Product with id '${productDTO.productId}' already exists")

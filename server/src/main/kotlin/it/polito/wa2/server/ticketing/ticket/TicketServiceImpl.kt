@@ -10,8 +10,10 @@ import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
+import it.polito.wa2.server.security.WebSecurityConfig
 import it.polito.wa2.server.ticketing.tickethistory.*
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
@@ -29,6 +31,7 @@ class TicketServiceImpl(
     private val itemService: ItemService
 ): TicketService {
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun managerGetTicket(ticketId: Long, managerEmail: String): TicketDTO {
         getProfileByEmail(managerEmail)
         val ticket = ticketRepository.findByIdOrNull(ticketId)
@@ -37,6 +40,7 @@ class TicketServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
     override fun clientGetTicket(ticketId: Long, clientEmail: String): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
@@ -46,6 +50,7 @@ class TicketServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.EXPERT}')")
     override fun expertGetTicket(ticketId: Long, expertEmail: String): TicketDTO {
         val ticket = ticketRepository.findByIdOrNull(ticketId)
             ?: throw TicketNotFoundException("Ticket with id '${ticketId}' not found")
@@ -55,6 +60,7 @@ class TicketServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
     override fun clientGetTicketsFiltered(
         clientEmail: String?,
         minPriority: Int?,
@@ -74,6 +80,7 @@ class TicketServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.EXPERT}')")
     override fun expertGetTicketsFiltered(
         clientEmail: String?,
         minPriority: Int?,
@@ -94,6 +101,7 @@ class TicketServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun managerGetTicketsFiltered(
         clientEmail: String?,
         minPriority: Int?,
@@ -112,6 +120,7 @@ class TicketServiceImpl(
         return filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
     override fun addTicket(ticketDTO: TicketDTO, userEmail: String): TicketIdDTO {
         val timestamp = Timestamp.valueOf(LocalDateTime.now())
         val item = getItem(ticketDTO.productId, ticketDTO.serialNum)
@@ -133,6 +142,7 @@ class TicketServiceImpl(
         return TicketIdDTO(ticket.getId()!!)
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun assignTicket(ticketAssignDTO: TicketAssignDTO, userEmail: String) {
         val expert = getProfileByEmail(ticketAssignDTO.expertEmail)
         val ticket = ticketRepository.findByIdOrNull(ticketAssignDTO.ticketId)
@@ -162,6 +172,7 @@ class TicketServiceImpl(
         )
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun managerUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
         val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
@@ -170,6 +181,7 @@ class TicketServiceImpl(
         updateTicket(ticketUpdateDTO, ticket, user)
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
     override fun clientUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
         val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")
@@ -180,6 +192,7 @@ class TicketServiceImpl(
         updateTicket(ticketUpdateDTO, ticket, user)
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.EXPERT}')")
     override fun expertUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
         val ticket = ticketRepository.findByIdOrNull(ticketUpdateDTO.ticketId)
             ?: throw TicketNotFoundException("The ticket associated to the ID ${ticketUpdateDTO.ticketId} does not exists")

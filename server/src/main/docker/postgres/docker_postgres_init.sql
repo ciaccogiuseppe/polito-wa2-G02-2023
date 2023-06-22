@@ -77,11 +77,11 @@ create table if not exists addresses
 (
     id        bigserial
         primary key,
-    address   varchar(255),
-    city      varchar(255),
-    country   varchar(255),
-    region    varchar(255),
-    client_id bigint not null
+    address   varchar(255) not null,
+    city      varchar(255) not null,
+    country   varchar(255) not null,
+    region    varchar(255) not null,
+    client_id bigint       not null
         constraint fkdois8l22rrsfm4w5l13wuaamy
             references profiles
 );
@@ -108,7 +108,7 @@ create table if not exists tickets
     id                bigserial
         primary key,
     created_timestamp timestamp(6) not null,
-    description       VARCHAR not null,
+    description       varchar not null,
     priority          integer      not null,
     status            varchar(255) not null,
     title             varchar(255) not null,

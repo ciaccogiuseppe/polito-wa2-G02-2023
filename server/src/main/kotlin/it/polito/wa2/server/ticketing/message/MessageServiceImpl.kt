@@ -7,6 +7,7 @@ import it.polito.wa2.server.UnauthorizedMessageException
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileService
+import it.polito.wa2.server.security.WebSecurityConfig
 import it.polito.wa2.server.ticketing.attachment.Attachment
 import it.polito.wa2.server.ticketing.attachment.AttachmentDTO
 import it.polito.wa2.server.ticketing.attachment.AttachmentRepository
@@ -15,6 +16,7 @@ import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.ticket.TicketRepository
 import it.polito.wa2.server.ticketing.ticket.TicketService
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,6 +30,7 @@ class MessageServiceImpl(
     private val ticketService: TicketService,
     private val attachmentService: AttachmentService): MessageService {
     @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}')")
     override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
         val ticket = getTicket(ticketId, userEmail)
         checkSender(userEmail, ticket)
@@ -35,11 +38,13 @@ class MessageServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun getChatManager(ticketId: Long, userEmail: String): List<MessageDTO> {
         val ticket = getTicket(ticketId, userEmail)
         return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
     }
 
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}')")
     override fun addMessageSender(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
@@ -48,6 +53,7 @@ class MessageServiceImpl(
         addMessage(messageDTO, userEmail, ticket)
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun addMessageManager(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")

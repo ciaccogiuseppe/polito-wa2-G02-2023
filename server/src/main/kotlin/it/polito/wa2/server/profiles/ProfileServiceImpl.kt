@@ -12,7 +12,8 @@ import it.polito.wa2.server.categories.CategoryService
 import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.items.ItemDTO
 import it.polito.wa2.server.items.toDTO
-import org.springframework.data.repository.findByIdOrNull
+import it.polito.wa2.server.security.WebSecurityConfig
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -26,6 +27,7 @@ class ProfileServiceImpl(
 ): ProfileService {
 
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     override fun getProfile(email: String): ProfileDTO {
         return profileRepository.findByEmail(email)?.toDTO()
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
@@ -37,6 +39,7 @@ class ProfileServiceImpl(
             ?: throw ProfileNotFoundException("Profile not found")
     }*/
 
+    @Transactional(readOnly = true)
     override fun getProfileItems(email: String): List<ItemDTO> {
         val profile = profileRepository.findByEmail(email)
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
@@ -44,6 +47,7 @@ class ProfileServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun getExpertByCategory(category: String): List<ProfileDTO> {
         return profileRepository
             .findByRole(ProfileRole.EXPERT)
@@ -75,6 +79,7 @@ class ProfileServiceImpl(
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     override fun updateProfile(email: String, newProfileDTO: ProfileDTO) {
         val profile = profileRepository.findByEmail(email)
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")

@@ -53,6 +53,14 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         keycloakService.updateUser(email, userDTO!!)
     }
 
+    @PutMapping("/API/vendor/user/{email}")
+    fun vendorUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
+        val userEmail = retrieveUserEmail(principal)
+        checkEmailWithLoggedUser(email, userEmail)
+        checkInputUpdateUser(userDTO, br)
+        keycloakService.updateUser(email, userDTO!!)
+    }
+
     @PutMapping("/API/manager/user/{email}")
     fun managerUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
         checkEmail(email)
@@ -74,18 +82,18 @@ class KeycloakController(private val keycloakService: KeycloakService) {
             throw BadRequestUserException("User must not be NULL")
     }
 
-    fun checkEmailWithLoggedUser(email: String, emailLogged: String){
+    private fun checkEmailWithLoggedUser(email: String, emailLogged: String){
         checkEmail(email)
         if(email != emailLogged)
             throw ForbiddenException("You cannot updated profiles that are not yours")
     }
 
-    fun checkEmail(email: String){
+    private fun checkEmail(email: String){
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
     }
 
-    fun retrieveUserEmail(principal: Principal): String {
+    private fun retrieveUserEmail(principal: Principal): String {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         return token.tokenAttributes["email"] as String
     }

@@ -4,6 +4,8 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.AddressNotFoundException
 import it.polito.wa2.server.DuplicateAddressException
 import it.polito.wa2.server.profiles.*
+import it.polito.wa2.server.security.WebSecurityConfig
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,11 +17,14 @@ class AddressServiceImpl(
     private val addressRepository: AddressRepository,
     private val profileRepository: ProfileRepository
 ): AddressService {
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.MANAGER}')")
     override fun getAddressOfClient(email: String): AddressDTO? {
         val address = addressRepository.findByClient(getProfileByEmail(email)) ?: return null
         return address.toDTO()
     }
 
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.MANAGER}')")
     override fun updateAddressOfClient(email: String, newAddress: AddressDTO) {
         val addr= addressRepository.findByClient(getProfileByEmail(email))
             ?: throw AddressNotFoundException("Address not found")

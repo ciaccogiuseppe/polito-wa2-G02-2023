@@ -8,10 +8,7 @@ import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.items.ItemDTO
 import it.polito.wa2.server.items.ItemRepository
-import it.polito.wa2.server.products.ProductDTO
 import it.polito.wa2.server.products.ProductRepository
-import it.polito.wa2.server.products.toDTO
-import it.polito.wa2.server.profiles.ProfileDTO
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
 import org.junit.jupiter.api.AfterAll
@@ -24,9 +21,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.*
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -149,7 +144,7 @@ class ItemControllerTests {
     @Test
     fun getItemsSuccess() {
 
-        val uri = URI("http://localhost:$port/API/public/products/0000000000000/items/")
+        val uri = URI("http://localhost:$port/API/authenticated/products/0000000000000/items/")
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         profileRepository.save(customer)
@@ -189,7 +184,7 @@ class ItemControllerTests {
     @Test
     fun getItemSuccess() {
 
-        val uri = URI("http://localhost:$port/API/public/products/0000000000000/items/12341234")
+        val uri = URI("http://localhost:$port/API/authenticated/products/0000000000000/items/12341234")
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         profileRepository.save(customer)

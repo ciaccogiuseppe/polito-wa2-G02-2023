@@ -1,15 +1,9 @@
 package it.polito.wa2.server.profiles
 
 import io.micrometer.observation.annotation.Observed
-import it.polito.wa2.server.BadRequestProfileException
-import it.polito.wa2.server.ForbiddenException
-import it.polito.wa2.server.UnprocessableAddressException
 import it.polito.wa2.server.UnprocessableProfileException
-import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.items.ItemDTO
-import jakarta.validation.Valid
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
@@ -84,12 +78,12 @@ class ProfileController(private val profileService: ProfileService) {
             throw UnprocessableAddressException("Wrong address format")
     }*/
 
-    fun retrieveUserEmail(principal: Principal): String {
+    private fun retrieveUserEmail(principal: Principal): String {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         return token.tokenAttributes["email"] as String
     }
 
-    fun checkEmail(email: String){
+    private fun checkEmail(email: String){
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
     }
@@ -98,7 +92,7 @@ class ProfileController(private val profileService: ProfileService) {
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
         if(email != emailLogged)
-            throw ForbiddenException("You cannot updated profiles that are not yours")
+            throw ForbiddenException("You cannot update profiles that are not yours")
     }
 
     /* returns true if all fields are not empty */

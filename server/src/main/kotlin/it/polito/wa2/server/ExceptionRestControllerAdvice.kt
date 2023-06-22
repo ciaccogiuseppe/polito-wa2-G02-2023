@@ -12,10 +12,10 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     fun handleUnauthorized(e: ForbiddenException) = ProblemDetail.forStatusAndDetail( HttpStatus.FORBIDDEN, e.message!! )
 
     @ExceptionHandler(UnprocessableUserException::class)
-    fun handleUnprocessableProfile(e: UnprocessableUserException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+    fun handleUnprocessableUser(e: UnprocessableUserException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
 
     @ExceptionHandler(BadRequestUserException::class)
-    fun handleProfileBadRequest(e: BadRequestUserException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
+    fun handleUserBadRequest(e: BadRequestUserException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
 
     /************** Product exception handlers **************/
     @ExceptionHandler(ProductNotFoundException::class)
@@ -57,7 +57,7 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     fun handleTicketNotFound(e: TicketNotFoundException) = ProblemDetail.forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!! )
 
     @ExceptionHandler(UnprocessableTicketException::class)
-    fun handleTicketNotFound(e: UnprocessableTicketException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+    fun handleUnprocessableTicket(e: UnprocessableTicketException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
 
     @ExceptionHandler(BadRequestFilterException::class)
     fun handleFilterBadRequest(e: BadRequestFilterException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
@@ -70,7 +70,7 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     fun handleMessageBadRequest(e: BadRequestMessageException) = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message!! )
 
     @ExceptionHandler(UnauthorizedMessageException::class)
-    fun handleMessageBadRequest(e: UnauthorizedMessageException) = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.message!! )
+    fun handleMessageUnauthorized(e: UnauthorizedMessageException) = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.message!! )
 
     /************** Category exception handlers **************/
     @ExceptionHandler(CategoryNotFoundException::class)
@@ -107,7 +107,7 @@ class ExceptionRestControllerAdvice: ResponseEntityExceptionHandler() {
     fun handleDuplicateAddress(e: DuplicateAddressException) = ProblemDetail.forStatusAndDetail( HttpStatus.CONFLICT, e.message!! )
 
     @ExceptionHandler(UnprocessableAddressException::class)
-    fun handleUnprocessableItem(e: UnprocessableAddressException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
+    fun handleUnprocessableAddress(e: UnprocessableAddressException) = ProblemDetail.forStatusAndDetail( HttpStatus.UNPROCESSABLE_ENTITY, e.message!! )
 }
 
 class ProductNotFoundException(message: String): RuntimeException(message)
