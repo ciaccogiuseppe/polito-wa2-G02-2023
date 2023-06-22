@@ -21,24 +21,21 @@ class TicketController(private val ticketService: TicketService) {
     @GetMapping("/API/manager/ticketing/{ticketId}")
     fun managerGetTicket(principal: Principal, @PathVariable ticketId: Long): TicketDTO {
         val userEmail = retrieveUserEmail(principal)
-        if(ticketId < 1)
-            throw UnprocessableTicketException("Invalid ticket id")
+        checkTicketId(ticketId)
         return ticketService.managerGetTicket(ticketId, userEmail)
     }
 
     @GetMapping("/API/client/ticketing/{ticketId}")
     fun clientGetTicket(principal: Principal, @PathVariable ticketId: Long): TicketDTO {
         val userEmail = retrieveUserEmail(principal)
-        if(ticketId < 1)
-            throw UnprocessableTicketException("Invalid ticket id")
+        checkTicketId(ticketId)
         return ticketService.clientGetTicket(ticketId, userEmail)
     }
 
     @GetMapping("/API/expert/ticketing/{ticketId}")
     fun expertGetTicket(principal: Principal, @PathVariable ticketId: Long): TicketDTO {
         val userEmail = retrieveUserEmail(principal)
-        if(ticketId < 1)
-            throw UnprocessableTicketException("Invalid ticket id")
+        checkTicketId(ticketId)
         return ticketService.expertGetTicket(ticketId, userEmail)
     }
 
@@ -192,6 +189,11 @@ class TicketController(private val ticketService: TicketService) {
             throw UnprocessableProfileException("Wrong ticket format")
         if (ticketUpdateDTO == null)
             throw BadRequestProfileException("Ticket must not be NULL")
+    }
+
+    private fun checkTicketId(ticketId: Long) {
+        if(ticketId < 1)
+            throw UnprocessableTicketException("Invalid ticket id")
     }
 
     private fun retrieveUserEmail(principal: Principal): String {

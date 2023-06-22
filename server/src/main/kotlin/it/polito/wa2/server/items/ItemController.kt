@@ -12,13 +12,13 @@ import java.security.Principal
 @RestController
 @Observed
 class ItemController(private val itemService: ItemService) {
-    @GetMapping("/API/authenticated/products/{productId}/items/")
+    @GetMapping("/API/private/products/{productId}/items/")
     fun getItemByProductId(@PathVariable("productId") productId: String): List<ItemDTO> {
         checkProductId(productId)
         return itemService.getItemByProductId(productId)
     }
 
-    @GetMapping("/API/authenticated/products/{productId}/items/{serialNum}")
+    @GetMapping("/API/private/products/{productId}/items/{serialNum}")
     fun getItemByProductIdAndSerialNum(@PathVariable("productId") productId: String,
                                        @PathVariable("serialNum") serialNum: Long): ItemDTO? {
         checkProductId(productId)
@@ -26,30 +26,24 @@ class ItemController(private val itemService: ItemService) {
         return itemService.getItemByProductIdAndSerialNum(productId, serialNum)
     }
 
-    /*@PostMapping("/API/public/products/{productId}/items/")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun addItem(@PathVariable("productId") productId: String, @RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
-        checkProductId(productId)
-        checkInputItem(itemDTO, br)
-        return itemService.addItem(productId, itemDTO!!)
-    }*/
+    @GetMapping("/API/client/profiles/items")
+    fun getProfileItems(principal: Principal): List<ItemDTO> {
+        val email = retrieveUserEmail(principal)
+        return itemService.getProfileItems(email)
+    }
 
     @PostMapping("/API/vendor/products/items/")
     fun generateUUID(@RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
         checkInputItem(itemDTO, br)
-        checkProductId(itemDTO!!.productId)
-        return itemService.createUUID(itemDTO)
+        return itemService.createUUID(itemDTO!!)
     }
 
     @PutMapping("/API/client/products/items/register")
     fun assignClient(principal: Principal,
                      @RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
-        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
-        val userEmail = token.tokenAttributes["email"] as String
+        val userEmail = retrieveUserEmail(principal)
         checkInputItem(itemDTO, br)
-        checkProductId(itemDTO!!.productId)
-        checkSerialNum(itemDTO.serialNum)
-        return itemService.assignClient(userEmail, itemDTO)
+        return itemService.assignClient(userEmail, itemDTO!!)
     }
 
     private fun checkProductId(productId: String) {
@@ -67,5 +61,10 @@ class ItemController(private val itemService: ItemService) {
             throw UnprocessableItemException("Wrong item format")
         if (itemDTO == null)
             throw BadRequestItemException("Item must not be NULL")
+    }
+
+    private fun retrieveUserEmail(principal: Principal): String {
+        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
+        return token.tokenAttributes["email"] as String
     }
 }

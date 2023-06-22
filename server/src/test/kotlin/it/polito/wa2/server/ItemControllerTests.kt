@@ -144,7 +144,7 @@ class ItemControllerTests {
     @Test
     fun getItemsSuccess() {
 
-        val uri = URI("http://localhost:$port/API/authenticated/products/0000000000000/items/")
+        val uri = URI("http://localhost:$port/API/private/products/0000000000000/items/")
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         profileRepository.save(customer)
@@ -163,7 +163,7 @@ class ItemControllerTests {
         val item = TestUtils.testItem(product1, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
         itemRepository.save(item)
 
-        val entity = TestUtils.testEntityHeader(null, clientToken)
+        val entity = TestUtils.testEntityHeader(null, managerToken)
 
         val result = restTemplate.exchange(
             uri,
@@ -184,7 +184,7 @@ class ItemControllerTests {
     @Test
     fun getItemSuccess() {
 
-        val uri = URI("http://localhost:$port/API/authenticated/products/0000000000000/items/12341234")
+        val uri = URI("http://localhost:$port/API/private/products/0000000000000/items/12341234")
 
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         profileRepository.save(customer)
@@ -203,7 +203,7 @@ class ItemControllerTests {
         val item = TestUtils.testItem(product1, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
         itemRepository.save(item)
 
-        val entity = TestUtils.testEntityHeader(null, clientToken)
+        val entity = TestUtils.testEntityHeader(null, vendorToken)
 
         val result = restTemplate.exchange(
             uri,

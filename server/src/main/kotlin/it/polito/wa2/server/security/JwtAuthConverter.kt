@@ -18,7 +18,7 @@ class JwtAuthConverter(private val properties: JwtAuthConverterProperties) : Con
 
     override fun convert(source: Jwt): AbstractAuthenticationToken? {
         val authorities: Collection<GrantedAuthority> = Stream.concat(
-            jwtGrantedAuthoritiesConverter.convert(source)?.stream(),
+            jwtGrantedAuthoritiesConverter.convert(source)?.stream()?:Stream.empty(),
             extractResourceRoles(source).stream()).collect(Collectors.toSet())
         return JwtAuthenticationToken(source, authorities, getPrincipalClaimName(source))
     }
@@ -30,8 +30,10 @@ class JwtAuthConverter(private val properties: JwtAuthConverterProperties) : Con
 
     private fun extractResourceRoles(source: Jwt): Collection<GrantedAuthority> {
         val resourceAccess: Map<String, Any>? = source.getClaim("resource_access")
-        val resource: Map<String, Any>? = resourceAccess?.get(properties.resourceId) as Map<String, Any>?
-        val resourceRoles: Collection<String>? = resource?.get("roles") as Collection<String>?
+        val resource = resourceAccess?.get(properties.resourceId)
+        if(resource !is Map<*,*>?) return setOf()
+        val resourceRoles = resource?.get("roles")
+        if(resourceRoles !is Collection<*>?) return setOf()
         if(resourceAccess == null || resource == null || resourceRoles == null)
             return setOf()
         return resourceRoles.stream().map{SimpleGrantedAuthority("ROLE_$it")}

@@ -17,16 +17,14 @@ import java.security.Principal
 class MessageController(private val messageService: MessageService) {
     @GetMapping("/API/chat/{ticketId}")
     fun getMessage(principal: Principal, @PathVariable ticketId: Long) : List<MessageDTO> {
-        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
-        val userEmail = token.tokenAttributes["email"] as String
+        val userEmail = retrieveUserEmail(principal)
         checkTicketId(ticketId)
         return messageService.getChat(ticketId, userEmail)
     }
 
     @GetMapping("/API/manager/chat/{ticketId}")
     fun getMessageManager(principal: Principal, @PathVariable ticketId: Long) : List<MessageDTO> {
-        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
-        val userEmail = token.tokenAttributes["email"] as String
+        val userEmail = retrieveUserEmail(principal)
         checkTicketId(ticketId)
         return messageService.getChatManager(ticketId, userEmail)
     }
@@ -34,8 +32,7 @@ class MessageController(private val messageService: MessageService) {
     @PostMapping("/API/chat/{ticketId}")
     @ResponseStatus(HttpStatus.CREATED)
     fun addMessage(principal: Principal, @PathVariable ticketId: Long, @RequestBody @Valid messageDTO: MessageDTO?, br: BindingResult) {
-        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
-        val userEmail = token.tokenAttributes["email"] as String
+        val userEmail = retrieveUserEmail(principal)
         checkTicketId(ticketId)
         checkInputMessage(messageDTO, br)
         messageService.addMessageSender(ticketId, messageDTO!!, userEmail)
@@ -51,5 +48,10 @@ class MessageController(private val messageService: MessageService) {
             throw UnprocessableMessageException("Wrong message format")
         if (messageDTO == null)
             throw BadRequestMessageException("Message must not be NULL")
+    }
+
+    private fun retrieveUserEmail(principal: Principal): String {
+        val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
+        return token.tokenAttributes["email"] as String
     }
 }
