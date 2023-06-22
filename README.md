@@ -50,189 +50,6 @@ To package the React application:
 - the client app can now be loaded opening `localhost:8080` and it can properly interact with the API server
 
 ## API Reference
-### Profiles
-- **METHOD** `GET` **URL**: `/API/manager/profiles/{email}`
-
-  - **Description**: Get profile, if existing, with email corresponding to `email`
-  - **Permissions allowed**: Manager
-  - **Request path parameter**: `email` to retrieve the corresponding profile
-  - **Request body**: _None_
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (profile with email `email` not existing)
-    - `422 Unprocessable Entity` (wrong format for `email`)
-    - `500 Internal Server Error`
-  - **Response body**: profile corresponding to `email` / Error message in case of error
-  ```
-  {
-    "profileId": <profileId>,
-    "email": <email>,
-    "name": <name>,
-    "surname": <surname>
-  }
-  ```
-| Field       | Content         |
-|-------------|-----------------|
-| `profileId` | profile id      |
-| `name`      | profile name    |
-| `surname`   | profile surname |
-| `email`     | profile email   |
-
-
-- **METHOD** `GET` **URL**: `/API/manager/profiles/profileId/{profileId}`
-
-  - **Description**: Get profile, if existing, with profileId corresponding to `profileId`
-  - **Permissions allowed**: Manager
-  - **Request path parameter**: `profileId` to retrieve the corresponding profile
-  - **Request body**: _None_
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (profile with profileId `profileId` not existing)
-    - `422 Unprocessable Entity` (wrong format for `profileId`)
-    - `500 Internal Server Error`
-  - **Response body**: profile corresponding to `profileId` / Error message in case of error
-  ```
-  {
-    "profileId": <profileId>,
-    "email": <email>,
-    "name": <name>,
-    "surname": <surname>
-  }
-  ```
-| Field       | Content         |
-|-------------|-----------------|
-| `profileId` | profile id      |
-| `name`      | profile name    |
-| `surname`   | profile surname |
-| `email`     | profile email   |
-
-- **METHOD** `POST` **URL**: `/API/public/profiles`
-
-  - **Description**: Create new profile, given its properties
-  - **Permissions allowed**:  _Public_
-  - **Request query parameter**: _None_
-  - **Request body**: Profile to be created
-
-    ```
-    {
-      "email": <email>,
-      "name": <name>,
-      "surname": <surname>,
-    }
-    ```
-    - **Response**: `201 Created` (success)
-    - **Error responses**:
-      - `400 Bad Request`      
-      - `409 Conflict` (Profile with the given email already exists)
-      - `422 Unprocessable Entity` (wrong format for request body)
-      - `500 Internal Server Error`
-    - **Response body**: _None_ / Error message in case of errors
-
-
-| Field     | Content         |
-|-----------|-----------------|
-| `name`    | profile name    |
-| `surname` | profile surname |
-| `email`   | profile email   |
-
-
-- **METHOD** `PUT` **URL**: `/API/manager/profiles/{email}`
-
-  - **Description**: Change data of given profile
-  - **Permissions allowed**: Manager
-  - **Request path parameter**:`email` to retrieve the corresponding profile
-  - **Request body**: Update information of profile
-
-    ```
-    {
-      "email": <email>
-      "name": <name>,
-      "surname": <surname>
-    }
-    ```
-
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (user associated with `email` not existing)
-    - `409 Conflict` (Another profile with the given email already exists)
-    - `422 Unprocessable Entity`  (wrong format for request body or email)
-    - `500 Internal Server Error`
-  - **Response body**: _None_ / Error message in case of error
-
-| Field     | Content             |
-|-----------|---------------------|
-| `name`    | new profile name    |
-| `surname` | new profile surname |
-| `email`   | new profile email   |
-
-- **METHOD** `PUT` **URL**: `/API/expert/profiles/{email}`
-
-  - **Description**: Change data of given expert profile
-  - **Permissions allowed**: Expert
-  - **Request path parameter**:`email` to retrieve the corresponding profile
-  - **Request body**: Update information of profile
-
-    ```
-    {
-      "email": <email>
-      "name": <name>,
-      "surname": <surname>
-    }
-    ```
-
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (user associated with `email` not existing)
-    - `409 Conflict` (Another profile with the given email already exists)
-    - `422 Unprocessable Entity`  (wrong format for request body or email)
-    - `500 Internal Server Error`
-  - **Response body**: _None_ / Error message in case of error
-
-| Field     | Content             |
-|-----------|---------------------|
-| `name`    | new profile name    |
-| `surname` | new profile surname |
-| `email`   | new profile email   |
-
-- **METHOD** `PUT` **URL**: `/API/client/profiles/{email}`
-
-  - **Description**: Change data of given client profile
-  - **Permissions allowed**: Client
-  - **Request path parameter**:`email` to retrieve the corresponding profile
-  - **Request body**: Update information of profile
-
-    ```
-    {
-      "email": <email>
-      "name": <name>,
-      "surname": <surname>
-    }
-    ```
-
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (user associated with `email` not existing)
-    - `409 Conflict` (Another profile with the given email already exists)
-    - `422 Unprocessable Entity`  (wrong format for request body or email)
-    - `500 Internal Server Error`
-  - **Response body**: _None_ / Error message in case of error
-
-| Field     | Content             |
-|-----------|---------------------|
-| `name`    | new profile name    |
-| `surname` | new profile surname |
-| `email`   | new profile email   |
-
 ### Products
 - **METHOD** `GET` **URL**: `/API/public/products/`
 
@@ -1323,3 +1140,186 @@ To package the React application:
 | `clientEmail`        | email of the client that owns the item                   |
 | `validFromTimestamp` | timestamp that represents the start of the item validity |
 | `durationMonths`     | duration of the item validity                            |
+
+### Profiles (DEPRECATED)
+- **METHOD** `GET` **URL**: `/API/manager/profiles/{email}`
+
+  - **Description**: Get profile, if existing, with email corresponding to `email`
+  - **Permissions allowed**: Manager
+  - **Request path parameter**: `email` to retrieve the corresponding profile
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (profile with email `email` not existing)
+    - `422 Unprocessable Entity` (wrong format for `email`)
+    - `500 Internal Server Error`
+  - **Response body**: profile corresponding to `email` / Error message in case of error
+  ```
+  {
+    "profileId": <profileId>,
+    "email": <email>,
+    "name": <name>,
+    "surname": <surname>
+  }
+  ```
+| Field       | Content         |
+|-------------|-----------------|
+| `profileId` | profile id      |
+| `name`      | profile name    |
+| `surname`   | profile surname |
+| `email`     | profile email   |
+
+
+- **METHOD** `GET` **URL**: `/API/manager/profiles/profileId/{profileId}`
+
+  - **Description**: Get profile, if existing, with profileId corresponding to `profileId`
+  - **Permissions allowed**: Manager
+  - **Request path parameter**: `profileId` to retrieve the corresponding profile
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (profile with profileId `profileId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `profileId`)
+    - `500 Internal Server Error`
+  - **Response body**: profile corresponding to `profileId` / Error message in case of error
+  ```
+  {
+    "profileId": <profileId>,
+    "email": <email>,
+    "name": <name>,
+    "surname": <surname>
+  }
+  ```
+| Field       | Content         |
+|-------------|-----------------|
+| `profileId` | profile id      |
+| `name`      | profile name    |
+| `surname`   | profile surname |
+| `email`     | profile email   |
+
+- **METHOD** `POST` **URL**: `/API/public/profiles`
+
+  - **Description**: Create new profile, given its properties
+  - **Permissions allowed**:  _Public_
+  - **Request query parameter**: _None_
+  - **Request body**: Profile to be created
+
+    ```
+    {
+      "email": <email>,
+      "name": <name>,
+      "surname": <surname>,
+    }
+    ```
+    - **Response**: `201 Created` (success)
+    - **Error responses**:
+      - `400 Bad Request`
+      - `409 Conflict` (Profile with the given email already exists)
+      - `422 Unprocessable Entity` (wrong format for request body)
+      - `500 Internal Server Error`
+    - **Response body**: _None_ / Error message in case of errors
+
+
+| Field     | Content         |
+|-----------|-----------------|
+| `name`    | profile name    |
+| `surname` | profile surname |
+| `email`   | profile email   |
+
+
+- **METHOD** `PUT` **URL**: `/API/manager/profiles/{email}`
+
+  - **Description**: Change data of given profile
+  - **Permissions allowed**: Manager
+  - **Request path parameter**:`email` to retrieve the corresponding profile
+  - **Request body**: Update information of profile
+
+    ```
+    {
+      "email": <email>
+      "name": <name>,
+      "surname": <surname>
+    }
+    ```
+
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `409 Conflict` (Another profile with the given email already exists)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+| Field     | Content             |
+|-----------|---------------------|
+| `name`    | new profile name    |
+| `surname` | new profile surname |
+| `email`   | new profile email   |
+
+- **METHOD** `PUT` **URL**: `/API/expert/profiles/{email}`
+
+  - **Description**: Change data of given expert profile
+  - **Permissions allowed**: Expert
+  - **Request path parameter**:`email` to retrieve the corresponding profile
+  - **Request body**: Update information of profile
+
+    ```
+    {
+      "email": <email>
+      "name": <name>,
+      "surname": <surname>
+    }
+    ```
+
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `409 Conflict` (Another profile with the given email already exists)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+| Field     | Content             |
+|-----------|---------------------|
+| `name`    | new profile name    |
+| `surname` | new profile surname |
+| `email`   | new profile email   |
+
+- **METHOD** `PUT` **URL**: `/API/client/profiles/{email}`
+
+  - **Description**: Change data of given client profile
+  - **Permissions allowed**: Client
+  - **Request path parameter**:`email` to retrieve the corresponding profile
+  - **Request body**: Update information of profile
+
+    ```
+    {
+      "email": <email>
+      "name": <name>,
+      "surname": <surname>
+    }
+    ```
+
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `409 Conflict` (Another profile with the given email already exists)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+| Field     | Content             |
+|-----------|---------------------|
+| `name`    | new profile name    |
+| `surname` | new profile surname |
+| `email`   | new profile email   |
