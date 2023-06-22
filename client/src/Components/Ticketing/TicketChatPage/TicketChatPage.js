@@ -93,6 +93,7 @@ function DeleteAttachmentButton(props) {
   const onClick = props.onClick;
   return (
     <a
+        href={"/"}
       style={{ cursor: "pointer" }}
       onClick={(e) => {
         e.preventDefault();
@@ -191,6 +192,7 @@ function EditButton(props) {
   return (
     <>
       <a
+          href={"/"}
         style={{ pointerEvents: disabled ? "none" : "", cursor: "pointer" }}
         onClick={(e) => {
           e.preventDefault();
@@ -212,6 +214,7 @@ function CloseEditButton(props) {
   return (
     <>
       <a
+          href={"/"}
         style={{ pointerEvents: disabled ? "none" : "", cursor: "pointer" }}
         onClick={(e) => {
           e.preventDefault();

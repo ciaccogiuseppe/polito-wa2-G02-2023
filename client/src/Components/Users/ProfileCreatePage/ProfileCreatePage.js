@@ -1,11 +1,10 @@
-import { Button, Form, Spinner } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import { useEffect, useState } from "react";
-import { addNewProfile } from "../../../API/Profiles";
 import NavigationButton from "../../Common/NavigationButton";
 import NavigationLink from "../../Common/NavigationLink";
 import ErrorMessage from "../../Common/ErrorMessage";
-import { loginAPI, signupAPI } from "../../../API/Auth";
+import { signupAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
 
 function ProfileCreatePage(props) {
@@ -21,13 +20,13 @@ function ProfileCreatePage(props) {
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
 
-  const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const loggedIn = props.loggedIn;
   function submit() {
     setErrorMessage("");
+    setLoading(true)
     let missingFields = "";
     if (name.length === 0) {
       missingFields = missingFields + "first name, ";
@@ -95,7 +94,10 @@ function ProfileCreatePage(props) {
         address: address,
       },
     })
-      .then(() => navigate("/"))
+      .then(() => {
+          setLoading(false)
+          navigate("/")
+      })
       .catch((err) => setErrorMessage(err));
   }
   useEffect(() => {
@@ -265,6 +267,10 @@ function ProfileCreatePage(props) {
           <span>Already have an account?</span>{" "}
           <NavigationLink href={"/login"} text={"Sign in"} />
         </div>
+          {loading &&
+          <>
+              <Spinner style={{ color: "#A0C1D9" }} />
+          </>}
 
         {errorMessage && (
           <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />
@@ -272,51 +278,6 @@ function ProfileCreatePage(props) {
       </div>
     </>
   );
-
-  {
-    /*function createProfile(){
-        setLoading(true);
-        addNewProfile({email:email, name:name, surname:surname}).then(
-            res => {
-                setErrMessage("");
-                setResponse("Profile added succesfully");
-                setLoading(false);
-                setEmail("");
-                setName("");
-                setSurname("");
-                //console.log(res);
-            }
-        ).catch(err => {
-            //console.log(err);
-            setResponse("");
-            setErrMessage(err.message);
-            setLoading(false);
-        })
-    }
-
-    return <>
-            <div className="CenteredButton">
-
-                <Form className="form">
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label className="text-info">Email address</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={email} type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Name</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={name} type="text" placeholder="Name" onChange={e => setName(e.target.value)}/>
-                        <Form.Label style={{marginTop:"8px"}} className="text-info">Surname</Form.Label>
-                        <Form.Control style={{width: "400px", alignSelf:"center", margin:"auto"}} value={surname} type="text" placeholder="Surname" onChange={e => setSurname(e.target.value)}/>
-                    </Form.Group>
-                    <Button type="submit" variant="outline-info" style={{borderWidth:"2px"}} className="HomeButton" onClick={(e) => {e.preventDefault(); createProfile();}}>Create Profile</Button>
-                </Form>
-                <hr style={{color:"white", width:"90%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}/>
-                {loading? <Spinner style={{alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}} animation="border" variant="info" /> :
-                    <>
-                        {response?<h4 className="text-success" style={{marginTop:"10px"}}>{response}</h4>:<></>}
-                        {errMessage?<h5 className="text-danger" style={{marginTop:"10px"}}>{errMessage}</h5>:<></>}</>}
-
-            </div>
-    </>*/
-  }
 }
 
 export default ProfileCreatePage;

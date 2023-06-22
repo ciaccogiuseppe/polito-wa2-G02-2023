@@ -137,14 +137,11 @@ function TicketListPage(props) {
   const [expertEmail, setExpertEmail] = useState("");
   const [initialDate, setInitialDate] = useState("");
   const [finalDate, setFinalDate] = useState("");
-  const [errMessage, setErrMessage] = useState("");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
   const [ticketList, setTicketList] = useState([]);
   const [priority, setPriority] = useState([0, 3]);
   const [selectedStatus, setSelectedStatus] = useState([]);
   const [showFilters, setShowFilters] = useState(
-    user.role === "MANAGER" ? true : false
+    user.role === "MANAGER"
   );
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(null);

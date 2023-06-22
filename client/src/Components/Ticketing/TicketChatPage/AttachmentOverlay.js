@@ -1,13 +1,15 @@
 import { Modal } from "react-bootstrap";
 import "./Modals.css";
-import { closeIcon, leftArrow, rightArrow } from "../../Common/Icons";
+import {attachmentIcon, closeIcon, leftArrow, rightArrow} from "../../Common/Icons";
 import { useState } from "react";
+import {isImage} from "./ChatMessage";
 
 function RightNavigate(props) {
   const onClick = props.onClick;
   const [color, setColor] = useState("white");
   return (
     <a
+        href={"/"}
       style={{ cursor: "pointer" }}
       onClick={(e) => {
         e.preventDefault();
@@ -26,6 +28,7 @@ function LeftNavigate(props) {
   const [color, setColor] = useState("white");
   return (
     <a
+        href={"/"}
       style={{ cursor: "pointer" }}
       onClick={(e) => {
         e.preventDefault();
@@ -44,6 +47,7 @@ function CloseOverlay(props) {
   const [color, setColor] = useState("white");
   return (
     <a
+        href={"/"}
       style={{ cursor: "pointer" }}
       onClick={(e) => {
         e.preventDefault();
@@ -104,8 +108,9 @@ function AttachmentOverlay(props) {
             setCurPos(curPos - 1 < 0 ? imageList.length - 1 : curPos - 1);
           }}
         />
-        <img
-          style={{
+          {isImage(imageList[curPos].attachment) ?<img
+              alt={imageList[curPos].name}
+              style={{
             maxWidth: "75%",
             alignSelf: "center",
             boxShadow: "0px 4px 8px -4px rgba(0,0,0,0.8)",
@@ -113,8 +118,40 @@ function AttachmentOverlay(props) {
             margin: "auto",
             height: "80%",
           }}
-          src={"data:image/png;base64, " + imageList[curPos]}
-        />
+          src={"data:image/png;base64, " + imageList[curPos].attachment}
+        /> : <a
+              className={"myLink"}
+              download={imageList[curPos].name.substring(24, imageList[curPos].name.length)}
+              href={"data:application;base64, " + imageList[curPos].attachment}
+              style={{
+                  color: "white",
+                  cursor: "pointer",
+                  boxShadow: "0px 4px 8px -4px rgba(0,0,0,0.8)",
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  textAlign: "center",
+                  borderRadius: "20px",
+                  margin:"auto",
+                  height: "75px",
+                  width: "75px",
+              }}
+          >
+              <div style={{ marginTop: "10px" }}>
+                  {attachmentIcon("white", 25)}
+              </div>
+              <div
+                  style={{
+                      margin:"auto",
+                      fontSize: 10,
+                      height: "35px",
+                      width: "50px",
+                      overflow: "clip",
+                      overflowWrap: "break-word",
+                      overflowY: "hidden",
+                  }}
+              >
+                  {imageList[curPos].name.substring(24, imageList[curPos].name.length)}
+              </div>
+          </a>}
 
         <RightNavigate
           onClick={() => {

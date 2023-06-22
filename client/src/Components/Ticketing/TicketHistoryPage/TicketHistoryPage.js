@@ -1,8 +1,7 @@
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
-import NavigationLink from "../../Common/NavigationLink";
 import {
   crossIcon,
   filterIcon,
@@ -20,9 +19,6 @@ function TicketHistoryPage(props) {
   const [expertEmail, setExpertEmail] = useState("");
   const [initialDate, setInitialDate] = useState("");
   const [finalDate, setFinalDate] = useState("");
-  const [errMessage, setErrMessage] = useState("");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
   const [ticketList, setTicketList] = useState([]);
   const [showFilters, setShowFilters] = useState(true);
 
@@ -34,7 +30,7 @@ function TicketHistoryPage(props) {
       setTicketId(state.ticketId);
       window.history.replaceState(null, "");
     }
-  }, []);
+  }, [state]);
 
   useEffect(() => {
     if (ticketId) {

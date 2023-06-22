@@ -1,5 +1,4 @@
 import TextNewLine from "../../Common/TextNewLine";
-import { Box } from "@mui/material";
 import { Row } from "react-bootstrap";
 import { attachmentIcon } from "../../Common/Icons";
 import { useEffect, useState } from "react";
@@ -54,7 +53,7 @@ function ChatMessage(props) {
         setIsExpert(false);
       }
     });
-  }, []);
+  }, [props.sender]);
 
   const navigate = useNavigate();
 
@@ -128,6 +127,7 @@ function ChatMessage(props) {
           {imageList.map((img, index) =>
             isImage(img.attachment) ? (
               <img
+                  alt={img.name}
                 onClick={() => {
                   setAlbum(imageList);
                   setStartPos(index);

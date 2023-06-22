@@ -3,10 +3,7 @@ import { Form } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useEffect, useState } from "react";
 import {
-  addProductAPI,
-  getAllBrands,
-  getAllProducts,
-  getProductByIdAPI,
+  getAllProducts
 } from "../../../API/Products";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
 import ErrorMessage from "../../Common/ErrorMessage";
@@ -18,7 +15,6 @@ function TicketCreatePage(props) {
   const loggedIn = props.loggedIn;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [file, setFile] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -29,7 +25,6 @@ function TicketCreatePage(props) {
   const [serialNum, setSerialNum] = useState("");
   const [serialNums, setSerialNums] = useState([]);
   const [productsList, setProductsList] = useState([]);
-  const [warranty, setWarranty] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -66,7 +61,7 @@ function TicketCreatePage(props) {
         .filter((v, i, a) => a.indexOf(v) === i)
         .sort()
     );
-  }, [category]);
+  }, [category, products]);
 
   useEffect(() => {
     setProduct("");
@@ -85,7 +80,7 @@ function TicketCreatePage(props) {
           a.name.localeCompare(b.name, undefined, { numeric: true })
         )
     );
-  }, [brand]);
+  }, [brand, category, products]);
 
   useEffect(() => {
     setSerialNum("");
@@ -101,7 +96,7 @@ function TicketCreatePage(props) {
         .filter((v, i, a) => a.indexOf(v) === i)
         .sort((a, b) => a < b)
     );
-  }, [product]);
+  }, [product, brand, category, products]);
 
   const navigate = useNavigate();
   function addTicket() {
@@ -116,23 +111,6 @@ function TicketCreatePage(props) {
         navigate("/tickets/" + response.data.ticketId);
       })
       .catch((err) => setErrorMessage(err));
-  }
-
-  function formElement(val, setVal) {
-    return (
-      <Form.Control
-        value={val}
-        className={"form-control:focus"}
-        style={{
-          width: "300px",
-          alignSelf: "center",
-          margin: "auto",
-          marginTop: "10px",
-        }}
-        type="file"
-        onChange={(e) => setVal(e.target.value)}
-      />
-    );
   }
 
   return (

@@ -34,23 +34,6 @@ function ProfileUpdatePage(props) {
   const [city, setCity] = useState(
     (Profile.address && Profile.address.city) || ""
   );
-  function formElement(val, setVal) {
-    return (
-      <Form.Control
-        value={val}
-        className={"form-control:focus"}
-        style={{
-          width: "300px",
-          alignSelf: "center",
-          margin: "auto",
-          marginTop: "10px",
-        }}
-        type="file"
-        onChange={(e) => setVal(e.target.value)}
-      />
-    );
-  }
-
   function updateProfile() {
     if (Profile.role === "CLIENT") {
       updateClientAPI(

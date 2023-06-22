@@ -1,58 +1,34 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Form, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { getProfileInfo } from "../../../API/Auth";
-import SuccessMessage from "../../Common/SuccessMessage";
+import { useNavigate, useParams } from "react-router-dom";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
 import { getProfileDetails } from "../../../API/Profiles";
 
-//const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
 function ProfileInfoPageExpert(props) {
   const params = useParams();
   const email = params.email;
-  const location = useLocation();
-  let message = location.state && location.state.message;
   const loggedIn = props.loggedIn;
   const [Profile, setProfile] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(message || "");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(email);
     window.scrollTo(0, 0);
     getProfileDetails(email)
       .then((response) => {
         setProfile(response.data);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [email]);
 
   useEffect(() => {
     if (Profile !== null) {
       setLoading(false);
     }
   }, [Profile]);
-
-  function formElement(val, setVal) {
-    return (
-      <Form.Control
-        value={val}
-        className={"form-control:focus"}
-        style={{
-          width: "300px",
-          alignSelf: "center",
-          margin: "auto",
-          marginTop: "10px",
-        }}
-        type="file"
-        onChange={(e) => setVal(e.target.value)}
-      />
-    );
-  }
 
   return (
     <>

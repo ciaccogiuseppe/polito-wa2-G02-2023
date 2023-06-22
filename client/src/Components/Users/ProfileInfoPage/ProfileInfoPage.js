@@ -1,13 +1,11 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Form, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getProfileInfo } from "../../../API/Auth";
 import SuccessMessage from "../../Common/SuccessMessage";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
-
-//const Profile = {firstName:"Mario", lastName:"Rossi", email:"mariorossi@polito.it", address:"Corso Duca degli Abruzzi, 24 - Torino"}
 
 function ProfileInfoPage(props) {
   const location = useLocation();
@@ -33,22 +31,6 @@ function ProfileInfoPage(props) {
     }
   }, [Profile]);
 
-  function formElement(val, setVal) {
-    return (
-      <Form.Control
-        value={val}
-        className={"form-control:focus"}
-        style={{
-          width: "300px",
-          alignSelf: "center",
-          margin: "auto",
-          marginTop: "10px",
-        }}
-        type="file"
-        onChange={(e) => setVal(e.target.value)}
-      />
-    );
-  }
 
   return (
     <>
