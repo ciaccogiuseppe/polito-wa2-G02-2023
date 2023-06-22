@@ -113,7 +113,7 @@ To package the React application:
 - **METHOD** `POST` **URL**: `/API/public/profiles`
 
   - **Description**: Create new profile, given its properties
-  - **Permissions allowed**: Manager, Expert, Client
+  - **Permissions allowed**:  _Public_
   - **Request query parameter**: _None_
   - **Request body**: Profile to be created
 
@@ -237,7 +237,7 @@ To package the React application:
 - **METHOD** `GET` **URL**: `/API/public/products/`
 
   - **Description**: Get all products in the DB
-  - **Permissions allowed**: Manager, Expert, Client
+  - **Permissions allowed**:  _Public_
   - **Request query parameter**: _None_
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
@@ -265,7 +265,7 @@ To package the React application:
 - **METHOD** `GET` **URL**: `/API/public/products/{productId}`
 
   - **Description**: Get details of product with id `{productId}`
-  - **Permissions allowed**: Manager, Expert, Client
+  - **Permissions allowed**:  _Public_
   - **Request path parameter**: `{productId}` to get corresponding product
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
@@ -323,7 +323,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `clientEmail`    | customer who created the ticket |
+| `clientEmail`    | client who created the ticket   |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -362,7 +362,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `clientEmail`    | customer who created the ticket |
+| `clientEmail`    | client who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -401,7 +401,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `clientEmail`    | customer who created the ticket |
+| `clientEmail`    | client who created the ticket |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -491,7 +491,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `clientEmail`    | customer who created the ticket |
+| `clientEmail`      | client who created the ticket   |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -534,7 +534,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `clientEmail`    | customer who created the ticket |
+| `clientEmail`      | client who created the ticket   |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -577,7 +577,7 @@ To package the React application:
 | `description`      | description of the ticket       |
 | `priority`         | priority of the ticket          |
 | `productId`        | id of the product of the ticket |
-| `clientEmail`    | customer who created the ticket |
+| `clientEmail`      | client who created the ticket   |
 | `expertEmail`      | expert assigned to the ticket   |
 | `status`           | status of the ticket            |
 | `createdTimestamp` | timestamp of ticket creation    |
@@ -766,14 +766,14 @@ To package the React application:
     ]
   }
   ```
-| Field           | Content                                  |
-|-----------------|------------------------------------------|
-| `messageId`     | id of the chat message                   |
-| `ticketId`      | id of the ticket                         |
-| `senderEmail`   | email of the sender user                 |
-| `text`          | textual content of the message           |
-| `sentTimestamp` | timestamp of the message                 |
-| `attachments`   | IDs of attachments linked to the message |
+| Field           | Content                           |
+|-----------------|-----------------------------------|
+| `messageId`     | id of the chat message            |
+| `ticketId`      | id of the ticket                  |
+| `senderEmail`   | email of the sender user          |
+| `text`          | textual content of the message    |
+| `sentTimestamp` | timestamp of the message          |
+| `attachments`   | attachments linked to the message |
 
 - **METHOD** `GET` **URL**: `/API/manager/chat/{ticketId}`
 
@@ -805,14 +805,14 @@ To package the React application:
     ]
   }
   ```
-| Field           | Content                                  |
-|-----------------|------------------------------------------|
-| `messageId`     | id of the chat message                   |
-| `ticketId`      | id of the ticket                         |
-| `senderEmail`   | email of the sender user                 |
-| `text`          | textual content of the message           |
-| `sentTimestamp` | timestamp of the message                 |
-| `attachments`   | IDs of attachments linked to the message |
+| Field           | Content                           |
+|-----------------|-----------------------------------|
+| `messageId`     | id of the chat message            |
+| `ticketId`      | id of the ticket                  |
+| `senderEmail`   | email of the sender user          |
+| `text`          | textual content of the message    |
+| `sentTimestamp` | timestamp of the message          |
+| `attachments`   | attachments linked to the message |
 
 - **METHOD** `POST` **URL**: `/API/chat/{ticketId}`
 
@@ -822,8 +822,12 @@ To package the React application:
   - **Request body**: Message to be added to chat
   ```
   {
-    "text": <text>,
-    "attachments": [<attachment1>, <attachment2>,...]
+     "messageId": <messageId>,
+     "ticketId": <ticketId>,
+     "senderEmail": <senderEmail>,
+     "text": <text>,
+     "sentTimestamp": <timestamp>,
+     "attachments":[<attachment1>, <attachment2>...]
   }
   ```
   - **Response**: `201 CREATED` (success)
@@ -834,46 +838,7 @@ To package the React application:
     - `409 Unauthorized` (the sender is not related to ticket)
     - `422 Unprocessable Entity` (wrong format for `ticketId` or request body)
     - `500 Internal Server Error`
-  - **Response body**: id of the added message / Error message in case of error
-  ```
-  {
-    "messageId": <messageId>
-  }
-  ```
-| Field           | Content                           |
-|-----------------|-----------------------------------|
-| `messageId`     | id of the chat message            |
-| `ticketId`      | id of the ticket                  |
-| `text`          | textual content of the message    |
-| `sentTimestamp` | timestamp of the message          |
-| `attachments`   | attachments linked to the message |
-
-- **METHOD** `POST` **URL**: `/API/manager/chat/{ticketId}`
-
-  - **Description**: Add message to chat linked to `ticketId`
-  - **Permissions allowed**: Manager
-  - **Request path parameter**: `ticketId` to retrieve the corresponding ticket
-  - **Request body**: Message to be added to chat
-  ```
-  {
-    "text": <text>,
-    "attachments": [<attachment1>, <attachment2>,...]
-  }
-  ```
-  - **Response**: `201 CREATED` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (ticket with id `ticketId` not existing, sender associated to `senderId` not existing)
-    - `409 Unauthorized` (the sender is not related to ticket)
-    - `422 Unprocessable Entity` (wrong format for `ticketId` or request body)
-    - `500 Internal Server Error`
-  - **Response body**: id of the added message / Error message in case of error
-  ```
-  {
-    "messageId": <messageId>
-  }
-  ```
+  - **Response body**: _None_ / Error message in case of error
 | Field           | Content                           |
 |-----------------|-----------------------------------|
 | `messageId`     | id of the chat message            |
@@ -936,3 +901,425 @@ To package the React application:
 | `attachmentId`   | id of the chat attachment      |
 | `name`           | name of the attachment         |
 | `attachment`     | attachment data (binary array) |
+
+
+### Authentication
+- **METHOD** `POST` **URL**: `/API/login`
+
+  - **Description**: login to the application
+  - **Permissions allowed**:   _Public_
+  - **Request path parameter**: _None_
+  - **Request body**: Message to be added to chat
+  ```
+  {
+    "username": <username>,
+    "password": <password>
+  }
+  ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `401 Unauthorized`
+  - **Response body**: token and associated data
+  ```
+  {
+    "refreshToken" : <refreshToken>
+    "token" : <token>,
+    "expiresIn": <expiresIn>
+  }
+  ```
+| Field          | Content                                      |
+|----------------|----------------------------------------------|
+| `refreshToken` | refreshToken associated to the login request |
+| `token`        | token associated to the login request        |
+| `expiresIn`    | time validity of the token                   |
+
+- **METHOD** `POST` **URL**: `/API/refreshtoken`
+
+  - **Description**: refresh the login token
+  - **Permissions allowed**: _Public_
+  - **Request path parameter**: _None_
+  - **Request body**: Message to be added to chat
+  ```
+  {
+    "username": <username>,
+    "password": <password>
+  }
+  ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `401 Unauthorized`
+  - **Response body**: token and associated data
+  ```
+  {
+    "refreshToken" : <refreshToken>
+    "token" : <token>,
+    "expiresIn": <expiresIn>
+  }
+  ```
+| Field          | Content                                      |
+|----------------|----------------------------------------------|
+| `refreshToken` | refreshToken associated to the login request |
+| `token`        | token associated to the login request        |
+| `expiresIn`    | time validity of the token                   |
+
+
+### Accounting
+- **METHOD** `POST` **URL**: `/API/signup`
+  - **Description**: signup to the application
+  - **Permissions allowed**:   _Public_
+  - **Request path parameter**: _None_
+  - **Request body**: requested user data
+  ```
+  {
+    "username": <username>,
+    "password": <password>,
+    "email": <email>,
+    "firstName": <firstName>,
+    "lastName": <lastName>,
+    "expertCategories": [<ProductCategory1>, <ProductCategory2>, ...],
+    "address": {
+       "country": <country>, "region": <region>, "city": <city>, "address": <address>
+     },
+    "role": <role>
+  }
+  ```
+    - **Notes**:
+      - _expertCategories_ is considered only if _role_ is "EXPERT"
+      - _address_ is considered only if _role_ is "CLIENT"
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `409 Conflict` (user with the given email already exists)
+    - `422 Unprocessable Entity` (wrong user format)
+    - `500 Internal Server Error`
+  - **Response body**:  _None_
+
+
+- **METHOD** `POST` **URL**: `/API/createExpert`
+  - **Description**: create an expert account
+  - **Permissions allowed**:  Manager
+  - **Request path parameter**: _None_
+  - **Request body**: requested user data
+  ```
+  {
+    "username": <username>,
+    "password": <password>,
+    "email": <email>,
+    "firstName": <firstName>,
+    "lastName": <lastName>,
+    "expertCategories": [<ProductCategory1>, <ProductCategory2>, ...],
+    "role": <role>
+  }
+  ```
+  - **Response**: `200 OK` (success)
+    - **Error responses**:
+      - `400 Bad Request`
+      - `409 Conflict` (user with the given email already exists)
+      - `422 Unprocessable Entity` (wrong user format)
+      - `500 Internal Server Error`
+    - **Response body**:  _None_
+
+
+- **METHOD** `POST` **URL**: `/API/createVendor`
+  - **Description**: create a vendor account
+  - **Permissions allowed**:  Manager
+  - **Request path parameter**: _None_
+  - **Request body**: requested user data
+  ```
+  {
+    "username": <username>,
+    "password": <password>,
+    "email": <email>,
+    "firstName": <firstName>,
+    "lastName": <lastName>,
+    "role": <role>
+  }
+  ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `409 Conflict` (user with the given email already exists)
+    - `422 Unprocessable Entity` (wrong user format)
+    - `500 Internal Server Error`
+  - **Response body**:  _None_
+
+
+- **METHOD** `PUT` **URL**: `/API/client/user/{email}`
+  - **Description**: Change data of given client user
+  - **Permissions allowed**: Client
+  - **Request path parameter**:`email` to retrieve the corresponding user
+  - **Request body**: Update information of client profile
+    ```
+    {
+      "email": <email>
+      "firstName": <firstName>,
+      "lastName": <lastName>,
+      "address": {
+         "country": <country>, "region": <region>, "city": <city>, "address": <address>
+       },
+      "role: <role>
+    }
+    ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+
+- **METHOD** `PUT` **URL**: `/API/expert/user/{email}`
+  - **Description**: Change data of given expert user
+  - **Permissions allowed**: Expert
+  - **Request path parameter**:`email` to retrieve the corresponding user
+  - **Request body**: Update information of expert profile
+    ```
+    {
+      "email": <email>
+      "firstName": <firstName>,
+      "lastName": <lastName>,
+      "expertCategories": [<ProductCategory1>, <ProductCategory2>, ...],
+      "role": <role>
+    }
+    ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+
+- **METHOD** `PUT` **URL**: `/API/manager/user/{email}`
+  - **Description**: Change data of given manager user
+  - **Permissions allowed**: Manager
+  - **Request path parameter**:`email` to retrieve the corresponding user
+  - **Request body**: Update information of manager profile
+    ```
+    {
+      "email": <email>
+      "firstName": <firstName>,
+      "lastName": <lastName>,
+      "role": <role>
+    }
+    ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+### Category
+- **METHOD** `GET` **URL**: `/API/public/categories/`
+  - **Description**: Get all the available categories
+  - **Permissions allowed**:  _Public_
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `500 Internal Server Error`
+  - **Response body**: List of all available categories of products
+  ```
+  {
+    [
+       { "categoryName" : <categoryName1> },
+       { "categoryName" : <categoryName2> },
+       ...
+     ]
+  }
+  ```
+
+### Brand
+- **METHOD** `GET` **URL**: `/API/public/brands/`
+  - **Description**: Get all the available brands
+  - **Permissions allowed**: _Public_
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `500 Internal Server Error`
+  - **Response body**: List of all available brands
+  ```
+  {
+    [
+       { "name" : <brandName> },
+       { "name" : <brandName> },
+       ...
+     ]
+  }
+  ```
+
+- **METHOD** `POST` **URL**: `/API/manager/brand/`
+  - **Description**: insert a new brand
+  - **Permissions allowed**:  Manager
+  - **Request path parameter**: _None_
+  - **Request body**: object containing the brand name
+  ```
+  { "name": <brandName> }
+  ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `422 Unprocessable Entity` (wrong brand format)
+    - `500 Internal Server Error`
+  - **Response body**: the created brand
+   ```
+  { "name": <brandName> }
+  ```
+
+### Item
+- **METHOD** `GET` **URL**: `/API/public/products/{productId}/items/`
+  - **Description**: Get all the available items associated to the given product
+  - **Permissions allowed**: _Public_
+  - **Request path parameter**: `productId` to retrieve the corresponding product
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `422 Unprocessable Entity` (wrong format)
+    - `500 Internal Server Error`
+  - **Response body**: List of all associated items
+  ```
+  {
+    [
+       { 
+          "productId": <productId>,
+          "serialNum": <serialNum>,
+          "uuid": <uuid>,
+          "clientEmail": <clientEmail>,
+          "validFromTimestamp": <validFromTimestamp>,
+          "durationMonths": <durationMonths>
+        },
+       ...
+     ]
+  }
+  ```
+| Field                | Content                                                  |
+|----------------------|----------------------------------------------------------|
+| `productId`          | id of the associated product                             |
+| `serialNum`          | serial number                                            |
+| `uuid`               | UUID associated to the item                              |
+| `clientEmail`        | email of the client that owns the item                   |
+| `validFromTimestamp` | timestamp that represents the start of the item validity |
+| `durationMonths`     | duration of the item validity                            |
+
+
+- **METHOD** `GET` **URL**: `/API/public/products/{productId}/items/{serialNum}`
+  - **Description**: Get the item associated to the given product and serial number, if exists
+  - **Permissions allowed**: _Public_
+  - **Request path parameters**:
+    - `productId` to retrieve the corresponding product
+    - `serialNum` to retrieve the corresponding serial number
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `404 Not Found`
+    - `422 Unprocessable Entity` (wrong format)
+    - `500 Internal Server Error`
+  - **Response body**: Associated item if exists
+  ```
+  { 
+     "productId": <productId>,
+     "serialNum": <serialNum>,
+     "uuid": <uuid>,
+     "clientEmail": <clientEmail>,
+     "validFromTimestamp": <validFromTimestamp>,
+     "durationMonths": <durationMonths>
+  }
+  ```
+| Field                | Content                                                  |
+|----------------------|----------------------------------------------------------|
+| `productId`          | id of the associated product                             |
+| `serialNum`          | serial number                                            |
+| `uuid`               | UUID associated to the item                              |
+| `clientEmail`        | email of the client that owns the item                   |
+| `validFromTimestamp` | timestamp that represents the start of the item validity |
+| `durationMonths`     | duration of the item validity                            |
+
+
+- **METHOD** `POST` **URL**: `/API/vendor/products/items/`
+  - **Description**: generate an UUID for the given item
+  - **Permissions allowed**:  Vendor
+  - **Request path parameter**: _None_
+  - **Request body**: object containing the brand name
+  ```
+  { 
+     "productId": <productId>,
+     "serialNum": <serialNum>,
+     "clientEmail": <clientEmail>
+  }
+  ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `422 Unprocessable Entity` (wrong format)
+    - `500 Internal Server Error`
+  - **Response body**: the updated item
+  ```
+  { 
+     "productId": <productId>,
+     "serialNum": <serialNum>,
+     "uuid": <uuid>,
+     "clientEmail": <clientEmail>,
+     "validFromTimestamp": <validFromTimestamp>,
+     "durationMonths": <durationMonths>
+  }
+  ```
+| Field                | Content                                                  |
+|----------------------|----------------------------------------------------------|
+| `productId`          | id of the associated product                             |
+| `serialNum`          | serial number                                            |
+| `uuid`               | UUID associated to the item                              |
+| `clientEmail`        | email of the client that owns the item                   |
+| `validFromTimestamp` | timestamp that represents the start of the item validity |
+| `durationMonths`     | duration of the item validity                            |
+
+- **METHOD** `PUT` **URL**: `/API/client/products/items/register`
+  - **Description**: register a new item
+  - **Permissions allowed**:  Client
+  - **Request path parameter**: _None_
+  - **Request body**: the registered item
+  ```
+  { 
+     "productId": <productId>,
+     "serialNum": <serialNum>,
+     "uuid": <uuid>,
+     "clientEmail": <clientEmail>,
+     "validFromTimestamp": <validFromTimestamp>,
+     "durationMonths": <durationMonths>
+  }
+  ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found`
+    - `422 Unprocessable Entity` (wrong format)
+    - `500 Internal Server Error`
+  - **Response body**: the created brand
+  ```
+  { 
+     "productId": <productId>,
+     "serialNum": <serialNum>,
+     "uuid": <uuid>,
+     "clientEmail": <clientEmail>,
+     "validFromTimestamp": <validFromTimestamp>,
+     "durationMonths": <durationMonths>
+  }
+  ```
+| Field                | Content                                                  |
+|----------------------|----------------------------------------------------------|
+| `productId`          | id of the associated product                             |
+| `serialNum`          | serial number                                            |
+| `uuid`               | UUID associated to the item                              |
+| `clientEmail`        | email of the client that owns the item                   |
+| `validFromTimestamp` | timestamp that represents the start of the item validity |
+| `durationMonths`     | duration of the item validity                            |
