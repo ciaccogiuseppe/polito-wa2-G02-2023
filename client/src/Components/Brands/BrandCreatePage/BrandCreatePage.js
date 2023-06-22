@@ -2,7 +2,7 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 import {Form} from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import {useEffect, useState} from "react";
-import {addBrandAPI, addProductAPI, getAllBrands, getAllCategories} from "../../../API/Products";
+import {addBrandAPI} from "../../../API/Products";
 import ErrorMessage from "../../Common/ErrorMessage";
 import {useNavigate} from "react-router-dom";
 

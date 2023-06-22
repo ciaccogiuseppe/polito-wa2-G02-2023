@@ -1,10 +1,9 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import { useEffect, useState } from "react";
-import { getAllProducts } from "../../../API/Products";
-import {Button, Form} from "react-bootstrap";
+import { Form} from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import "./LoginPage.css"
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import NavigationLink from "../../Common/NavigationLink";
 import {loginAPI} from "../../../API/Auth";
 import ErrorMessage from "../../Common/ErrorMessage";

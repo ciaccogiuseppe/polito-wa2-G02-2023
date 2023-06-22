@@ -1,20 +1,14 @@
-import AppNavbar from "../../AppNavbar/AppNavbar";
 import {Form} from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import {useEffect, useState} from "react";
-import {addProductAPI, getAllBrands, getAllCategories, getAllProducts} from "../../../API/Products";
+import {getAllProducts} from "../../../API/Products";
 import ErrorMessage from "../../Common/ErrorMessage";
-import {deformatCategory, reformatCategory} from "../ProductsPage/ProductsPage";
-import {useNavigate} from "react-router-dom";
+import {reformatCategory} from "../ProductsPage/ProductsPage";
 import {addItemAPI, getItemAPI} from "../../../API/Item";
 
 
 
 function WarrantyGenerate(props) {
-    const loggedIn=props.loggedIn
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [file, setFile] = useState([])
     const [categories, setCategories] = useState([])
     const [errorMessage, setErrorMessage] = useState("")
     const [brands, setBrands] = useState([])
@@ -52,7 +46,7 @@ function WarrantyGenerate(props) {
             .filter(p => reformatCategory(p.category) === category)
             .map(p => p.brand)
             .filter((v,i,a)=>a.indexOf(v)===i).sort())
-    }, [category])
+    }, [category, products])
 
     useEffect(() => {
         setProduct("")
@@ -63,9 +57,8 @@ function WarrantyGenerate(props) {
                 .filter((v,i,a)=>a.indexOf(v)===i)
                 .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
         )
-    }, [brand])
+    }, [brand, category, products])
 
-    const navigate = useNavigate()
     function addItem(){
         getItemAPI({productId:useProductId?productId:product,
             serialNum:serialNumber})

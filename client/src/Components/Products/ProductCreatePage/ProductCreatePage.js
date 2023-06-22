@@ -11,9 +11,6 @@ import {useNavigate} from "react-router-dom";
 
 function ProductCreatePage(props) {
     const loggedIn=props.loggedIn
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [file, setFile] = useState([])
     const [categories, setCategories] = useState([])
     const [errorMessage, setErrorMessage] = useState("")
     const [brands, setBrands] = useState([])
@@ -45,11 +42,6 @@ function ProductCreatePage(props) {
         }).then(() => navigate("/products")).catch(err => setErrorMessage(err))
     }
 
-
-    function formElement(val, setVal) {
-        return <Form.Control value={val} className={"form-control:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px"}} type="file" onChange={e => setVal(e.target.value)}/>
-
-    }
 
 
     useEffect(() => {
