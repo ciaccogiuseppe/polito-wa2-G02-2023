@@ -55,6 +55,18 @@ create table if not exists profiles
 alter table profiles
     owner to postgres;
 
+create table if not exists passwordreset
+(
+    uuid    uuid primary key,
+    created timestamp,
+    user_id bigint
+    constraint password_reset___fk
+        references profiles
+);
+
+alter table passwordreset
+    owner to postgres;
+
 create table if not exists items
 (
     serial_num           bigint       not null,

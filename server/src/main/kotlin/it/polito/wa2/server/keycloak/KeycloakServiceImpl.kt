@@ -2,7 +2,9 @@ package it.polito.wa2.server.keycloak
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProfileException
+import it.polito.wa2.server.BadRequestUserException
 import it.polito.wa2.server.ProfileNotFoundException
+import it.polito.wa2.server.passwordReset.PasswordResetService
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.security.WebSecurityConfig
@@ -16,7 +18,8 @@ import java.util.*
 @Service @Transactional @Observed
 class KeycloakServiceImpl(
     private val keycloakConfig: KeycloakConfig,
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
+    private val passwordResetService: PasswordResetService
 ): KeycloakService {
     companion object {
         const val CLIENT = "app_client"
@@ -38,6 +41,22 @@ class KeycloakServiceImpl(
         addUser(user)
         keycloakConfig.assignRoles(user.email, listOf(EXPERT))
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.EXPERT)
+    }
+
+    override fun resetPassword(email: String) {
+
+        val uuid = UUID.randomUUID()
+        passwordResetService.addPasswordReset(email, uuid)
+        keycloakConfig.resetPassword(email, uuid)
+    }
+
+    override fun applyResetPassword(passwordDTO: PasswordDTO) {
+        if(passwordResetService.checkIsValid(passwordDTO.email, passwordDTO.token)) {
+            keycloakConfig.applyResetPassword(passwordDTO.email, passwordDTO.password)
+            passwordResetService.delete(passwordDTO.token)
+        }
+        else
+            throw BadRequestUserException("Invalid request, ask for a new reset link")
     }
 
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")

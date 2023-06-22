@@ -60,6 +60,16 @@ services:
       - LOGGING_CONFIG=/data/logback_config/logback.xml
       - LOKI_HOST=loki
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
+      - MAIL_SENDER_HOST=smtp.gmail.com
+      - MAIL_SENDER_PORT=587
+      - MAIL_SENDER_USERNAME=ticketing.wa2g02@gmail.com
+      - MAIL_SENDER_PASSWORD=tybqmhpuclhcdwre
+      - MAIL_SENDER_PROTOCOL=smtp
+      - MAIL_SENDER_DEBUG=true
+      - MAIL_SENDER_AUTH=true
+      - MAIL_SENDER_STARTTLS_ENABLE=true
+      - SERVER_URL=http://localhost:8081
+
     depends_on:
       - keycloak
       - database

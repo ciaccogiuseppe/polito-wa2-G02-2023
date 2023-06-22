@@ -5,6 +5,7 @@ import it.polito.wa2.server.addresses.Address
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.ticketing.message.Message
+import it.polito.wa2.server.passwordReset.PasswordReset
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import jakarta.persistence.*
@@ -46,6 +47,9 @@ class Profile : EntityBase<Long>() {
 
     @OneToMany(mappedBy = "client")
     val items = mutableSetOf<Item>()
+
+    @OneToMany(mappedBy="profile")
+    val passwordResets = mutableSetOf<PasswordReset>()
 
     @ManyToMany
     @JoinTable(

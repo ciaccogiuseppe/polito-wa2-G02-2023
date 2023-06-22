@@ -41,6 +41,8 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.POST, "/API/login/**").permitAll()
             .requestMatchers(HttpMethod.POST,"/API/refreshtoken/**").permitAll()
             .requestMatchers(HttpMethod.POST,"/API/signup/**").permitAll()
+            .requestMatchers(HttpMethod.GET,"/API/resetPassword/**").permitAll()
+            .requestMatchers(HttpMethod.PUT,"/API/resetPassword/**").permitAll()
             .requestMatchers(HttpMethod.POST,"/API/createExpert").hasRole(MANAGER)
             .requestMatchers(HttpMethod.POST,"/API/createVendor").hasRole(MANAGER)
             .requestMatchers(HttpMethod.GET, "/API/attachment/**").hasAnyRole(CLIENT, EXPERT)

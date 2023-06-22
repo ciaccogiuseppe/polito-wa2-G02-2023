@@ -1,4 +1,4 @@
-package it.polito.wa2.server.ticketing.passwordReset
+package it.polito.wa2.server.passwordReset
 
 import it.polito.wa2.server.EntityBase
 import it.polito.wa2.server.profiles.Profile
