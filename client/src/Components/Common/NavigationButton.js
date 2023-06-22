@@ -6,6 +6,7 @@ function NavigationButton(props){
     const [color, setColor] = useState("#A0C1D9")
     const [textColor, setTextColor] = useState("#333333")
     return <Button
+        type={props.type}
     disabled={props.disabled}
         style={{
             backgroundColor:color,

@@ -110,7 +110,7 @@ function WarrantyGenerate(props) {
         <div className="CenteredButton" style={{marginTop:"25px"}}>
             <h2 className={"no-printme"} style={{color:"#EEEEEE", marginTop:"50px"}}>GENERATE CODE</h2>
             <hr style={{color:"white", width:"15%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
-            {!warrantyCode && <Form className="form" style={{marginTop:"30px"}}>
+            {!warrantyCode && <Form className="form" style={{marginTop:"30px"}} onSubmit={()=>addItem()}>
                 <Form.Group className="mb-3">
 
                     <Form.Select onChange={(e)=>{setUseProductId(e.target.value !== "true")}} className={"form-select:focus"} style={{width: "300px", alignSelf:"center", margin:"auto", marginTop:"10px", fontSize:"12px"}}>
@@ -162,7 +162,7 @@ function WarrantyGenerate(props) {
                 {errorMessage && <><div style={{margin:"10px"}}>
                     <ErrorMessage text={errorMessage} close={()=>{setErrorMessage("")}}/> </div></>}
 
-                <NavigationButton text={"Generate"} onClick={e => {e.preventDefault(); addItem()}}/>
+                <NavigationButton type={"submit"} text={"Generate"} onClick={e => {e.preventDefault(); addItem()}}/>
 
             </Form>}
             {warrantyCode && <div>

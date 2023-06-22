@@ -31,7 +31,7 @@ function BrandCreatePage(props) {
         <div className="CenteredButton" style={{marginTop:"50px"}}>
             <h1 style={{color:"#EEEEEE", marginTop:"80px"}}>INSERT BRAND</h1>
             <hr style={{color:"white", width:"25%", alignSelf:"center", marginLeft:"auto", marginRight:"auto", marginBottom:"2px", marginTop:"2px"}}/>
-            <Form className="form" style={{marginTop:"30px"}}>
+            <Form className="form" style={{marginTop:"30px"}} onSubmit={()=>addProduct()}>
                 <Form.Group className="mb-3">
 
                     <Form.Label style={{color:"#DDDDDD"}}>Brand</Form.Label>
@@ -40,7 +40,7 @@ function BrandCreatePage(props) {
                 {errorMessage && <><div style={{margin:"10px"}}>
                     <ErrorMessage text={errorMessage} close={()=>{setErrorMessage("")}}/> </div></>}
 
-                <NavigationButton text={"Insert"} onClick={e => {e.preventDefault(); addProduct()}}/>
+                <NavigationButton text={"Insert"} type={"submit"} onClick={e => {e.preventDefault(); addProduct()}}/>
                 <div style={{marginTop:"20px"}}>
                     <NavigationButton text={"Back"} onClick={e => {e.preventDefault(); navigate(-1)}}/>
                 </div>
