@@ -1,4 +1,3 @@
-
 function InfoMessage(props) {
   const text = props.text;
   return (

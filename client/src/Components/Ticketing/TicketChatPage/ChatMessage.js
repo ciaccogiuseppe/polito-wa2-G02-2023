@@ -127,7 +127,7 @@ function ChatMessage(props) {
           {imageList.map((img, index) =>
             isImage(img.attachment) ? (
               <img
-                  alt={img.name}
+                alt={img.name}
                 onClick={() => {
                   setAlbum(imageList);
                   setStartPos(index);

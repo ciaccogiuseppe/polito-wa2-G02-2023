@@ -140,9 +140,7 @@ function TicketListPage(props) {
   const [ticketList, setTicketList] = useState([]);
   const [priority, setPriority] = useState([0, 3]);
   const [selectedStatus, setSelectedStatus] = useState([]);
-  const [showFilters, setShowFilters] = useState(
-    user.role === "MANAGER"
-  );
+  const [showFilters, setShowFilters] = useState(user.role === "MANAGER");
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(null);
   const navigate = useNavigate();

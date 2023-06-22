@@ -1,6 +1,7 @@
 import { APIURL } from "./API_URL";
 import { setAuthToken } from "./AuthCommon";
 import { api } from "../App";
+import axios from "axios";
 
 async function loginAPI(loginPayload) {
   setAuthToken("");
@@ -47,6 +48,17 @@ async function createVendorAPI(signupPayload) {
       return Promise.reject(err.response.data.detail);
     });
 }
+async function resetPasswordApplyAPI(passwordPayload) {
+  return axios
+    .put(APIURL + "/API/resetPassword/", passwordPayload)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.log(err);
+      return Promise.reject(err.response.data.detail);
+    });
+}
 
 async function createExpertAPI(signupPayload) {
   return api
@@ -75,6 +87,17 @@ async function getProfileInfo() {
       return Promise.reject(err.response.data.detail);
     });
 }
+async function passwordResetTriggerAPI(email) {
+  return api
+    .get(APIURL + "/API/resetPassword/" + email)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.log(err);
+      return Promise.reject(err.response.data.detail);
+    });
+}
 
 export {
   loginAPI,
@@ -82,4 +105,6 @@ export {
   signupAPI,
   createExpertAPI,
   createVendorAPI,
+  resetPasswordApplyAPI,
+  passwordResetTriggerAPI,
 };

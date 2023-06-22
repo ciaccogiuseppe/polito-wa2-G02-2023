@@ -26,7 +26,7 @@ function ProfileCreatePage(props) {
   const loggedIn = props.loggedIn;
   function submit() {
     setErrorMessage("");
-    setLoading(true)
+    setLoading(true);
     let missingFields = "";
     if (name.length === 0) {
       missingFields = missingFields + "first name, ";
@@ -95,12 +95,12 @@ function ProfileCreatePage(props) {
       },
     })
       .then(() => {
-          setLoading(false)
-          navigate("/")
+        setLoading(false);
+        navigate("/");
       })
       .catch((err) => {
-          setLoading(false)
-          setErrorMessage(err)
+        setLoading(false);
+        setErrorMessage(err);
       });
   }
   useEffect(() => {
@@ -270,10 +270,11 @@ function ProfileCreatePage(props) {
           <span>Already have an account?</span>{" "}
           <NavigationLink href={"/login"} text={"Sign in"} />
         </div>
-          {loading &&
+        {loading && (
           <>
-              <Spinner style={{ color: "#A0C1D9" }} />
-          </>}
+            <Spinner style={{ color: "#A0C1D9" }} />
+          </>
+        )}
 
         {errorMessage && (
           <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />

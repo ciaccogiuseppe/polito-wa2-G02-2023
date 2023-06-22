@@ -1,11 +1,7 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import HomePage from "./Components/HomePage/HomePage";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProductsPage from "./Components/Products/ProductsPage/ProductsPage";
 import ProductIdPage from "./Components/Products/ProductIdPage/ProductIdPage";
 import ProfileInfoPage from "./Components/Users/ProfileInfoPage/ProfileInfoPage";
@@ -33,6 +29,8 @@ import ProfileInfoPageExpert from "./Components/Users/ProfileInfoPageByExpert/Pr
 import UsersCreatePage from "./Components/Admin/UsersCreatePage/UsersCreatePage";
 import ClientProductsPage from "./Components/Products/ClientProductsPage/ClientProductsPage";
 import ProductRegisterPage from "./Components/Products/ProductRegisterPage/ProductRegisterPage";
+import PasswordResetPage from "./Components/Users/PasswordResetPage/PasswordResetPage";
+import PasswordResetTriggerPage from "./Components/Users/PasswordResetPage/PasswordResetTriggerPage";
 
 export const api = axios.create({
   baseURL: APIURL,
@@ -175,6 +173,28 @@ function App() {
               path="/login"
               element={
                 <LoginPage
+                  user={user}
+                  loggedIn={loggedIn}
+                  setLoggedIn={setLoggedIn}
+                  logout={logout}
+                />
+              }
+            />
+            <Route
+              path="/passwordreset"
+              element={
+                <PasswordResetTriggerPage
+                  user={user}
+                  loggedIn={loggedIn}
+                  setLoggedIn={setLoggedIn}
+                  logout={logout}
+                />
+              }
+            />
+            <Route
+              path="/resetpasswordapply/:id"
+              element={
+                <PasswordResetPage
                   user={user}
                   loggedIn={loggedIn}
                   setLoggedIn={setLoggedIn}

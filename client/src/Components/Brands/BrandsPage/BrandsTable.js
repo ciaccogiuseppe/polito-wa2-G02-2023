@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-
 function BrandsTableTR(props) {
   const [BGcolor, setBGcolor] = useState("");
   const brand = props.brand;

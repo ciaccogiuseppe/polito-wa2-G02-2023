@@ -31,7 +31,6 @@ function ProfileInfoPage(props) {
     }
   }, [Profile]);
 
-
   return (
     <>
       <AppNavbar

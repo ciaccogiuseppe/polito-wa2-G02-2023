@@ -2,18 +2,15 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 import { Form } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useEffect, useState } from "react";
-import {
-  getAllProducts,
-} from "../../../API/Products";
+import { getAllProducts } from "../../../API/Products";
 import ErrorMessage from "../../Common/ErrorMessage";
-import {
-  reformatCategory,
-} from "../ProductsPage/ProductsPage";
+import { reformatCategory } from "../ProductsPage/ProductsPage";
 import { useNavigate } from "react-router-dom";
 import { assignItemAPI } from "../../../API/Item";
 
 function ProductRegisterPage(props) {
-  const loggedIn = props.loggedIn;const [categories, setCategories] = useState([]);
+  const loggedIn = props.loggedIn;
+  const [categories, setCategories] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [brands, setBrands] = useState([]);
   const [brand, setBrand] = useState("");

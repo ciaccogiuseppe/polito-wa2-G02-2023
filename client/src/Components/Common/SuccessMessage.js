@@ -37,7 +37,7 @@ function SuccessMessage(props) {
         }}
       >
         <a
-            href={"/"}
+          href={"/"}
           style={{ cursor: "pointer" }}
           onClick={(e) => {
             e.preventDefault();

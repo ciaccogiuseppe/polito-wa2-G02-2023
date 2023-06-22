@@ -2,9 +2,7 @@ import AppNavbar from "../../AppNavbar/AppNavbar";
 import { Form } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useEffect, useState } from "react";
-import {
-  getAllProducts
-} from "../../../API/Products";
+import { getAllProducts } from "../../../API/Products";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { addTicketAPI } from "../../../API/Tickets";

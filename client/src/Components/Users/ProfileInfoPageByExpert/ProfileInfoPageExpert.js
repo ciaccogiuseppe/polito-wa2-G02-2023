@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
 import { getProfileDetails } from "../../../API/Profiles";
 
-
 function ProfileInfoPageExpert(props) {
   const params = useParams();
   const email = params.email;

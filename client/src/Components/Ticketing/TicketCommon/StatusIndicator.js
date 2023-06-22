@@ -79,21 +79,21 @@ function StatusIndicator(type) {
         </div>
       );
     default:
-        return (
-            <div
-                style={{
-                    borderRadius: "25px",
-                    color: "white",
-                    backgroundColor: "#b92f4f",
-                    fontSize: 10,
-                    textAlign: "center",
-                    verticalAlign: "middle",
-                    padding: 5,
-                }}
-            >
-                ERROR
-            </div>
-        );
+      return (
+        <div
+          style={{
+            borderRadius: "25px",
+            color: "white",
+            backgroundColor: "#b92f4f",
+            fontSize: 10,
+            textAlign: "center",
+            verticalAlign: "middle",
+            padding: 5,
+          }}
+        >
+          ERROR
+        </div>
+      );
   }
 }
 
