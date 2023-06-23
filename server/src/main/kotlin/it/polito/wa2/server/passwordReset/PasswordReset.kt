@@ -1,15 +1,12 @@
 package it.polito.wa2.server.passwordReset
 
-import it.polito.wa2.server.EntityBase
 import it.polito.wa2.server.profiles.Profile
-import it.polito.wa2.server.ticketing.attachment.Attachment
-import it.polito.wa2.server.ticketing.ticket.Ticket
 import jakarta.persistence.*
 import java.sql.Timestamp
 import java.util.*
 
 @Entity
-@Table(name="passwordreset")
+@Table(name="password_reset")
 class PasswordReset {
 
     @ManyToOne

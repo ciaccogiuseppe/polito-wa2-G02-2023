@@ -1,6 +1,5 @@
 package it.polito.wa2.server.keycloak
 
-import com.nimbusds.jwt.JWTParser
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestUserException
 import it.polito.wa2.server.ForbiddenException
@@ -8,7 +7,6 @@ import it.polito.wa2.server.UnprocessableProfileException
 import it.polito.wa2.server.UnprocessableUserException
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*

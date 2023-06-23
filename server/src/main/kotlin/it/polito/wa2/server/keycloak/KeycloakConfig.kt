@@ -1,27 +1,17 @@
 package it.polito.wa2.server.keycloak
 
-import it.polito.wa2.server.LoginFailedException
-import it.polito.wa2.server.security.LoginResponse
-import it.polito.wa2.server.security.TokenResponse
 import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.admin.client.resource.RealmResource
-import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.RoleRepresentation
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.json.BasicJsonParser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.client.RestTemplate
 import java.util.*
 import java.util.stream.Collectors
 

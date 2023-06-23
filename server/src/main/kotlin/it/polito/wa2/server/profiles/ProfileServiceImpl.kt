@@ -1,10 +1,7 @@
 package it.polito.wa2.server.profiles
 
 import io.micrometer.observation.annotation.Observed
-import it.polito.wa2.server.BadRequestProfileException
-import it.polito.wa2.server.DuplicateProfileException
-import it.polito.wa2.server.ProfileNotFoundException
-import it.polito.wa2.server.UnprocessableProfileException
+import it.polito.wa2.server.*
 import it.polito.wa2.server.addresses.*
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
@@ -13,7 +10,6 @@ import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.items.ItemDTO
 import it.polito.wa2.server.items.toDTO
 import it.polito.wa2.server.security.WebSecurityConfig
-import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,14 +25,20 @@ class ProfileServiceImpl(
 
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
-    /*
-    @PostAuthorize("hasRole('${WebSecurityConfig.MANAGER}') or " +
-            "(hasRole('${WebSecurityConfig.CLIENT}') and ()) or " +
-            "(hasRole('${WebSecurityConfig.EXPERT}') and ())")
-     */
-    override fun getProfile(email: String): ProfileDTO {
-        return profileRepository.findByEmail(email)?.toDTO()
-            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
+    override fun getProfile(email: String, loggedEmail: String): ProfileDTO {
+        val profile = getProfilePrivate(email)
+
+        if(loggedEmail != email) {
+            val loggedProfile = getProfilePrivate(loggedEmail)
+            when(loggedProfile.role) {
+                ProfileRole.CLIENT -> if(profile.role != ProfileRole.EXPERT) forbidden()
+                ProfileRole.EXPERT -> if(profile.role != ProfileRole.CLIENT && profile.role != ProfileRole.EXPERT) forbidden()
+                ProfileRole.MANAGER -> {}
+                else -> forbidden()
+            }
+        }
+
+        return profile.toDTO()
     }
 
     @Transactional(readOnly = true)
@@ -107,5 +109,14 @@ class ProfileServiceImpl(
     private fun getCategoryByName(categoryName: ProductCategory): Category {
         val categoryDTO = categoryService.getCategory(categoryName)
         return categoryRepository.findByName(categoryDTO.categoryName)!!
+    }
+
+    private fun getProfilePrivate(email: String): Profile {
+        return profileRepository.findByEmail(email)
+            ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
+    }
+
+    private fun forbidden() {
+        throw ForbiddenException("You cannot access to this profile")
     }
 }

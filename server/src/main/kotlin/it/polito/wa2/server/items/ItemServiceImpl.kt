@@ -46,7 +46,7 @@ class ItemServiceImpl(
         val product = getProduct(productId)
         val item = itemRepository.findByProductAndSerialNum(product, serialNum)
             ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
-        if(item.client != getProfileByEmail(email))
+        if(item.client != getProfileByEmail(email, email))
             throw ForbiddenException("You cannot access to this item")
         return item.toDTO()
     }
@@ -98,7 +98,7 @@ class ItemServiceImpl(
             ?: throw ItemNotFoundException("Item with productIid '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}' not found")
         if(itemDTO.uuid != item.uuid)
             throw ForbiddenException("Impossible to be linked to the product")
-        item.client = getProfileByEmail(userEmail)
+        item.client = getProfileByEmail(userEmail, userEmail)
         return itemRepository.save(item).toDTO()
     }
 
@@ -107,8 +107,8 @@ class ItemServiceImpl(
         return productRepository.findByIdOrNull(productDTO.productId)!!
     }
 
-    private fun getProfileByEmail(email: String): Profile {
-        val profileDTO = profileService.getProfile(email)
+    private fun getProfileByEmail(email: String, loggedEmail: String): Profile {
+        val profileDTO = profileService.getProfile(email, loggedEmail)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 }

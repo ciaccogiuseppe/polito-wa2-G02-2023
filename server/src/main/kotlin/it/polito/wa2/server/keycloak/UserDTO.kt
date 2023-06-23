@@ -4,7 +4,6 @@ import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.profiles.ProfileDTO
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Pattern
 import java.util.UUID
 

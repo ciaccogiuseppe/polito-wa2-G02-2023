@@ -1,7 +1,6 @@
 package it.polito.wa2.server.passwordReset
 
 import io.micrometer.observation.annotation.Observed
-import it.polito.wa2.server.ForbiddenException
 import it.polito.wa2.server.profiles.ProfileRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,7 +16,7 @@ class PasswordResetServiceImpl (
     override fun checkIsValid(email: String, uuid: UUID): Boolean {
         val record = passwordResetRepository.findById(uuid)
         val curTimestamp = Timestamp(System.currentTimeMillis() - 43200000)
-        if(record.isEmpty ) return false
+        if( !record.isPresent ) return false
         else
             if(record.get().created!!.before(curTimestamp )) {
                 passwordResetRepository.deleteById(uuid)

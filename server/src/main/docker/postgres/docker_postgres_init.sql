@@ -55,7 +55,7 @@ create table if not exists profiles
 alter table profiles
     owner to postgres;
 
-create table if not exists passwordreset
+create table if not exists password_reset
 (
     uuid    uuid primary key,
     created timestamp,
@@ -64,7 +64,7 @@ create table if not exists passwordreset
         references profiles
 );
 
-alter table passwordreset
+alter table password_reset
     owner to postgres;
 
 create table if not exists items

@@ -1,17 +1,13 @@
 package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
-import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.profiles.*
-import jakarta.validation.constraints.NotBlank
-import org.junit.Ignore
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.json.BasicJsonParser
@@ -19,12 +15,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -128,7 +120,9 @@ class ProfileControllerTests {
 
         val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val client = TestUtils.testProfile("client@polito.it", "Client", "PoliTo", ProfileRole.CLIENT)
         profileRepository.save(manager)
+        profileRepository.save(client)
         profileRepository.save(profile)
 
         val entity = TestUtils.testEntityHeader(null, clientToken)
@@ -149,6 +143,7 @@ class ProfileControllerTests {
 
         profileRepository.delete(profile)
         profileRepository.delete(manager)
+        profileRepository.delete(client)
     }
 @Test
         //@DirtiesContext

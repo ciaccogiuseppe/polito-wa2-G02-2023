@@ -33,7 +33,7 @@ class MessageServiceImpl(
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}')")
     override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
-        val user = getProfileByEmail(userEmail)
+        val user = getProfileByEmail(userEmail, userEmail)
         val ticket = if(user.role == ProfileRole.CLIENT) getTicketClient(ticketId, userEmail)
             else getTicketExpert(ticketId, userEmail)
         checkSender(user, ticket)
@@ -51,7 +51,7 @@ class MessageServiceImpl(
     override fun addMessageSender(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
         if(ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
-        val user = getProfileByEmail(userEmail)
+        val user = getProfileByEmail(userEmail, userEmail)
         val ticket = if(user.role == ProfileRole.CLIENT) getTicketClient(ticketId, userEmail)
             else getTicketExpert(ticketId, userEmail)
         checkSender(user, ticket)
@@ -90,14 +90,14 @@ class MessageServiceImpl(
 
 
 
-    private fun getProfileByEmail(email: String): Profile {
-        val profileDTO = profileService.getProfile(email)
+    private fun getProfileByEmail(email: String, loggedEmail: String): Profile {
+        val profileDTO = profileService.getProfile(email, loggedEmail)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 
     private fun addMessage(messageDTO: MessageDTO, userEmail: String, ticket: Ticket){
         val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
-        val sender = getProfileByEmail(userEmail)
+        val sender = getProfileByEmail(userEmail, userEmail)
         if(sender != ticket.client && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)

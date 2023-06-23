@@ -33,7 +33,7 @@ class TicketServiceImpl(
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun managerGetTicket(ticketId: Long, managerEmail: String): TicketDTO {
-        getProfileByEmail(managerEmail)
+        getProfileByEmail(managerEmail, managerEmail)
         val ticket = getTicket(ticketId)
         return ticket.toDTO()
     }
@@ -69,8 +69,8 @@ class TicketServiceImpl(
         status: List<TicketStatus>?,
         userEmail: String
     ): List<TicketDTO> {
-        val client: Profile = getProfileByEmail(userEmail)
-        val expert = if (expertEmail != null) getProfileByEmail(expertEmail) else null
+        val client: Profile = getProfileByEmail(userEmail, userEmail)
+        val expert = if (expertEmail != null) getProfileByEmail(expertEmail, userEmail) else null
         val product = if (productId != null) getProduct(productId) else null
         return if (clientEmail != client.email) listOf()
             else filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
@@ -89,8 +89,8 @@ class TicketServiceImpl(
         status: List<TicketStatus>?,
         userEmail: String
     ): List<TicketDTO> {
-        val client = if (clientEmail != null) getProfileByEmail(clientEmail) else null
-        val expert: Profile = getProfileByEmail(userEmail)
+        val client = if (clientEmail != null) getProfileByEmail(clientEmail, userEmail) else null
+        val expert: Profile = getProfileByEmail(userEmail, userEmail)
         val product: Product? = if (productId != null) getProduct(productId) else null
 
         return if (expertEmail != expert.email) listOf()
@@ -110,8 +110,8 @@ class TicketServiceImpl(
         status: List<TicketStatus>?,
         userEmail: String
     ): List<TicketDTO> {
-        val client = if (clientEmail != null) getProfileByEmail(clientEmail) else null
-        val expert = if (expertEmail != null) getProfileByEmail(expertEmail) else null
+        val client = if (clientEmail != null) getProfileByEmail(clientEmail, userEmail) else null
+        val expert = if (expertEmail != null) getProfileByEmail(expertEmail, userEmail) else null
         val product = if (productId != null) getProduct(productId) else null
 
         return filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
@@ -121,7 +121,7 @@ class TicketServiceImpl(
     override fun addTicket(ticketDTO: TicketDTO, userEmail: String): TicketIdDTO {
         val timestamp = Timestamp.valueOf(LocalDateTime.now())
         val item = getItem(ticketDTO.productId, ticketDTO.serialNum, userEmail)
-        val client = getProfileByEmail(userEmail)
+        val client = getProfileByEmail(userEmail, userEmail)
         if(item.client != client)
             throw ForbiddenException("You cannot create a ticket for this item")
         checkWarrantyValidity(item, timestamp)
@@ -141,7 +141,7 @@ class TicketServiceImpl(
 
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun assignTicket(ticketAssignDTO: TicketAssignDTO, userEmail: String) {
-        val expert = getProfileByEmail(ticketAssignDTO.expertEmail)
+        val expert = getProfileByEmail(ticketAssignDTO.expertEmail, userEmail)
         val ticket = getTicket(ticketAssignDTO.ticketId)
         val oldState = ticket.status
 
@@ -150,7 +150,7 @@ class TicketServiceImpl(
         if (expert.role != ProfileRole.EXPERT)
             throw UnprocessableTicketException("The assigned profile is not an expert")
 
-        val user = getProfileByEmail(userEmail)
+        val user = getProfileByEmail(userEmail, userEmail)
 
         ticket.expert = expert
         ticket.priority = ticketAssignDTO.priority
@@ -171,7 +171,7 @@ class TicketServiceImpl(
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun managerUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
         val ticket = getTicket(ticketUpdateDTO.ticketId)
-        val user = getProfileByEmail(userEmail)
+        val user = getProfileByEmail(userEmail, userEmail)
 
         updateTicket(ticketUpdateDTO, ticket, user)
     }
@@ -179,7 +179,7 @@ class TicketServiceImpl(
     @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
     override fun clientUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
         val ticket = getTicket(ticketUpdateDTO.ticketId)
-        val user = getProfileByEmail(userEmail)
+        val user = getProfileByEmail(userEmail, userEmail)
         if (user != ticket.client)
             throw ForbiddenException("It's not possible to set the status of tickets that are not yours")
 
@@ -189,7 +189,7 @@ class TicketServiceImpl(
     @PreAuthorize("hasRole('${WebSecurityConfig.EXPERT}')")
     override fun expertUpdateTicket(ticketUpdateDTO: TicketUpdateDTO, userEmail: String) {
         val ticket = getTicket(ticketUpdateDTO.ticketId)
-        val user = getProfileByEmail(userEmail)
+        val user = getProfileByEmail(userEmail, userEmail)
         if (user != ticket.expert)
             throw ForbiddenException("It's not possible to set the status of tickets that are not assigned to you")
         updateTicket(ticketUpdateDTO, ticket, user)
@@ -294,8 +294,8 @@ class TicketServiceImpl(
         }
     }
 
-    private fun getProfileByEmail(email: String): Profile {
-        val profileDTO = profileService.getProfile(email)
+    private fun getProfileByEmail(email: String, loggedEmail: String): Profile {
+        val profileDTO = profileService.getProfile(email, loggedEmail)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 
