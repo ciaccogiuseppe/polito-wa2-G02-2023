@@ -92,7 +92,10 @@ function LoginPage(props) {
           <NavigationLink href={"/signup"} text={"Sign up"} />
         </div>
         <div style={{ fontSize: "12px", color: "#EEEEEE", marginTop: "5px" }}>
-          <NavigationLink href={"/passwordreset"} text={"Forgot your password?"} />
+          <NavigationLink
+            href={"/passwordreset"}
+            text={"Forgot your password?"}
+          />
         </div>
 
         {errorMessage && (

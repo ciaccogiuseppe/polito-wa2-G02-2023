@@ -29,7 +29,8 @@ data class MessageDTO(
 )
 
 fun Message.toDTO(): MessageDTO {
-    return MessageDTO(this.getId(), ticket?.getId()!!, sender?.email!!,
+    return MessageDTO(
+        this.getId(), ticket?.getId()!!, sender?.email!!,
         text, sentTimestamp, attachments.map { it.toDTO() }.toMutableSet()
     )
 }

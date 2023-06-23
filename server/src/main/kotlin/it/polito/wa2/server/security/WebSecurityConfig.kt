@@ -26,6 +26,9 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter) {
             .requestMatchers(HttpMethod.GET, "").permitAll()
             .requestMatchers(HttpMethod.GET, "/*").permitAll()
             .requestMatchers(HttpMethod.GET, "/static/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/resetpasswordapply/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/tickets/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/profiledata/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/manager/**").hasRole(MANAGER)
             .requestMatchers(HttpMethod.POST, "/API/manager/**").hasRole(MANAGER)
@@ -57,7 +60,6 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter) {
             .jwtAuthenticationConverter(jwtAuthConverter)
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         httpSecurity.csrf().disable()
-        httpSecurity.cors()
         return httpSecurity.build()
     }
 }

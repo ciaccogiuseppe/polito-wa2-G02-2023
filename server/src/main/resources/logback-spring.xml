@@ -22,5 +22,5 @@
     <root level="INFO">
         <appender-ref ref="LOKI"/>
     </root>
-    <!--<logger name="feign" level="DEBUG"/> --><!-- you can set your own level rule -->
+    <logger name="org.springframework.web" level="INFO"/>
 </configuration>

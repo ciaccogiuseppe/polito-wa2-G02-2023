@@ -9,7 +9,7 @@ import {
 import StatusIndicator from "../TicketCommon/StatusIndicator";
 import TextNewLine from "../../Common/TextNewLine";
 import ChatMessage from "./ChatMessage";
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import AddButton from "../../Common/AddButton";
 import AttachmentOverlay from "./AttachmentOverlay";
 import { useEffect, useRef, useState } from "react";
@@ -341,6 +341,7 @@ function TicketChatPage(props) {
   const [chat, setChat] = useState([]);
   const [chatErrorMessage, setChatErrorMessage] = useState("");
   const [newMessage, setNewMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [newPriority, setNewPriority] = useState("");
   const [newStatus, setNewStatus] = useState("");
@@ -437,6 +438,7 @@ function TicketChatPage(props) {
   );
 
   function addMessage() {
+    setLoading(true);
     addMessageAPI(
       {
         ticketId: parseInt(ticketID),
@@ -454,8 +456,12 @@ function TicketChatPage(props) {
         setChatErrorMessage("");
         setAddingMessage(false);
         window.location.reload();
+        setLoading(false);
       })
-      .catch((err) => setChatErrorMessage(err));
+      .catch((err) => {
+        setChatErrorMessage(err);
+        setLoading(false);
+      });
   }
 
   function ticketUpdate() {
@@ -989,19 +995,24 @@ function TicketChatPage(props) {
                   )}
                 </div>
               )}
+              {loading && (
+                <>
+                  <Spinner style={{ color: "#A0C1D9" }} />
+                </>
+              )}
+              {chatErrorMessage && (
+                <>
+                  <div style={{ margin: "10px" }}>
+                    <ErrorMessage
+                      text={chatErrorMessage}
+                      close={() => {
+                        setChatErrorMessage("");
+                      }}
+                    />{" "}
+                  </div>
+                </>
+              )}
             </div>
-            {chatErrorMessage && (
-              <>
-                <div style={{ margin: "10px" }}>
-                  <ErrorMessage
-                    text={chatErrorMessage}
-                    close={() => {
-                      setChatErrorMessage("");
-                    }}
-                  />{" "}
-                </div>
-              </>
-            )}
           </>
         )}
       </div>

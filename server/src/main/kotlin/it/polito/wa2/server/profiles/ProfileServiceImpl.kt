@@ -31,7 +31,7 @@ class ProfileServiceImpl(
     @PreAuthorize("isAuthenticated()")
     @PostAuthorize(
         "" +
-                "(returnObject.email == authentication.name || hasRole('manager')) || " +
+                "(returnObject.email == #loggedEmail || hasRole('manager')) || " +
                 "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).CLIENT.toString()) && " +
                 "(hasRole('expert'))) || " +
                 "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).EXPERT.toString()) && " +

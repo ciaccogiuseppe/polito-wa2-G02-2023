@@ -69,16 +69,16 @@ function PasswordResetTriggerPage(props) {
               onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
-            <div style={{margin:"20px"}}>
-                <NavigationButton
-                    text={"Reset password"}
-                    type={"submit"}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        reset();
-                    }}
-                />
-            </div>
+          <div style={{ margin: "20px" }}>
+            <NavigationButton
+              text={"Reset password"}
+              type={"submit"}
+              onClick={(e) => {
+                e.preventDefault();
+                reset();
+              }}
+            />
+          </div>
 
           <NavigationButton
             text={"Back to login"}
