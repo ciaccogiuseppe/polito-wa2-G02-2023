@@ -68,16 +68,18 @@ To package the React application:
       {
         "productId": <productId>,
         "name": <name>,
-        "brand": <brand>
+        "brand": <brand>,
+        "category": <category>
       }, {...}, ...
     ]
   }
   ```
-| Field       | Content              |
-|-------------|----------------------|
-| `productId` | product id           |
-| `name`      | product name         |
-| `brand`     | brand of the product |
+| Field       | Content                 |
+|-------------|-------------------------|
+| `productId` | product id              |
+| `name`      | product name            |
+| `brand`     | brand of the product    |
+| `category`  | category of the product |
 
 - **METHOD** `GET` **URL**: `/API/public/products/{productId}`
 
@@ -96,14 +98,56 @@ To package the React application:
   {
     "productId": <productId>,
     "name": <name>,
-    "brand": <brand>
+    "brand": <brand>,
+    "category": <category>
   }
   ```
-| Field       | Content              |
-|-------------|----------------------|
-| `productId` | product id           |
-| `name`      | product name         |
-| `brand`     | brand of the product |
+| Field       | Content                 |
+|-------------|-------------------------|
+| `productId` | product id              |
+| `name`      | product name            |
+| `brand`     | brand of the product    |
+| `category`  | category of the product |
+
+- **METHOD** `POST` **URL**: `/API/manager/products/`
+
+  - **Description**: Create new product
+  - **Permissions allowed**: Manager
+  - **Request query parameter**: _None_
+  - **Request body**: Product to be inserted
+  ```
+  {
+     "productId": <productId>,
+     "name": <name>,
+     "brand": <brand>,
+     "category": <category>
+  }
+  ```
+  - **Response**: `201 Created` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (provided brand or category does not exist)
+    - `409 Conflict` (product with the given id already exists)
+    - `422 Unprocessable Entity` (wrong format for request body)
+    - `500 Internal Server Error`
+  - **Response body**: the created product / Error message in case of errors
+    ```
+    {
+      "productId": <productId>,
+      "name": <name>,
+      "brand": <brand>,
+      "category": <category>
+    }
+    ```
+
+| Field       | Content                 |
+|-------------|-------------------------|
+| `productId` | product id              |
+| `name`      | product name            |
+| `brand`     | brand of the product    |
+| `category`  | category of the product |
+
 
 ### Ticketing
 - **METHOD** `GET` **URL**: `/API/manager/ticketing/{ticketId}`
@@ -116,7 +160,7 @@ To package the React application:
   - **Error responses**:
     - `400 Bad Request`
     - `403 Forbidden`
-    - `404 Not Found` (ticket with ticketId `ticketId` not existing)
+    - `404 Not Found`
     - `422 Unprocessable Entity` (wrong format for `ticketId`)
     - `500 Internal Server Error`
   - **Response body**: ticket corresponding to ticketId / Error message in case of error
@@ -127,23 +171,25 @@ To package the React application:
     "description": <description>,
     "priority": <priority>,   
     "productId": <productId>, 
+    "serialNum": <serialNum>,
     "clientEmail": <clientEmail>,  
     "expertEmail": <expertEmail>, 
     "status": <status>, 
     "createdTimestamp": <createdTimestamp> 
   }
   ```
-| Field              | Content                         |
-|--------------------|---------------------------------|
-| `ticketId`         | ticket id                       |
-| `title`            | title of the ticket             |
-| `description`      | description of the ticket       |
-| `priority`         | priority of the ticket          |
-| `productId`        | id of the product of the ticket |
-| `clientEmail`    | client who created the ticket   |
-| `expertEmail`      | expert assigned to the ticket   |
-| `status`           | status of the ticket            |
-| `createdTimestamp` | timestamp of ticket creation    |
+| Field              | Content                                    |
+|--------------------|--------------------------------------------|
+| `ticketId`         | ticket id                                  |
+| `title`            | title of the ticket                        |
+| `description`      | description of the ticket                  |
+| `priority`         | priority of the ticket                     |
+| `productId`        | id of the product of the ticket            |
+| `serialNum`        | serial number of the product of the ticket |
+| `clientEmail`      | client who created the ticket              |
+| `expertEmail`      | expert assigned to the ticket              |
+| `status`           | status of the ticket                       |
+| `createdTimestamp` | timestamp of ticket creation               |
 
 - **METHOD** `GET` **URL**: `/API/expert/ticketing/{ticketId}`
 
@@ -155,7 +201,7 @@ To package the React application:
   - **Error responses**:
     - `400 Bad Request`
     - `403 Forbidden`
-    - `404 Not Found` (ticket with ticketId `ticketId` not existing)
+    - `404 Not Found`
     - `422 Unprocessable Entity` (wrong format for `ticketId`)
     - `500 Internal Server Error`
   - **Response body**: ticket corresponding to ticketId / Error message in case of error
@@ -166,23 +212,25 @@ To package the React application:
     "description": <description>,
     "priority": <priority>,   
     "productId": <productId>, 
+    "serialNum": <serialNum>,
     "clientEmail": <clientEmail>,  
     "expertEmail": <expertEmail>, 
     "status": <status>, 
     "createdTimestamp": <createdTimestamp> 
   }
   ```
-| Field              | Content                         |
-|--------------------|---------------------------------|
-| `ticketId`         | ticket id                       |
-| `title`            | title of the ticket             |
-| `description`      | description of the ticket       |
-| `priority`         | priority of the ticket          |
-| `productId`        | id of the product of the ticket |
-| `clientEmail`    | client who created the ticket |
-| `expertEmail`      | expert assigned to the ticket   |
-| `status`           | status of the ticket            |
-| `createdTimestamp` | timestamp of ticket creation    |
+| Field              | Content                                    |
+|--------------------|--------------------------------------------|
+| `ticketId`         | ticket id                                  |
+| `title`            | title of the ticket                        |
+| `description`      | description of the ticket                  |
+| `priority`         | priority of the ticket                     |
+| `productId`        | id of the product of the ticket            |
+| `serialNum`        | serial number of the product of the ticket |
+| `clientEmail`      | client who created the ticket              |
+| `expertEmail`      | expert assigned to the ticket              |
+| `status`           | status of the ticket                       |
+| `createdTimestamp` | timestamp of ticket creation               |
 
 - **METHOD** `GET` **URL**: `/API/client/ticketing/{ticketId}`
 
@@ -194,7 +242,7 @@ To package the React application:
   - **Error responses**:
     - `400 Bad Request`
     - `403 Forbidden`
-    - `404 Not Found` (ticket with ticketId `ticketId` not existing)
+    - `404 Not Found`
     - `422 Unprocessable Entity` (wrong format for `ticketId`)
     - `500 Internal Server Error`
   - **Response body**: ticket corresponding to ticketId / Error message in case of error
@@ -205,23 +253,25 @@ To package the React application:
     "description": <description>,
     "priority": <priority>,   
     "productId": <productId>, 
+    "serialNum": <serialNum>,
     "clientEmail": <clientEmail>,  
     "expertEmail": <expertEmail>, 
     "status": <status>, 
     "createdTimestamp": <createdTimestamp> 
   }
   ```
-| Field              | Content                         |
-|--------------------|---------------------------------|
-| `ticketId`         | ticket id                       |
-| `title`            | title of the ticket             |
-| `description`      | description of the ticket       |
-| `priority`         | priority of the ticket          |
-| `productId`        | id of the product of the ticket |
-| `clientEmail`    | client who created the ticket |
-| `expertEmail`      | expert assigned to the ticket   |
-| `status`           | status of the ticket            |
-| `createdTimestamp` | timestamp of ticket creation    |
+| Field              | Content                                    |
+|--------------------|--------------------------------------------|
+| `ticketId`         | ticket id                                  |
+| `title`            | title of the ticket                        |
+| `description`      | description of the ticket                  |
+| `priority`         | priority of the ticket                     |
+| `productId`        | id of the product of the ticket            |
+| `serialNum`        | serial number of the product of the ticket |
+| `clientEmail`      | client who created the ticket              |
+| `expertEmail`      | expert assigned to the ticket              |
+| `status`           | status of the ticket                       |
+| `createdTimestamp` | timestamp of ticket creation               |
 
 - **METHOD** `GET` **URL**: `/API/manager/ticketing/history/filter`
 
@@ -232,7 +282,7 @@ To package the React application:
     - `userEmail` to retrieve the  records associated to the corresponding user
     - `updatedAfter` to retrieve the records created after the given date
     - `updatedBefore` to retrieve the records created before the given date
-    - `currentExpertId` to retrieve the records associated to the given expertId
+    - `currentExpertEmail` to retrieve the records associated to the given expertId
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
@@ -300,65 +350,23 @@ To package the React application:
     ]
   }
   ```
-| Field              | Content                         |
-|--------------------|---------------------------------|
-| `ticketId`         | ticket id                       |
-| `title`            | title of the ticket             |
-| `description`      | description of the ticket       |
-| `priority`         | priority of the ticket          |
-| `productId`        | id of the product of the ticket |
-| `clientEmail`      | client who created the ticket   |
-| `expertEmail`      | expert assigned to the ticket   |
-| `status`           | status of the ticket            |
-| `createdTimestamp` | timestamp of ticket creation    |
+| Field              | Content                                    |
+|--------------------|--------------------------------------------|
+| `ticketId`         | ticket id                                  |
+| `title`            | title of the ticket                        |
+| `description`      | description of the ticket                  |
+| `priority`         | priority of the ticket                     |
+| `productId`        | id of the product of the ticket            |
+| `serialNum`        | serial number of the product of the ticket |
+| `clientEmail`      | client who created the ticket              |
+| `expertEmail`      | expert assigned to the ticket              |
+| `status`           | status of the ticket                       |
+| `createdTimestamp` | timestamp of ticket creation               |
 
 - **METHOD** `GET` **URL**: `/API/expert/ticketing/filter`
 
   - **Description**: Get all tickets, associated with the logged expert, satisfying the given filters
   - **Permissions allowed**: Expert
-  - **Request query parameter**: Required filters (only needed ones to be specified)
-    - `minPriority` specifies the minimum priority
-    - `maxPriority` specifies the maximum priority
-    - `productId` to retrieve the  records associated to the corresponding product
-    - `clientEmail` to retrieve the  records associated to the corresponding customer
-    - `updatedAfter` to retrieve the records created after the given date
-    - `updatedBefore` to retrieve the records created before the given date
-    - `expertEmail` to retrieve the records associated to the given expertId
-    - `status`: list of the desired states of the records
-  - **Request body**: _None_
-- **Response**: `200 OK` (success)
-- **Error responses**:
-  - `400 Bad Request`
-  - `403 Forbidden`
-  - `404 Not Found` (ticket with ticketId `ticketId` not existing, expert associated to the given `expertId` not existing, customer associated to the given `customerId` not existing,  product associated to the given `productId` not existing)
-  - `422 Unprocessable Entity` (wrong format for `request query parameters` or `updatedAfter` is after `updatedBefore`)
-  - `500 Internal Server Error`
-- **Response body**: list of tickets satisfying the given filtering conditions / Error message in case of error
-  ```
-  {
-    [
-      <ticket_1>,
-      <ticket_2>,
-      ...
-    ]
-  }
-  ```
-| Field              | Content                         |
-|--------------------|---------------------------------|
-| `ticketId`         | ticket id                       |
-| `title`            | title of the ticket             |
-| `description`      | description of the ticket       |
-| `priority`         | priority of the ticket          |
-| `productId`        | id of the product of the ticket |
-| `clientEmail`      | client who created the ticket   |
-| `expertEmail`      | expert assigned to the ticket   |
-| `status`           | status of the ticket            |
-| `createdTimestamp` | timestamp of ticket creation    |
-
-- **METHOD** `GET` **URL**: `/API/client/ticketing/filter`
-
-  - **Description**: Get all tickets, associated with the current client, satisfying the given filters
-  - **Permissions allowed**: Manager
   - **Request query parameter**: Required filters (only needed ones to be specified)
     - `minPriority` specifies the minimum priority
     - `maxPriority` specifies the maximum priority
@@ -386,17 +394,62 @@ To package the React application:
       ]
     }
     ```
-| Field              | Content                         |
-|--------------------|---------------------------------|
-| `ticketId`         | ticket id                       |
-| `title`            | title of the ticket             |
-| `description`      | description of the ticket       |
-| `priority`         | priority of the ticket          |
-| `productId`        | id of the product of the ticket |
-| `clientEmail`      | client who created the ticket   |
-| `expertEmail`      | expert assigned to the ticket   |
-| `status`           | status of the ticket            |
-| `createdTimestamp` | timestamp of ticket creation    |
+| Field              | Content                                    |
+|--------------------|--------------------------------------------|
+| `ticketId`         | ticket id                                  |
+| `title`            | title of the ticket                        |
+| `description`      | description of the ticket                  |
+| `priority`         | priority of the ticket                     |
+| `productId`        | id of the product of the ticket            |
+| `serialNum`        | serial number of the product of the ticket |
+| `clientEmail`      | client who created the ticket              |
+| `expertEmail`      | expert assigned to the ticket              |
+| `status`           | status of the ticket                       |
+| `createdTimestamp` | timestamp of ticket creation               |
+
+- **METHOD** `GET` **URL**: `/API/client/ticketing/filter`
+
+  - **Description**: Get all tickets, associated with the current client, satisfying the given filters
+  - **Permissions allowed**: Client
+  - **Request query parameter**: Required filters (only needed ones to be specified)
+    - `minPriority` specifies the minimum priority
+    - `maxPriority` specifies the maximum priority
+    - `productId` to retrieve the  records associated to the corresponding product
+    - `clientEmail` to retrieve the  records associated to the corresponding customer
+    - `updatedAfter` to retrieve the records created after the given date
+    - `updatedBefore` to retrieve the records created before the given date
+    - `expertEmail` to retrieve the records associated to the given expertId
+    - `status`: list of the desired states of the records
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (ticket with ticketId `ticketId` not existing, expert associated to the given `expertId` not existing, customer associated to the given `customerId` not existing,  product associated to the given `productId` not existing)
+    - `422 Unprocessable Entity` (wrong format for `request query parameters` or `updatedAfter` is after `updatedBefore`)
+    - `500 Internal Server Error`
+  - **Response body**: list of tickets satisfying the given filtering conditions / Error message in case of error
+    ```
+    {
+      [
+        <ticket_1>,
+        <ticket_2>,
+        ...
+      ]
+    }
+    ```
+| Field              | Content                                    |
+|--------------------|--------------------------------------------|
+| `ticketId`         | ticket id                                  |
+| `title`            | title of the ticket                        |
+| `description`      | description of the ticket                  |
+| `priority`         | priority of the ticket                     |
+| `productId`        | id of the product of the ticket            |
+| `serialNum`        | serial number of the product of the ticket |
+| `clientEmail`      | client who created the ticket              |
+| `expertEmail`      | expert assigned to the ticket              |
+| `status`           | status of the ticket                       |
+| `createdTimestamp` | timestamp of ticket creation               |
 
 - **METHOD** `POST` **URL**: `/API/client/ticketing/`
 
@@ -409,6 +462,7 @@ To package the React application:
       "title": <title>,
       "description": <description>,
       "productId": <productId>,
+      "serialNum": <serialNum>
     }
     ```
   - **Response**: `201 Created` (success)
@@ -425,13 +479,12 @@ To package the React application:
       }
     ```
 
-| Field          | Content                                          |
-|----------------|--------------------------------------------------|
-| `title`        | ticket title (textual field)                     |
-| `description`  | ticket description (textual field)               |
-| `productId`    | product id of the product linked to the ticket   |
-
-
+| Field         | Content                                           |
+|---------------|---------------------------------------------------|
+| `title`       | ticket title (textual field)                      |
+| `description` | ticket description (textual field)                |
+| `productId`   | product id of the product linked to the ticket    |
+| `serialNum`   | serial number of the product linked to the ticket |
 
     
 - **METHOD** `PUT` **URL**: `/API/manager/ticketing/assign`
@@ -444,11 +497,10 @@ To package the React application:
     ```
     {
       "ticketId": <ticketId>,
-      "expertId": <expertId>,
+      "expertEmail": <expertEmail>,
       "priority": <priority>
     }
     ```
-
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
@@ -471,14 +523,12 @@ To package the React application:
   - **Permissions allowed**: Manager
   - **Request query parameter**: _None_
   - **Request body**: Update information of ticket
-
     ```
     {
       "ticketId": <ticketId>,
       "newState": <newState>
     }
     ```
-
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
@@ -499,14 +549,12 @@ To package the React application:
   - **Permissions allowed**: Expert
   - **Request query parameter**: _None_
   - **Request body**: Update information of ticket
-
     ```
     {
       "ticketId": <ticketId>,
       "newState": <newState>
     }
     ```
-
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
@@ -527,14 +575,12 @@ To package the React application:
   - **Permissions allowed**: Client
   - **Request query parameter**: _None_
   - **Request body**: Update information of ticket
-
     ```
     {
       "ticketId": <ticketId>,
       "newState": <newState>
     }
     ```
-
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
@@ -561,7 +607,7 @@ To package the React application:
   - **Error responses**:
     - `400 Bad Request`
     - `403 Forbidden`
-    - `404 Not Found` (ticket with id `ticketId` not existing)
+    - `404 Not Found`
     - `422 Unprocessable Entity` (wrong format for `ticketId`)
     - `500 Internal Server Error`
   - **Response body**: list of messages of chat corresponding to ticketId / Error message in case of error
@@ -658,6 +704,7 @@ To package the React application:
 |-----------------|-----------------------------------|
 | `messageId`     | id of the chat message            |
 | `ticketId`      | id of the ticket                  |
+| `senderEmail`   | email of the sender user          |
 | `text`          | textual content of the message    |
 | `sentTimestamp` | timestamp of the message          |
 | `attachments`   | attachments linked to the message |
@@ -693,7 +740,7 @@ To package the React application:
 - **METHOD** `GET` **URL**: `/API/manager/attachment/{attachmentId}`
 
   - **Description**: Get attachment linked to `attachmentId`
-  - **Permissions allowed**: Expert, Client
+  - **Permissions allowed**: Manager
   - **Request path parameter**: `attachmentId` to retrieve the corresponding attachment
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
@@ -733,7 +780,10 @@ To package the React application:
   ```
   - **Response**: `200 OK` (success)
   - **Error responses**:
+    - `400 Bad Request`
     - `401 Unauthorized`
+    - `422 Unprocessable Entity` (wrong authentication request format)
+    - `500 Internal Server Error`
   - **Response body**: token and associated data
   ```
   {
@@ -756,13 +806,15 @@ To package the React application:
   - **Request body**: Message to be added to chat
   ```
   {
-    "username": <username>,
-    "password": <password>
+    "refreshToken": <refreshToken>,
   }
   ```
   - **Response**: `200 OK` (success)
   - **Error responses**:
+    - `400 Bad Request`
     - `401 Unauthorized`
+    - `422 Unprocessable Entity` (wrong authentication request format)
+    - `500 Internal Server Error`
   - **Response body**: token and associated data
   ```
   {
@@ -810,6 +862,40 @@ To package the React application:
   - **Response body**:  _None_
 
 
+- **METHOD** `GET` **URL**: `/API/resetPassword/{email}`
+  - **Description**: request the reset of the password for a given user
+  - **Permissions allowed**:   _Public_
+  - **Request path parameter**: `email` to retrieve the corresponding user
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `422 Unprocessable Entity` (wrong email format)
+    - `500 Internal Server Error`
+  - **Response body**:  _None_
+
+- **METHOD** `PUT` **URL**: `/API/resetPassword`
+  - **Description**: reset the password for a given user
+  - **Permissions allowed**:   _Public_
+  - **Request path parameter**: _None_
+  - **Request body**: Updated password and user associated data
+    ```
+    {
+      "email": <email>,
+      "password": <password>,
+      "token": <token>
+    }
+    ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+  
 - **METHOD** `POST` **URL**: `/API/createExpert`
   - **Description**: create an expert account
   - **Permissions allowed**:  Manager
@@ -910,8 +996,31 @@ To package the React application:
 
 
 - **METHOD** `PUT` **URL**: `/API/manager/user/{email}`
-  - **Description**: Change data of given manager user
+  - **Description**: Change data of given user
   - **Permissions allowed**: Manager
+  - **Request path parameter**:`email` to retrieve the corresponding user
+  - **Request body**: Update information of manager profile
+    ```
+    {
+      "email": <email>
+      "firstName": <firstName>,
+      "lastName": <lastName>,
+      "role": <role>
+    }
+    ```
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (user associated with `email` not existing)
+    - `422 Unprocessable Entity`  (wrong format for request body or email)
+    - `500 Internal Server Error`
+  - **Response body**: _None_ / Error message in case of error
+
+
+- **METHOD** `PUT` **URL**: `/API/vendor/user/{email}`
+  - **Description**: Change data of given vendor user
+  - **Permissions allowed**: Vendor
   - **Request path parameter**:`email` to retrieve the corresponding user
   - **Request body**: Update information of manager profile
     ```
@@ -990,15 +1099,15 @@ To package the React application:
   ```
 
 ### Item
-- **METHOD** `GET` **URL**: `/API/public/products/{productId}/items/`
+- **METHOD** `GET` **URL**: `/API/private/products/{productId}/items/`
   - **Description**: Get all the available items associated to the given product
-  - **Permissions allowed**: _Public_
+  - **Permissions allowed**: Manager, Vendor
   - **Request path parameter**: `productId` to retrieve the corresponding product
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
-    - `422 Unprocessable Entity` (wrong format)
+    - `422 Unprocessable Entity` (wrong request format)
     - `500 Internal Server Error`
   - **Response body**: List of all associated items
   ```
@@ -1022,13 +1131,13 @@ To package the React application:
 | `serialNum`          | serial number                                            |
 | `uuid`               | UUID associated to the item                              |
 | `clientEmail`        | email of the client that owns the item                   |
-| `validFromTimestamp` | timestamp that represents the start of the item validity |
-| `durationMonths`     | duration of the item validity                            |
+| `validFromTimestamp` | timestamp that represents the start of the UUID validity |
+| `durationMonths`     | duration of the UUID validity                            |
 
 
-- **METHOD** `GET` **URL**: `/API/public/products/{productId}/items/{serialNum}`
+- **METHOD** `GET` **URL**: `/API/private/products/{productId}/items/{serialNum}`
   - **Description**: Get the item associated to the given product and serial number, if exists
-  - **Permissions allowed**: _Public_
+  - **Permissions allowed**: Manager, Vendor
   - **Request path parameters**:
     - `productId` to retrieve the corresponding product
     - `serialNum` to retrieve the corresponding serial number
@@ -1056,8 +1165,47 @@ To package the React application:
 | `serialNum`          | serial number                                            |
 | `uuid`               | UUID associated to the item                              |
 | `clientEmail`        | email of the client that owns the item                   |
-| `validFromTimestamp` | timestamp that represents the start of the item validity |
-| `durationMonths`     | duration of the item validity                            |
+| `validFromTimestamp` | timestamp that represents the start of the UUID validity |
+| `durationMonths`     | duration of the UUID validity                            |
+
+
+- **METHOD** `GET` **URL**: `/API/client/profiles/items`
+
+  - **Description**: Get the items associated to the user
+  - **Permissions allowed**: Manager, Client
+  - **Request path parameter**: _None_
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found` (profile with email `email` not existing)
+    - `422 Unprocessable Entity` (wrong format for `email`)
+    - `500 Internal Server Error`
+  - **Response body**: profile corresponding to `email` / Error message in case of error
+  ```
+  {
+    [
+       { 
+          "productId": <productId>,
+          "serialNum": <serialNum>,
+          "uuid": <uuid>,
+          "clientEmail": <clientEmail>,
+          "validFromTimestamp": <validFromTimestamp>,
+          "durationMonths": <durationMonths>
+        },
+       ...
+     ]
+  }
+  ```
+| Field                | Content                                                  |
+|----------------------|----------------------------------------------------------|
+| `productId`          | id of the associated product                             |
+| `serialNum`          | serial number                                            |
+| `uuid`               | UUID associated to the item                              |
+| `clientEmail`        | email of the client that owns the item                   |
+| `validFromTimestamp` | timestamp that represents the start of the UUID validity |
+| `durationMonths`     | duration of the UUID validity                            |
 
 
 - **METHOD** `POST` **URL**: `/API/vendor/products/items/`
@@ -1094,8 +1242,8 @@ To package the React application:
 | `serialNum`          | serial number                                            |
 | `uuid`               | UUID associated to the item                              |
 | `clientEmail`        | email of the client that owns the item                   |
-| `validFromTimestamp` | timestamp that represents the start of the item validity |
-| `durationMonths`     | duration of the item validity                            |
+| `validFromTimestamp` | timestamp that represents the start of the UUID validity |
+| `durationMonths`     | duration of the UUID validity                            |
 
 - **METHOD** `PUT` **URL**: `/API/client/products/items/register`
   - **Description**: register a new item
@@ -1136,14 +1284,51 @@ To package the React application:
 | `serialNum`          | serial number                                            |
 | `uuid`               | UUID associated to the item                              |
 | `clientEmail`        | email of the client that owns the item                   |
-| `validFromTimestamp` | timestamp that represents the start of the item validity |
-| `durationMonths`     | duration of the item validity                            |
+| `validFromTimestamp` | timestamp that represents the start of the UUID validity |
+| `durationMonths`     | duration of the UUID validity                            |
 
-### Profiles (DEPRECATED)
-- **METHOD** `GET` **URL**: `/API/manager/profiles/{email}`
+### Profiles
+- **METHOD** `GET` **URL**: `/API/authenticated/profile`
+
+  - **Description**: Get profile of the user performing the request
+  - **Permissions allowed**: Manager, Expert, Client, Vendor
+  - **Request path parameter**: _None_
+  - **Request body**: _None_
+  - **Response**: `200 OK` (success)
+  - **Error responses**:
+    - `400 Bad Request`
+    - `403 Forbidden`
+    - `404 Not Found`
+    - `500 Internal Server Error`
+  - **Response body**: profile corresponding the user performing the request / Error message in case of error
+  ```
+  {
+    "profileId": <profileId>,
+    "email": <email>,
+    "name": <name>,
+    "surname": <surname>,,
+    "expertCategories": [<ProductCategory1>, <ProductCategory2>, ...],
+    "address": {
+       "country": <country>, "region": <region>, "city": <city>, "address": <address>
+     },
+    "role": <role>
+  }
+  ```
+| Field              | Content                          |
+|--------------------|----------------------------------|
+| `profileId`        | profile id                       |
+| `name`             | profile name                     |
+| `surname`          | profile surname                  |
+| `email`            | profile email                    |
+| `expertCategories` | categories assigned to an expert |
+| `address`          | client address                   |
+| `role`             | profile role                     |
+
+
+- **METHOD** `GET` **URL**: `/API/authenticated/profiles/{email}`
 
   - **Description**: Get profile, if existing, with email corresponding to `email`
-  - **Permissions allowed**: Manager
+  - **Permissions allowed**: Manager, Expert, Client, Vendor
   - **Request path parameter**: `email` to retrieve the corresponding profile
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
@@ -1159,165 +1344,62 @@ To package the React application:
     "profileId": <profileId>,
     "email": <email>,
     "name": <name>,
-    "surname": <surname>
+    "surname": <surname>,,
+    "expertCategories": [<ProductCategory1>, <ProductCategory2>, ...],
+    "address": {
+       "country": <country>, "region": <region>, "city": <city>, "address": <address>
+     },
+    "role": <role>
   }
   ```
-| Field       | Content         |
-|-------------|-----------------|
-| `profileId` | profile id      |
-| `name`      | profile name    |
-| `surname`   | profile surname |
-| `email`     | profile email   |
+| Field              | Content                          |
+|--------------------|----------------------------------|
+| `profileId`        | profile id                       |
+| `name`             | profile name                     |
+| `surname`          | profile surname                  |
+| `email`            | profile email                    |
+| `expertCategories` | categories assigned to an expert |
+| `address`          | client address                   |
+| `role`             | profile role                     |
 
 
-- **METHOD** `GET` **URL**: `/API/manager/profiles/profileId/{profileId}`
+- **METHOD** `GET` **URL**: `/API/manager/profiles/experts/{category}`
 
-  - **Description**: Get profile, if existing, with profileId corresponding to `profileId`
+  - **Description**: Get the profiles associated to the given category `category`
   - **Permissions allowed**: Manager
-  - **Request path parameter**: `profileId` to retrieve the corresponding profile
+  - **Request path parameter**: `category` to retrieve the corresponding category
   - **Request body**: _None_
   - **Response**: `200 OK` (success)
   - **Error responses**:
     - `400 Bad Request`
     - `403 Forbidden`
-    - `404 Not Found` (profile with profileId `profileId` not existing)
-    - `422 Unprocessable Entity` (wrong format for `profileId`)
+    - `404 Not Found`
+    - `422 Unprocessable Entity` (wrong format for `email`)
     - `500 Internal Server Error`
-  - **Response body**: profile corresponding to `profileId` / Error message in case of error
+  - **Response body**: profiles corresponding to the provided category / Error message in case of error
   ```
   {
-    "profileId": <profileId>,
-    "email": <email>,
-    "name": <name>,
-    "surname": <surname>
+     [
+        {
+           "profileId": <profileId>,
+           "email": <email>,
+           "name": <name>,
+           "surname": <surname>,,
+           "expertCategories": [<ProductCategory1>, <ProductCategory2>, ...],
+           "address": {
+              "country": <country>, "region": <region>, "city": <city>, "address": <address>
+           },
+           "role": <role>
+        }, { .... }, ....
+      ]
   }
   ```
-| Field       | Content         |
-|-------------|-----------------|
-| `profileId` | profile id      |
-| `name`      | profile name    |
-| `surname`   | profile surname |
-| `email`     | profile email   |
-
-- **METHOD** `POST` **URL**: `/API/public/profiles`
-
-  - **Description**: Create new profile, given its properties
-  - **Permissions allowed**:  _Public_
-  - **Request query parameter**: _None_
-  - **Request body**: Profile to be created
-
-    ```
-    {
-      "email": <email>,
-      "name": <name>,
-      "surname": <surname>,
-    }
-    ```
-  - **Response**: `201 Created` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `409 Conflict` (Profile with the given email already exists)
-    - `422 Unprocessable Entity` (wrong format for request body)
-    - `500 Internal Server Error`
-  - **Response body**: _None_ / Error message in case of errors
-
-
-| Field     | Content         |
-|-----------|-----------------|
-| `name`    | profile name    |
-| `surname` | profile surname |
-| `email`   | profile email   |
-
-
-- **METHOD** `PUT` **URL**: `/API/manager/profiles/{email}`
-
-  - **Description**: Change data of given profile
-  - **Permissions allowed**: Manager
-  - **Request path parameter**:`email` to retrieve the corresponding profile
-  - **Request body**: Update information of profile
-
-    ```
-    {
-      "email": <email>
-      "name": <name>,
-      "surname": <surname>
-    }
-    ```
-
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (user associated with `email` not existing)
-    - `409 Conflict` (Another profile with the given email already exists)
-    - `422 Unprocessable Entity`  (wrong format for request body or email)
-    - `500 Internal Server Error`
-  - **Response body**: _None_ / Error message in case of error
-
-| Field     | Content             |
-|-----------|---------------------|
-| `name`    | new profile name    |
-| `surname` | new profile surname |
-| `email`   | new profile email   |
-
-- **METHOD** `PUT` **URL**: `/API/expert/profiles/{email}`
-
-  - **Description**: Change data of given expert profile
-  - **Permissions allowed**: Expert
-  - **Request path parameter**:`email` to retrieve the corresponding profile
-  - **Request body**: Update information of profile
-
-    ```
-    {
-      "email": <email>
-      "name": <name>,
-      "surname": <surname>
-    }
-    ```
-
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (user associated with `email` not existing)
-    - `409 Conflict` (Another profile with the given email already exists)
-    - `422 Unprocessable Entity`  (wrong format for request body or email)
-    - `500 Internal Server Error`
-  - **Response body**: _None_ / Error message in case of error
-
-| Field     | Content             |
-|-----------|---------------------|
-| `name`    | new profile name    |
-| `surname` | new profile surname |
-| `email`   | new profile email   |
-
-- **METHOD** `PUT` **URL**: `/API/client/profiles/{email}`
-
-  - **Description**: Change data of given client profile
-  - **Permissions allowed**: Client
-  - **Request path parameter**:`email` to retrieve the corresponding profile
-  - **Request body**: Update information of profile
-
-    ```
-    {
-      "email": <email>
-      "name": <name>,
-      "surname": <surname>
-    }
-    ```
-
-  - **Response**: `200 OK` (success)
-  - **Error responses**:
-    - `400 Bad Request`
-    - `403 Forbidden`
-    - `404 Not Found` (user associated with `email` not existing)
-    - `409 Conflict` (Another profile with the given email already exists)
-    - `422 Unprocessable Entity`  (wrong format for request body or email)
-    - `500 Internal Server Error`
-  - **Response body**: _None_ / Error message in case of error
-
-| Field     | Content             |
-|-----------|---------------------|
-| `name`    | new profile name    |
-| `surname` | new profile surname |
-| `email`   | new profile email   |
+| Field              | Content                          |
+|--------------------|----------------------------------|
+| `profileId`        | profile id                       |
+| `name`             | profile name                     |
+| `surname`          | profile surname                  |
+| `email`            | profile email                    |
+| `expertCategories` | categories assigned to an expert |
+| `address`          | client address                   |
+| `role`             | profile role                     |
