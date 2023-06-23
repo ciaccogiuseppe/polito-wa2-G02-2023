@@ -2,9 +2,14 @@ package it.polito.wa2.server.security
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.LoginFailedException
+import it.polito.wa2.server.UnprocessableProfileException
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Positive
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.json.BasicJsonParser
 import org.springframework.http.*
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 
@@ -20,7 +25,8 @@ class AuthController(
     private val restTemplate = RestTemplate()
 
     @PostMapping("/API/login")
-    fun login(@RequestBody loginRequest: LoginRequest): LoginResponse {
+    fun login(@Valid @RequestBody loginRequest: LoginRequest, br: BindingResult): LoginResponse {
+        checkInputParameters(br)
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
         val body = "grant_type=password&username=${loginRequest.username}&password=${loginRequest.password}" +
@@ -35,7 +41,8 @@ class AuthController(
     }
 
     @PostMapping("/API/refreshToken")
-    fun refreshToken(@RequestBody refreshRequest: RefreshRequest): LoginResponse {
+    fun refreshToken(@Valid @RequestBody refreshRequest: RefreshRequest, br: BindingResult): LoginResponse {
+        checkInputParameters(br)
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
         val body = "grant_type=refresh_token&refresh_token=${refreshRequest.refreshToken}&client_id=$clientId"
@@ -71,10 +78,14 @@ class AuthController(
         }
     }
 
+    private fun checkInputParameters(br: BindingResult) {
+        if (br.hasErrors())
+            throw UnprocessableProfileException("Wrong format for authentication request")
+    }
 }
 
-data class LoginRequest(val username: String, val password: String)
+data class LoginRequest(@field:NotBlank val username: String, @field:NotBlank val password: String)
 
-data class RefreshRequest(val refreshToken: String)
-data class LoginResponse(val refreshToken: String, val token: String, val expiresIn: Long)
-data class TokenResponse(val refreshToken: String, val token: String, val expiresIn:Long)
+data class RefreshRequest(@field:NotBlank val refreshToken: String)
+data class LoginResponse(@field:NotBlank val refreshToken: String, @field:NotBlank val token: String, @field:Positive val expiresIn: Long)
+data class TokenResponse(@field:NotBlank val refreshToken: String, @field:NotBlank val token: String, @field:Positive val expiresIn:Long)

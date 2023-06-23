@@ -23,11 +23,12 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         keycloakService.addClient(userDTO!!)
     }
     @GetMapping("/API/resetPassword/{email}")
-    fun addClient(@PathVariable email: String) {
+    fun resetPassword(@PathVariable email: String) {
+        checkEmail(email)
         keycloakService.resetPassword(email)
     }
     @PutMapping("/API/resetPassword/")
-    fun addClient(@Valid @RequestBody passwordDTO: PasswordDTO?, br: BindingResult) {
+    fun applyResetPassword(@Valid @RequestBody passwordDTO: PasswordDTO?, br: BindingResult) {
         checkInputPassword(passwordDTO, br)
         keycloakService.applyResetPassword(passwordDTO!!)
     }

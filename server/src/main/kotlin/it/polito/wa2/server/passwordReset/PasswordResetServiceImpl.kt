@@ -8,7 +8,7 @@ import java.sql.Timestamp
 import java.util.*
 import javax.ws.rs.NotFoundException
 
-@Service @Transactional(readOnly = true) @Observed
+@Service @Transactional @Observed
 class PasswordResetServiceImpl (
     private val passwordResetRepository: PasswordResetRepository,
     private val profileRepository: ProfileRepository
