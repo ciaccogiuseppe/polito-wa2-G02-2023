@@ -48,6 +48,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_MVC_PROBLEMDETAILS_ENABLED=true
       - KEYCLOAK_AUTH-SERVER-URL=http://keycloak:8080
       - KEYCLOAK_REALM=SpringBootKeycloak
       - KEYCLOAK_RESOURCE=springboot-keycloak-client

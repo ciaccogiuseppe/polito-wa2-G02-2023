@@ -37,7 +37,7 @@ class ProfileServiceImpl(
                 "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).EXPERT.toString()) && " +
                 "(hasRole('expert') || hasRole('client')))"
     )
-    override fun getProfile(email: String): ProfileDTO {
+    override fun getProfile(email: String, loggedEmail: String): ProfileDTO {
         val profile = getProfilePrivate(email)
         return profile.toDTO()
     }
