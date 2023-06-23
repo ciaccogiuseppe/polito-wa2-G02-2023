@@ -30,14 +30,13 @@ class ProfileServiceImpl(
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
     @PostAuthorize(
-        "" +
                 "(returnObject.email == authentication.name || hasRole('manager')) || " +
                 "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).CLIENT.toString()) && " +
                 "(hasRole('expert'))) || " +
                 "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).EXPERT.toString()) && " +
                 "(hasRole('expert') || hasRole('client')))"
     )
-    override fun getProfile(email: String, loggedEmail: String): ProfileDTO {
+    override fun getProfile(email: String): ProfileDTO {
         val profile = getProfilePrivate(email)
         return profile.toDTO()
     }
@@ -50,6 +49,7 @@ class ProfileServiceImpl(
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('${WebSecurityConfig.MANAGER}', '${WebSecurityConfig.CLIENT}')")
     override fun getProfileItems(email: String): List<ItemDTO> {
         val profile = profileRepository.findByEmail(email)
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
@@ -120,7 +120,4 @@ class ProfileServiceImpl(
             ?: throw ProfileNotFoundException("Profile with email '${email}' not found")
     }
 
-    private fun forbidden() {
-        throw ForbiddenException("You cannot access to this profile")
-    }
 }
