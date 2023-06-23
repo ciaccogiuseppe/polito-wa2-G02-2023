@@ -42,9 +42,9 @@ class TicketHistoryServiceImpl(
         if (ticketId != null)
             ticket = getTicket(ticketId, loggedUserEmail)
         if (userEmail != null)
-            user = getProfileByEmail(userEmail, loggedUserEmail)
+            user = getProfileByEmail(userEmail)
         if (currentExpertEmail != null)
-            currentExpert = getProfileByEmail(currentExpertEmail, loggedUserEmail)
+            currentExpert = getProfileByEmail(currentExpertEmail)
         return ticketHistoryRepository
             .findAll()
             .filter {
@@ -65,8 +65,8 @@ class TicketHistoryServiceImpl(
         return ticketRepository.findByIdOrNull(ticketDTO.ticketId)!!
     }
 
-    private fun getProfileByEmail(email: String, loggedEmail: String): Profile {
-        val profileDTO = profileService.getProfile(email, loggedEmail)
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 }

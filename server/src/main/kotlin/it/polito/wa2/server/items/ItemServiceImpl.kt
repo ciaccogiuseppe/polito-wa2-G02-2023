@@ -48,7 +48,7 @@ class ItemServiceImpl(
         val product = getProduct(productId)
         val item = itemRepository.findByProductAndSerialNum(product, serialNum)
             ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
-        if (item.client != getProfileByEmail(email, email))
+        if (item.client != getProfileByEmail(email))
             throw ForbiddenException("You cannot access to this item")
         return item.toDTO()
     }
@@ -61,6 +61,7 @@ class ItemServiceImpl(
         return profile.items.map { it.toDTO() }
     }
 
+    @PreAuthorize("hasRole('${WebSecurityConfig.VENDOR}')")
     override fun addItem(productId: String, itemDTO: ItemDTO): ItemDTO {
         if (productId != itemDTO.productId)
             throw BadRequestItemException("ProductId in path doesn't match the productId in the body")
@@ -100,7 +101,7 @@ class ItemServiceImpl(
             ?: throw ItemNotFoundException("Item with productIid '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}' not found")
         if (itemDTO.uuid != item.uuid)
             throw ForbiddenException("Impossible to be linked to the product")
-        item.client = getProfileByEmail(userEmail, userEmail)
+        item.client = getProfileByEmail(userEmail)
         return itemRepository.save(item).toDTO()
     }
 
@@ -109,8 +110,8 @@ class ItemServiceImpl(
         return productRepository.findByIdOrNull(productDTO.productId)!!
     }
 
-    private fun getProfileByEmail(email: String, loggedEmail: String): Profile {
-        val profileDTO = profileService.getProfile(email, loggedEmail)
+    private fun getProfileByEmail(email: String): Profile {
+        val profileDTO = profileService.getProfile(email)
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 }

@@ -19,10 +19,9 @@ class ProfileController(private val profileService: ProfileService) {
     }
 
     @GetMapping("/API/authenticated/profiles/{email}")
-    fun getProfile(principal: Principal, @PathVariable email: String): ProfileDTO {
-        val userEmail = retrieveUserEmail(principal)
+    fun getProfile(@PathVariable email: String): ProfileDTO {
         checkEmail(email)
-        return profileService.getProfile(email, userEmail)
+        return profileService.getProfile(email)
     }
 
     @GetMapping("/API/manager/profiles/experts/{category}")
