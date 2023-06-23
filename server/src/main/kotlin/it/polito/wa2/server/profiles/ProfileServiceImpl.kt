@@ -10,6 +10,7 @@ import it.polito.wa2.server.categories.ProductCategory
 import it.polito.wa2.server.items.ItemDTO
 import it.polito.wa2.server.items.toDTO
 import it.polito.wa2.server.security.WebSecurityConfig
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,21 +24,18 @@ class ProfileServiceImpl(
     private val addressService: AddressService
 ): ProfileService {
 
+
+
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
+    @PostAuthorize("" +
+            "(returnObject.email == authentication.name || hasRole('manager')) || " +
+            "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).CLIENT.toString()) && " +
+            "(hasRole('expert'))) || " +
+            "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).EXPERT.toString()) && " +
+            "(hasRole('expert') || hasRole('client')))")
     override fun getProfile(email: String, loggedEmail: String): ProfileDTO {
         val profile = getProfilePrivate(email)
-
-        if(loggedEmail != email) {
-            val loggedProfile = getProfilePrivate(loggedEmail)
-            when(loggedProfile.role) {
-                ProfileRole.CLIENT -> if(profile.role != ProfileRole.EXPERT) forbidden()
-                ProfileRole.EXPERT -> if(profile.role != ProfileRole.CLIENT && profile.role != ProfileRole.EXPERT) forbidden()
-                ProfileRole.MANAGER -> {}
-                else -> forbidden()
-            }
-        }
-
         return profile.toDTO()
     }
 

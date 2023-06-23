@@ -97,7 +97,8 @@ class CategoryControllerTests {
             entity,
             String::class.java
         )
-
+        categoryRepository.delete(category1)
+        categoryRepository.delete(category2)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
@@ -105,7 +106,6 @@ class CategoryControllerTests {
         Assertions.assertTrue(body.any{it.containsValue(ProductCategory.PC.toString())})
         Assertions.assertTrue(body.any{it.containsValue(ProductCategory.TV.toString())})
 
-        categoryRepository.delete(category1)
-        categoryRepository.delete(category2)
+
     }
 }

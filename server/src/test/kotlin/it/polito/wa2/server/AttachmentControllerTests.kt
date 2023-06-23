@@ -156,8 +156,6 @@ class AttachmentControllerTests {
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
-
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
@@ -169,6 +167,10 @@ class AttachmentControllerTests {
 
         brandRepository.delete(brand)
         productRepository.delete(product)
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+
+
     }
 
     @Test
@@ -217,12 +219,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(attachment.name, body["name"])
-        Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
-        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
-
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
@@ -233,6 +229,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
+        Assertions.assertEquals(attachment.name, body["name"])
+        Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
+        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
+
+
     }
 
     @Test
@@ -279,13 +283,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(attachment.name, body["name"])
-        Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
-        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
-
-
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
@@ -296,6 +293,15 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
+        Assertions.assertEquals(attachment.name, body["name"])
+        Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
+        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
+
+
+
     }
 
     @Test
@@ -342,9 +348,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
-
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
@@ -355,6 +358,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
+
     }
 
     @Test
@@ -403,14 +411,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(attachment.name, body["name"])
-        Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
-        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
-
-
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
@@ -421,6 +421,15 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         productRepository.delete(product)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
+        Assertions.assertEquals(attachment.name, body["name"])
+        Assertions.assertEquals(Base64.getEncoder().encodeToString(attachment.attachment), body["attachment"])
+        Assertions.assertEquals(attachment.getId(), body["attachmentId"] )
+
+
+
     }
 
     @Test
@@ -468,9 +477,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
-
         attachmentRepository.delete(attachment)
         messageRepository.delete(message)
         ticketRepository.delete(ticket)
@@ -481,6 +487,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         productRepository.delete(product)
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
+
     }
 
     @Test
@@ -501,9 +512,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
+        profileRepository.delete(manager)
+
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
 
-        profileRepository.delete(manager)
+
     }
 
     @Test
@@ -546,9 +559,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
+        profileRepository.delete(manager)
+
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 
-        profileRepository.delete(manager)
+
     }
 
 }

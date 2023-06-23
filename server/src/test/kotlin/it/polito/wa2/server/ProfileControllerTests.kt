@@ -101,28 +101,26 @@ class ProfileControllerTests {
             String::class.java
         )
 
-
+        profileRepository.delete(profile)
+        profileRepository.delete(manager)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
         Assertions.assertEquals(manager.email, body["email"])
         Assertions.assertEquals(manager.name, body["name"])
         Assertions.assertEquals(manager.surname, body["surname"])
 
-        profileRepository.delete(profile)
-        profileRepository.delete(manager)
+
     }
 
     @Test
         //@DirtiesContext
     fun getExistingProfile() {
-        val email = "mario.rossi@polito.it"
+        val email = "client@polito.it"
         val uri = URI("http://localhost:$port/API/authenticated/profiles/$email")
 
         val profile = TestUtils.testProfile(email, "Profile", "Polito", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
-        val client = TestUtils.testProfile("client@polito.it", "Client", "PoliTo", ProfileRole.CLIENT)
         profileRepository.save(manager)
-        profileRepository.save(client)
         profileRepository.save(profile)
 
         val entity = TestUtils.testEntityHeader(null, clientToken)
@@ -134,6 +132,8 @@ class ProfileControllerTests {
             String::class.java
         )
 
+        profileRepository.delete(profile)
+        profileRepository.delete(manager)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
@@ -141,9 +141,7 @@ class ProfileControllerTests {
         Assertions.assertEquals(profile.name, body["name"])
         Assertions.assertEquals(profile.surname, body["surname"])
 
-        profileRepository.delete(profile)
-        profileRepository.delete(manager)
-        profileRepository.delete(client)
+
     }
 @Test
         //@DirtiesContext
@@ -165,11 +163,11 @@ class ProfileControllerTests {
             entity,
             String::class.java
         )
-
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
         profileRepository.delete(profile)
         profileRepository.delete(manager)
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
     }
 
     @Test
@@ -208,11 +206,6 @@ class ProfileControllerTests {
             String::class.java
         )
 
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*, *> }
-        Assertions.assertEquals(2, body.size)
-
         profileRepository.delete(profile)
         profileRepository.delete(expert1)
         profileRepository.delete(expert2)
@@ -220,6 +213,11 @@ class ProfileControllerTests {
         categoryRepository.delete(category1)
         categoryRepository.delete(category2)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
 

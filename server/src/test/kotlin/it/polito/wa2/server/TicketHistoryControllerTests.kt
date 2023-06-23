@@ -117,9 +117,9 @@ class TicketHistoryControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
     }
 
     @Test
@@ -137,9 +137,9 @@ class TicketHistoryControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
     }
 
     @Test
@@ -158,9 +158,9 @@ class TicketHistoryControllerTests {
             String::class.java
         )
 
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
     }
 
     // --------------------------- ticketId
@@ -206,10 +206,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-
-        Assertions.assertEquals(body.size, 0)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
         ticketHistoryRepository.delete(history1ticket1)
         ticketRepository.delete(ticket1)
@@ -221,6 +217,12 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+
+        Assertions.assertEquals(body.size, 0)
+
+
     }
 
     @Test
@@ -269,7 +271,18 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
+        ticketHistoryRepository.delete(history1ticket1)
+        ticketHistoryRepository.delete(history2ticket2)
+        ticketHistoryRepository.delete(history3ticket2)
+        ticketRepository.delete(ticket1)
+        ticketRepository.delete(ticket2)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
@@ -292,18 +305,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["userEmail"], history3ticket2.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3ticket2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
-        ticketHistoryRepository.delete(history1ticket1)
-        ticketHistoryRepository.delete(history2ticket2)
-        ticketHistoryRepository.delete(history3ticket2)
-        ticketRepository.delete(ticket1)
-        ticketRepository.delete(ticket2)
-        itemRepository.delete(item)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
-        brandRepository.delete(brand)
-        categoryRepository.delete(category)
+
     }
 
     @Test
@@ -346,9 +348,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
         ticketHistoryRepository.delete(history1ticket1)
         ticketRepository.delete(ticket1)
         itemRepository.delete(item)
@@ -358,6 +357,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+
     }
 
     @Test
@@ -375,9 +377,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     @Test
@@ -395,9 +397,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
     }
 
     // --------------------------- userEmail
@@ -447,11 +449,24 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
+
+        ticketHistoryRepository.delete(history1customer1)
+        ticketHistoryRepository.delete(history2customer2)
+        ticketHistoryRepository.delete(history3customer2)
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer1)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
         Assertions.assertEquals(body[0]["historyId"], history2customer2.getId())
         Assertions.assertEquals(body[0]["ticketId"], history2customer2.ticket!!.getId())
         Assertions.assertEquals(body[0]["newState"], history2customer2.newState.name)
@@ -468,18 +483,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["userEmail"], history3customer2.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3customer2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
-        ticketHistoryRepository.delete(history1customer1)
-        ticketHistoryRepository.delete(history2customer2)
-        ticketHistoryRepository.delete(history3customer2)
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(customer1)
-        profileRepository.delete(customer2)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
-        brandRepository.delete(brand)
-        categoryRepository.delete(category)
+
     }
 
     @Test
@@ -522,10 +526,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
-
         ticketHistoryRepository.delete(history1customer1)
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
@@ -535,6 +535,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+
+
     }
 
     @Test
@@ -552,9 +556,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     @Test
@@ -572,9 +576,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     // --------------------------- currentExpertEmail
@@ -624,11 +628,24 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
+
+        ticketHistoryRepository.delete(history1expert2)
+        ticketHistoryRepository.delete(history2expert3)
+        ticketHistoryRepository.delete(history3expert3)
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer1)
+        profileRepository.delete(expert2)
+        profileRepository.delete(expert3)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
         Assertions.assertEquals(body[0]["historyId"], history2expert3.getId())
         Assertions.assertEquals(body[0]["ticketId"], history2expert3.ticket!!.getId())
         Assertions.assertEquals(body[0]["newState"], history2expert3.newState.name)
@@ -645,18 +662,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["userEmail"], history3expert3.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3expert3.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
-        ticketHistoryRepository.delete(history1expert2)
-        ticketHistoryRepository.delete(history2expert3)
-        ticketHistoryRepository.delete(history3expert3)
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(customer1)
-        profileRepository.delete(expert2)
-        profileRepository.delete(expert3)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
-        brandRepository.delete(brand)
-        categoryRepository.delete(category)
     }
 
     @Test
@@ -698,10 +703,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
-
         ticketHistoryRepository.delete(history1customer1)
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
@@ -711,6 +712,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+
+
     }
 
     @Test
@@ -728,9 +733,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     @Test
@@ -748,9 +753,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     // --------------------------- updatedAfter & updatedBefore
@@ -798,11 +803,23 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
+        ticketHistoryRepository.delete(history1timestamp10)
+        ticketHistoryRepository.delete(history2timestamp20)
+        ticketHistoryRepository.delete(history3timestamp30)
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer1)
+        profileRepository.delete(expert2)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
 
         Assertions.assertEquals(body.size, 2)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
         Assertions.assertEquals(body[0]["historyId"], history2timestamp20.getId())
         Assertions.assertEquals(body[0]["ticketId"], history2timestamp20.ticket!!.getId())
         Assertions.assertEquals(body[0]["newState"], history2timestamp20.newState.name)
@@ -819,18 +836,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["userEmail"], history3timestamp30.user!!.email)
         Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3timestamp30.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
-        ticketHistoryRepository.delete(history1timestamp10)
-        ticketHistoryRepository.delete(history2timestamp20)
-        ticketHistoryRepository.delete(history3timestamp30)
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(customer1)
-        profileRepository.delete(expert2)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
 
-        brandRepository.delete(brand)
-        categoryRepository.delete(category)
     }
 
     @Test
@@ -876,19 +882,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-
-        Assertions.assertEquals(body.size, 1)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        Assertions.assertEquals(body[0]["historyId"], history1timestamp10.getId())
-        Assertions.assertEquals(body[0]["ticketId"], history1timestamp10.ticket!!.getId())
-        Assertions.assertEquals(body[0]["newState"], history1timestamp10.newState.name)
-        Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
-        Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
-
         ticketHistoryRepository.delete(history1timestamp10)
         ticketHistoryRepository.delete(history2timestamp20)
         ticketHistoryRepository.delete(history3timestamp30)
@@ -901,6 +894,20 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+
+        Assertions.assertEquals(body.size, 1)
+        Assertions.assertEquals(body[0]["historyId"], history1timestamp10.getId())
+        Assertions.assertEquals(body[0]["ticketId"], history1timestamp10.ticket!!.getId())
+        Assertions.assertEquals(body[0]["newState"], history1timestamp10.newState.name)
+        Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
+        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+
+
     }
 
     @Test
@@ -947,18 +954,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-
-        Assertions.assertEquals(body.size, 1)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        Assertions.assertEquals(body[0]["historyId"], history1timestamp10.getId())
-        Assertions.assertEquals(body[0]["ticketId"], history1timestamp10.ticket!!.getId())
-        Assertions.assertEquals(body[0]["newState"], history1timestamp10.newState.name)
-        Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
-        Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
 
         ticketHistoryRepository.delete(history1timestamp10)
         ticketHistoryRepository.delete(history2timestamp20)
@@ -972,6 +967,19 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+
+        Assertions.assertEquals(body.size, 1)
+        Assertions.assertEquals(body[0]["historyId"], history1timestamp10.getId())
+        Assertions.assertEquals(body[0]["ticketId"], history1timestamp10.ticket!!.getId())
+        Assertions.assertEquals(body[0]["newState"], history1timestamp10.newState.name)
+        Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
+        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+
     }
 
     @Test
@@ -1019,11 +1027,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-
-        Assertions.assertEquals(body.size, 0)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
         ticketHistoryRepository.delete(history1timestamp10)
         ticketHistoryRepository.delete(history2timestamp20)
         ticketHistoryRepository.delete(history3timestamp30)
@@ -1036,6 +1039,12 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+
+        Assertions.assertEquals(body.size, 0)
     }
 
     @Test
@@ -1053,9 +1062,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     @Test
@@ -1073,9 +1082,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+
     }
 
     // --------------------------- all filters
@@ -1137,27 +1146,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-
-        Assertions.assertEquals(body.size, 2)
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        Assertions.assertEquals(body[0]["historyId"], history1ticket1user1expert3timestamp34.getId())
-        Assertions.assertEquals(body[0]["ticketId"], history1ticket1user1expert3timestamp34.ticket!!.getId())
-        Assertions.assertEquals(body[0]["newState"], history1ticket1user1expert3timestamp34.newState.name)
-        Assertions.assertEquals(body[0]["oldState"], history1ticket1user1expert3timestamp34.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertEmail"], history1ticket1user1expert3timestamp34.currentExpert!!.email)
-        Assertions.assertEquals(body[0]["userEmail"], history1ticket1user1expert3timestamp34.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1ticket1user1expert3timestamp34.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
-
-        Assertions.assertEquals(body[1]["historyId"], history5ticket1user1expert3timestamp43.getId())
-        Assertions.assertEquals(body[1]["ticketId"], history5ticket1user1expert3timestamp43.ticket!!.getId())
-        Assertions.assertEquals(body[1]["newState"], history5ticket1user1expert3timestamp43.newState.name)
-        Assertions.assertEquals(body[1]["oldState"], history5ticket1user1expert3timestamp43.oldState.name)
-        Assertions.assertEquals(body[1]["currentExpertEmail"], history5ticket1user1expert3timestamp43.currentExpert!!.email)
-        Assertions.assertEquals(body[1]["userEmail"], history5ticket1user1expert3timestamp43.user!!.email)
-        Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history5ticket1user1expert3timestamp43.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
-
         ticketHistoryRepository.delete(history1ticket1user1expert3timestamp34)
         ticketHistoryRepository.delete(history2ticket1user2expert3timestamp34)
         ticketHistoryRepository.delete(history3ticket2user1expert3timestamp34)
@@ -1176,5 +1164,27 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+
+        Assertions.assertEquals(body.size, 2)
+        Assertions.assertEquals(body[0]["historyId"], history1ticket1user1expert3timestamp34.getId())
+        Assertions.assertEquals(body[0]["ticketId"], history1ticket1user1expert3timestamp34.ticket!!.getId())
+        Assertions.assertEquals(body[0]["newState"], history1ticket1user1expert3timestamp34.newState.name)
+        Assertions.assertEquals(body[0]["oldState"], history1ticket1user1expert3timestamp34.oldState.name)
+        Assertions.assertEquals(body[0]["currentExpertEmail"], history1ticket1user1expert3timestamp34.currentExpert!!.email)
+        Assertions.assertEquals(body[0]["userEmail"], history1ticket1user1expert3timestamp34.user!!.email)
+        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1ticket1user1expert3timestamp34.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+
+        Assertions.assertEquals(body[1]["historyId"], history5ticket1user1expert3timestamp43.getId())
+        Assertions.assertEquals(body[1]["ticketId"], history5ticket1user1expert3timestamp43.ticket!!.getId())
+        Assertions.assertEquals(body[1]["newState"], history5ticket1user1expert3timestamp43.newState.name)
+        Assertions.assertEquals(body[1]["oldState"], history5ticket1user1expert3timestamp43.oldState.name)
+        Assertions.assertEquals(body[1]["currentExpertEmail"], history5ticket1user1expert3timestamp43.currentExpert!!.email)
+        Assertions.assertEquals(body[1]["userEmail"], history5ticket1user1expert3timestamp43.user!!.email)
+        Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history5ticket1user1expert3timestamp43.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+
+
     }
 }

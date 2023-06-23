@@ -117,7 +117,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
 
         val createdProfile = profileRepository.findByEmail(user.email)
-
+        profileRepository.delete(createdProfile!!)
         Assertions.assertNotNull(createdProfile)
         Assertions.assertEquals(user.email, createdProfile?.email)
         Assertions.assertEquals(user.firstName, createdProfile?.name)
@@ -130,7 +130,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdUser?.firstName)
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
-        profileRepository.delete(createdProfile!!)
+
     }
 
     @Test
@@ -167,6 +167,7 @@ class KeycloakControllerTests {
         val createdProfile = profileRepository.findByEmail(user.email)
 
         Assertions.assertNotNull(createdProfile)
+        profileRepository.delete(createdProfile!!)
         Assertions.assertEquals(user.email, createdProfile?.email)
         Assertions.assertEquals(user.firstName, createdProfile?.name)
         Assertions.assertEquals(user.lastName, createdProfile?.surname)
@@ -178,7 +179,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdUser?.firstName)
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
-        profileRepository.delete(createdProfile!!)
+
     }
 
     @Test
@@ -206,6 +207,7 @@ class KeycloakControllerTests {
         val createdProfile = profileRepository.findByEmail(user.email)
 
         Assertions.assertNotNull(createdProfile)
+        profileRepository.delete(createdProfile!!)
         Assertions.assertEquals(user.email, createdProfile?.email)
         Assertions.assertEquals(user.firstName, createdProfile?.name)
         Assertions.assertEquals(user.lastName, createdProfile?.surname)
@@ -217,7 +219,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdUser?.firstName)
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
-        profileRepository.delete(createdProfile!!)
+
     }
     @Test
     //@DirtiesContext
@@ -244,6 +246,7 @@ class KeycloakControllerTests {
         val createdProfile = profileRepository.findByEmail(user.email)
 
         Assertions.assertNotNull(createdProfile)
+        profileRepository.delete(createdProfile!!)
         Assertions.assertEquals(user.email, createdProfile?.email)
         Assertions.assertEquals(user.firstName, createdProfile?.name)
         Assertions.assertEquals(user.lastName, createdProfile?.surname)
@@ -255,7 +258,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdUser?.firstName)
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
-        profileRepository.delete(createdProfile!!)
+
     }
 
     @Test
@@ -306,9 +309,10 @@ class KeycloakControllerTests {
         val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
         val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
 
+        profileRepository.delete(profile)
         Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
 
-        profileRepository.delete(profile)
+
     }
 
     @Test
@@ -335,6 +339,7 @@ class KeycloakControllerTests {
         val createdProfile = profileRepository.findByEmail(user.email)
 
         Assertions.assertNotNull(createdProfile)
+        profileRepository.delete(createdProfile!!)
         Assertions.assertEquals(user.email, createdProfile?.email)
         Assertions.assertEquals(user.firstName, createdProfile?.name)
         Assertions.assertEquals(user.lastName, createdProfile?.surname)
@@ -346,7 +351,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdUser?.firstName)
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
-        profileRepository.delete(createdProfile!!)
+
     }
 
     @Test
@@ -373,6 +378,7 @@ class KeycloakControllerTests {
         val createdProfile = profileRepository.findByEmail(user.email)
 
         Assertions.assertNotNull(createdProfile)
+        profileRepository.delete(createdProfile!!)
         Assertions.assertEquals(user.email, createdProfile?.email)
         Assertions.assertEquals(user.firstName, createdProfile?.name)
         Assertions.assertEquals(user.lastName, createdProfile?.surname)
@@ -384,7 +390,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.firstName, createdUser?.firstName)
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
-        profileRepository.delete(createdProfile!!)
+
     }
 
     @Test
@@ -422,10 +428,10 @@ class KeycloakControllerTests {
         val entity = TestUtils.testEntityHeader(user, managerToken)
 
         val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)
-
+        profileRepository.delete(profile)
         Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
 
-        profileRepository.delete(profile)
+
     }
 
     @Test
@@ -450,10 +456,10 @@ class KeycloakControllerTests {
         val entity = TestUtils.testEntityHeader(user, managerToken)
 
         val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)
-
+        profileRepository.delete(profile)
         Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
 
-        profileRepository.delete(profile)
+
     }
 
 }

@@ -137,7 +137,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
         Assertions.assertEquals(product.productId, body["productId"])
@@ -149,14 +156,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(ticket.description, body["description"])
         Assertions.assertEquals(ticket.title, body["title"])
 
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
-        brandRepository.delete(brand)
-        categoryRepository.delete(category)
+
     }
 
     @Test
@@ -195,7 +195,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
         Assertions.assertEquals(product.productId, body["productId"])
@@ -207,14 +214,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(ticket.description, body["description"])
         Assertions.assertEquals(ticket.title, body["title"])
 
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
-        brandRepository.delete(brand)
-        categoryRepository.delete(category)
+
     }
 
     @Test
@@ -253,7 +253,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
         Assertions.assertEquals(product.productId, body["productId"])
@@ -265,14 +272,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(ticket.description, body["description"])
         Assertions.assertEquals(ticket.title, body["title"])
 
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
-        brandRepository.delete(brand)
-        categoryRepository.delete(category)
+
     }
 
     @Test
@@ -311,8 +311,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -321,6 +319,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -359,7 +360,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -368,6 +368,8 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
     }
 
     @Test
@@ -385,8 +387,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
         
     }
 
@@ -405,8 +408,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
+
     }
 
     @Test
@@ -455,11 +459,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -473,6 +472,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
@@ -521,12 +525,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -540,6 +538,12 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
@@ -589,10 +593,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -606,6 +606,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
@@ -656,11 +661,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -675,6 +675,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(1, body.size)
+
+
     }
 
     @Test
@@ -723,11 +728,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -742,6 +742,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(1, body.size)
+
+
     }
 
     @Test
@@ -790,11 +795,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -809,6 +809,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
@@ -857,11 +862,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -876,6 +876,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
@@ -931,11 +936,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -951,6 +951,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
@@ -1006,11 +1011,6 @@ val category = Category()
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -1026,6 +1026,11 @@ val category = Category()
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(2, body.size)
+
+
     }
     @Test
     //@DirtiesContext
@@ -1078,11 +1083,6 @@ val brand = Brand()
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
@@ -1098,6 +1098,11 @@ val brand = Brand()
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(1, body.size)
+
+
     }
 
 
@@ -1225,9 +1230,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
@@ -1235,6 +1237,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -1285,9 +1290,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
@@ -1295,6 +1297,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
 
@@ -1347,9 +1352,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
         itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
@@ -1357,6 +1359,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+
     }
 
     @Test
@@ -1407,9 +1412,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
@@ -1417,6 +1419,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -1592,9 +1597,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         val entity = TestUtils.testEntityHeader(ticketAssign, clientToken)
 
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -1603,6 +1605,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -1643,9 +1648,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         val entity = TestUtils.testEntityHeader(ticketAssign, expertToken)
 
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -1654,6 +1656,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -1755,9 +1760,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketAssign, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -1766,6 +1768,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -1859,9 +1864,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketAssign, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -1870,6 +1872,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -1908,10 +1913,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -1920,6 +1921,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
+
     }
 
     @Test
@@ -2074,8 +2079,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2084,6 +2087,8 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     @Test
@@ -2122,9 +2127,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, expertToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2133,6 +2135,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -2171,10 +2176,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2183,6 +2184,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
+
     }
 
     @Test
@@ -2334,9 +2339,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2345,6 +2347,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -2499,9 +2504,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2511,6 +2513,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -2552,9 +2557,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, expertToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2564,6 +2566,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -2602,10 +2607,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2614,6 +2615,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
+
     }
 
     @Test
@@ -2882,9 +2887,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         val entity = TestUtils.testEntityHeader(ticketUpdate, expertToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
 
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -2893,6 +2895,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3047,9 +3052,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3058,6 +3060,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3211,9 +3216,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3222,6 +3224,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3260,9 +3265,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3271,6 +3273,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3310,9 +3315,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3321,6 +3323,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3360,9 +3365,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3371,6 +3373,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3410,9 +3415,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3421,6 +3423,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3459,9 +3464,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3470,6 +3472,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3508,9 +3513,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3519,6 +3521,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
@@ -3557,9 +3562,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
         profileRepository.delete(customer)
@@ -3568,6 +3570,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 }
 

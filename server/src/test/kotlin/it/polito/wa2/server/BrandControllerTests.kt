@@ -106,13 +106,13 @@ class BrandControllerTests {
             entity,
             String::class.java
         )
-
+        brandRepository.delete(brand)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 1)
 
-        brandRepository.delete(brand)
+
     }
 
     @Test
@@ -134,12 +134,12 @@ class BrandControllerTests {
             String::class.java
         )
 
-
+        brandRepository.delete(brand)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 1)
 
-        brandRepository.delete(brand)
+
     }
 
     @Test
@@ -160,13 +160,13 @@ class BrandControllerTests {
             entity,
             String::class.java
         )
-
+        brandRepository.delete(brand)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 1)
 
-        brandRepository.delete(brand)
+
     }
 
     @Test
@@ -187,13 +187,13 @@ class BrandControllerTests {
             entity,
             String::class.java
         )
-
+        brandRepository.delete(brand)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 1)
 
-        brandRepository.delete(brand)
+
     }
 
 
@@ -215,13 +215,13 @@ class BrandControllerTests {
             entity,
             String::class.java
         )
-
+        brandRepository.delete(brand)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(body.size, 1)
 
-        brandRepository.delete(brand)
+
     }
 
     @Test
@@ -350,9 +350,9 @@ class BrandControllerTests {
         )
 
 
-
-        Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
         brandRepository.delete(brand)
+        Assertions.assertEquals(HttpStatus.CONFLICT, result.statusCode)
+
     }
 
     @Test

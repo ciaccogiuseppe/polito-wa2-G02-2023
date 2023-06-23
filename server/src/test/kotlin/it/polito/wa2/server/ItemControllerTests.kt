@@ -129,6 +129,8 @@ class ItemControllerTests {
             entity,
             String::class.java
         )
+
+
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
         val createdItem = itemRepository.findByProductAndSerialNum(product1, 123451234)
@@ -139,6 +141,7 @@ class ItemControllerTests {
         productRepository.delete(product1)
         categoryRepository.delete(category)
         brandRepository.delete(brand)
+
     }
 
     @Test
@@ -171,15 +174,16 @@ class ItemControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
         itemRepository.delete(item)
         productRepository.delete(product1)
         categoryRepository.delete(category)
         brandRepository.delete(brand)
         profileRepository.delete(customer)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(1, body.size)
+
+
     }
     @Test
     fun getItemSuccess() {
@@ -211,16 +215,17 @@ class ItemControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseMap(result.body)
-        Assertions.assertEquals(product1.productId, body["productId"])
-        Assertions.assertEquals(item.serialNum, body["serialNum"])
-
         itemRepository.delete(item)
         productRepository.delete(product1)
         categoryRepository.delete(category)
         brandRepository.delete(brand)
         profileRepository.delete(customer)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseMap(result.body)
+        Assertions.assertEquals(product1.productId, body["productId"])
+        Assertions.assertEquals(item.serialNum, body["serialNum"])
+
+
     }
     @Test
     fun getAllItems() {
@@ -252,15 +257,16 @@ class ItemControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
         itemRepository.delete(item)
         productRepository.delete(product1)
         categoryRepository.delete(category)
         brandRepository.delete(brand)
         profileRepository.delete(customer)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(1, body.size)
+
+
     }
     @Test
     fun assignItemSuccess() {
@@ -300,16 +306,19 @@ class ItemControllerTests {
             entity,
             String::class.java
         )
+
+
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
         val item2 = itemRepository.findByProductAndSerialNum(product1, 12341234)
-        Assertions.assertEquals(item2!!.client!!.email, "client@polito.it")
-
-        itemRepository.delete(item)
+        itemRepository.delete(item2!!)
         productRepository.delete(product1)
         categoryRepository.delete(category)
         brandRepository.delete(brand)
         profileRepository.delete(customer)
+        Assertions.assertEquals(item2.client!!.email, "client@polito.it")
+
+
     }
 }
 

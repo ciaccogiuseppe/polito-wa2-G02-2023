@@ -162,7 +162,21 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-
+        messageRepository.delete(message4)
+        messageRepository.delete(message3)
+        messageRepository.delete(message2)
+        messageRepository.delete(message1)
+        ticketRepository.delete(ticket2)
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
+        productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(3, body.size)
@@ -180,21 +194,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
 
-        messageRepository.delete(message4)
-        messageRepository.delete(message3)
-        messageRepository.delete(message2)
-        messageRepository.delete(message1)
-        ticketRepository.delete(ticket2)
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(manager)
-        profileRepository.delete(customer)
-        profileRepository.delete(customer2)
-        profileRepository.delete(expert)
-        profileRepository.delete(expert2)
-        productRepository.delete(product)
-        brandRepository.delete(brand)
-        productRepository.delete(product)
+
     }
 
     @Test
@@ -249,7 +249,20 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-
+        messageRepository.delete(message4)
+        messageRepository.delete(message3)
+        messageRepository.delete(message2)
+        messageRepository.delete(message1)
+        ticketRepository.delete(ticket2)
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(manager)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
+        productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(3, body.size)
@@ -267,20 +280,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
 
-        messageRepository.delete(message4)
-        messageRepository.delete(message3)
-        messageRepository.delete(message2)
-        messageRepository.delete(message1)
-        ticketRepository.delete(ticket2)
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(manager)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        profileRepository.delete(expert2)
-        productRepository.delete(product)
-        brandRepository.delete(brand)
-        productRepository.delete(product)
+
     }
 
     @Test
@@ -335,10 +335,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         messageRepository.delete(message4)
         messageRepository.delete(message3)
         messageRepository.delete(message2)
@@ -354,6 +350,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -407,7 +407,19 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-
+        messageRepository.delete(message4)
+        messageRepository.delete(message3)
+        messageRepository.delete(message2)
+        messageRepository.delete(message1)
+        ticketRepository.delete(ticket2)
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(manager)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        brandRepository.delete(brand)
+        productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
         Assertions.assertEquals(3, body.size)
@@ -425,19 +437,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
         Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
 
-        messageRepository.delete(message4)
-        messageRepository.delete(message3)
-        messageRepository.delete(message2)
-        messageRepository.delete(message1)
-        ticketRepository.delete(ticket2)
-        ticketRepository.delete(ticket)
-        itemRepository.delete(item)
-        profileRepository.delete(customer)
-        profileRepository.delete(manager)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        brandRepository.delete(brand)
-        productRepository.delete(product)
+
     }
 
     @Test
@@ -493,9 +493,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         messageRepository.delete(message4)
         messageRepository.delete(message3)
         messageRepository.delete(message2)
@@ -511,6 +508,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -566,9 +566,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
-
         messageRepository.delete(message4)
         messageRepository.delete(message3)
         messageRepository.delete(message2)
@@ -584,6 +581,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
+
+
     }
 
     @Test
@@ -638,10 +638,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             String::class.java
         )
 
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(0, body.size)
         messageRepository.delete(message3)
         messageRepository.delete(message2)
         messageRepository.delete(message1)
@@ -656,6 +652,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(0, body.size)
+
     }
 
     @Test
@@ -674,9 +674,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
     }
 
     @Test
@@ -695,9 +695,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
+        profileRepository.delete(manager)
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
 
-        profileRepository.delete(manager)
+
     }
 
     @Test
@@ -756,16 +757,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
-        Assertions.assertEquals(
-            attachment2.getId(),
-            ((body[0]["attachments"]as ArrayList<*>)[0] as LinkedHashMap<*,*>)["attachmentId"]
-            )
-
         attachmentRepository.delete(attachment1)
         attachmentRepository.delete(attachment2)
         messageRepository.delete(message4)
@@ -781,6 +772,16 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        Assertions.assertEquals(1, body.size)
+
+        Assertions.assertEquals(
+            attachment2.getId(),
+            ((body[0]["attachments"]as ArrayList<*>)[0] as LinkedHashMap<*,*>)["attachmentId"]
+            )
+
+
     }
 
 
@@ -839,10 +840,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
 
         val addedMessage = messageRepository.findAllByTicket(ticket)
-
-        Assertions.assertEquals(1, addedMessage.size)
-        Assertions.assertEquals(message.text, addedMessage[0].text)
-
         messageRepository.delete(addedMessage[0])
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
@@ -853,6 +850,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(1, addedMessage.size)
+        Assertions.assertEquals(message.text, addedMessage[0].text)
+
+
     }
 
     @Test
@@ -907,9 +908,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
@@ -921,6 +919,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -976,11 +977,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
 
         val addedMessage = messageRepository.findAllByTicket(ticket)
-
-        Assertions.assertEquals(1, addedMessage.size)
-        Assertions.assertEquals(message.text, addedMessage[0].text)
-        Assertions.assertEquals(1, addedMessage[0].getId())
-
         messageRepository.delete(addedMessage[0])
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
@@ -992,6 +988,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(1, addedMessage.size)
+        Assertions.assertEquals(message.text, addedMessage[0].text)
+        Assertions.assertEquals(1, addedMessage[0].getId())
+
+
     }
 
     @Test
@@ -1047,9 +1048,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket)
         itemRepository.delete(item)
@@ -1061,6 +1059,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         productRepository.delete(product)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -1104,15 +1105,15 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
         brandRepository.delete(brand)
         productRepository.delete(product)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+
     }
 }
 
