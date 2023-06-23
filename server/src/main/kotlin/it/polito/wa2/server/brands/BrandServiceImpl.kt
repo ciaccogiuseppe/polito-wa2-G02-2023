@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 @Observed
-class BrandServiceImpl(private val brandRepository: BrandRepository): BrandService{
+class BrandServiceImpl(private val brandRepository: BrandRepository) : BrandService {
     @Transactional(readOnly = true)
     override fun getBrand(name: String): BrandDTO {
         return brandRepository.findByName(name)?.toDTO()

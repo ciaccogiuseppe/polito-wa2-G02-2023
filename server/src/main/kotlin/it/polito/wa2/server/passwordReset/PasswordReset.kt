@@ -6,12 +6,12 @@ import java.sql.Timestamp
 import java.util.*
 
 @Entity
-@Table(name="password_reset")
+@Table(name = "password_reset")
 class PasswordReset {
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
-    var profile : Profile? = null
+    @JoinColumn(name = "user_id", nullable = false)
+    var profile: Profile? = null
 
     @Id
     var uuid: UUID? = null
@@ -19,5 +19,5 @@ class PasswordReset {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    var created : Timestamp? = null
+    var created: Timestamp? = null
 }

@@ -7,7 +7,7 @@ import java.sql.Timestamp
 
 data class TicketDTO(
     @field:Positive
-    val ticketId : Long?,
+    val ticketId: Long?,
     @field:NotBlank(message = "A title is required")
     val title: String,
     @field:NotBlank
@@ -19,11 +19,15 @@ data class TicketDTO(
     @field:Positive
     val serialNum: Long,
 
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val clientEmail: String?,
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val expertEmail: String?,
     val status: TicketStatus?,
     val createdTimestamp: Timestamp?
@@ -31,10 +35,12 @@ data class TicketDTO(
 
 data class TicketAssignDTO(
     @field:Positive
-    val ticketId : Long,
+    val ticketId: Long,
     @field:NotBlank(message = "expert email is required")
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val expertEmail: String,
     @field:PositiveOrZero
     val priority: Int
@@ -42,7 +48,7 @@ data class TicketAssignDTO(
 
 data class TicketUpdateDTO(
     @field:Positive
-    val ticketId : Long,
+    val ticketId: Long,
     val newState: TicketStatus
 )
 

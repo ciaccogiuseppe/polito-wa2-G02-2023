@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 
 
-@CrossOrigin(origins =["http://localhost:3001"])
+@CrossOrigin(origins = ["http://localhost:3001"])
 @RestController
 @Observed
 class AuthController(
@@ -30,7 +30,7 @@ class AuthController(
         val headers = HttpHeaders()
         headers.set("Content-Type", "application/x-www-form-urlencoded")
         val body = "grant_type=password&username=${loginRequest.username}&password=${loginRequest.password}" +
-                "&client_id=$clientId"+"&scope=openid offline_access"
+                "&client_id=$clientId" + "&scope=openid offline_access"
 
         val entity = HttpEntity(body, headers)
 
@@ -62,7 +62,8 @@ class AuthController(
                 tokenUrl,
                 HttpMethod.POST,
                 entity,
-                String::class.java)
+                String::class.java
+            )
             println(response)
             val responseBody = response.body ?: throw IllegalStateException("Unable to retrieve access token")
             val tokenResponse = TokenResponse(
@@ -72,7 +73,7 @@ class AuthController(
             )
             return LoginResponse(tokenResponse.refreshToken, tokenResponse.token, tokenResponse.expiresIn)
 
-        } catch(e: RuntimeException){
+        } catch (e: RuntimeException) {
             println(e)
             throw LoginFailedException("Login failed")
         }
@@ -87,5 +88,14 @@ class AuthController(
 data class LoginRequest(@field:NotBlank val username: String, @field:NotBlank val password: String)
 
 data class RefreshRequest(@field:NotBlank val refreshToken: String)
-data class LoginResponse(@field:NotBlank val refreshToken: String, @field:NotBlank val token: String, @field:Positive val expiresIn: Long)
-data class TokenResponse(@field:NotBlank val refreshToken: String, @field:NotBlank val token: String, @field:Positive val expiresIn:Long)
+data class LoginResponse(
+    @field:NotBlank val refreshToken: String,
+    @field:NotBlank val token: String,
+    @field:Positive val expiresIn: Long
+)
+
+data class TokenResponse(
+    @field:NotBlank val refreshToken: String,
+    @field:NotBlank val token: String,
+    @field:Positive val expiresIn: Long
+)

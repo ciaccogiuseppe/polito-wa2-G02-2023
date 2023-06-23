@@ -8,24 +8,24 @@ import jakarta.persistence.*
 import java.sql.Timestamp
 
 @Entity
-@Table(name="messages")
-class Message: EntityBase<Long>() {
+@Table(name = "messages")
+class Message : EntityBase<Long>() {
 
     @ManyToOne
-    @JoinColumn(name="ticket_id", nullable = false)
-    var ticket : Ticket? = null
+    @JoinColumn(name = "ticket_id", nullable = false)
+    var ticket: Ticket? = null
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    var sender : Profile? = null
+    var sender: Profile? = null
 
     @OneToMany(mappedBy = "message")
     var attachments = mutableSetOf<Attachment>()
 
     @Column(nullable = false)
-    var text : String = ""
+    var text: String = ""
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    var sentTimestamp : Timestamp? = null
+    var sentTimestamp: Timestamp? = null
 }

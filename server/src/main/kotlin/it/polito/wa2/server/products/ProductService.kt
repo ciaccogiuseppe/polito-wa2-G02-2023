@@ -5,5 +5,5 @@ interface ProductService {
 
     fun getProduct(productId: String): ProductDTO
 
-    fun addProduct(productDTO: ProductDTO) : ProductDTO
+    fun addProduct(productDTO: ProductDTO): ProductDTO
 }

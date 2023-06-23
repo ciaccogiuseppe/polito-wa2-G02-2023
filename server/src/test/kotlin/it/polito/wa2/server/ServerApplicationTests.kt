@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest
 @Disabled
 class ServerApplicationTests {
 
-	@Test
-	fun contextLoads() {
-	}
+    @Test
+    fun contextLoads() {
+    }
 
 }

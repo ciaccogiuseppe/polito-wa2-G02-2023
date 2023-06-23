@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
 @RestController
-@CrossOrigin(origins =["http://localhost:3001"])
+@CrossOrigin(origins = ["http://localhost:3001"])
 @Observed
 class KeycloakController(private val keycloakService: KeycloakService) {
     @PostMapping("/API/signup")
@@ -22,11 +22,13 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         checkInputUser(userDTO, br)
         keycloakService.addClient(userDTO!!)
     }
+
     @GetMapping("/API/resetPassword/{email}")
     fun resetPassword(@PathVariable email: String) {
         checkEmail(email)
         keycloakService.resetPassword(email)
     }
+
     @PutMapping("/API/resetPassword/")
     fun applyResetPassword(@Valid @RequestBody passwordDTO: PasswordDTO?, br: BindingResult) {
         checkInputPassword(passwordDTO, br)
@@ -48,7 +50,12 @@ class KeycloakController(private val keycloakService: KeycloakService) {
     }
 
     @PutMapping("/API/client/user/{email}")
-    fun clientUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
+    fun clientUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
         val userEmail = retrieveUserEmail(principal)
         checkEmailWithLoggedUser(email, userEmail)
         checkInputUpdateUser(userDTO, br)
@@ -56,7 +63,12 @@ class KeycloakController(private val keycloakService: KeycloakService) {
     }
 
     @PutMapping("/API/expert/user/{email}")
-    fun expertUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
+    fun expertUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
         val userEmail = retrieveUserEmail(principal)
         checkEmailWithLoggedUser(email, userEmail)
         checkInputUpdateUser(userDTO, br)
@@ -64,7 +76,12 @@ class KeycloakController(private val keycloakService: KeycloakService) {
     }
 
     @PutMapping("/API/vendor/user/{email}")
-    fun vendorUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
+    fun vendorUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
         val userEmail = retrieveUserEmail(principal)
         checkEmailWithLoggedUser(email, userEmail)
         checkInputUpdateUser(userDTO, br)
@@ -72,40 +89,45 @@ class KeycloakController(private val keycloakService: KeycloakService) {
     }
 
     @PutMapping("/API/manager/user/{email}")
-    fun managerUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserUpdateDTO?, br: BindingResult) {
+    fun managerUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
         checkEmail(email)
         checkInputUpdateUser(userDTO, br)
         keycloakService.updateUser(email, userDTO!!)
     }
 
-    private fun checkInputUser(userDTO: UserDTO?, br: BindingResult){
+    private fun checkInputUser(userDTO: UserDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableUserException("Wrong user format")
         if (userDTO == null)
             throw BadRequestUserException("User must not be NULL")
     }
 
-    private fun checkInputPassword(passwordDTO: PasswordDTO?, br: BindingResult){
+    private fun checkInputPassword(passwordDTO: PasswordDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableUserException("Wrong data format")
         if (passwordDTO == null)
             throw BadRequestUserException("Request must not be NULL")
     }
 
-    private fun checkInputUpdateUser(userDTO: UserUpdateDTO?, br: BindingResult){
+    private fun checkInputUpdateUser(userDTO: UserUpdateDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableUserException("Wrong user format")
         if (userDTO == null)
             throw BadRequestUserException("User must not be NULL")
     }
 
-    private fun checkEmailWithLoggedUser(email: String, emailLogged: String){
+    private fun checkEmailWithLoggedUser(email: String, emailLogged: String) {
         checkEmail(email)
-        if(email != emailLogged)
+        if (email != emailLogged)
             throw ForbiddenException("You cannot updated profiles that are not yours")
     }
 
-    private fun checkEmail(email: String){
+    private fun checkEmail(email: String) {
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
     }

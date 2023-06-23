@@ -4,5 +4,5 @@ interface BrandService {
     fun getBrand(name: String): BrandDTO
     fun getAllBrands(): List<BrandDTO>
 
-    fun addBrand(brandDTO:BrandDTO) : BrandDTO
+    fun addBrand(brandDTO: BrandDTO): BrandDTO
 }

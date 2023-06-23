@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 class AddressServiceImpl(
     private val addressRepository: AddressRepository,
     private val profileRepository: ProfileRepository
-): AddressService {
+) : AddressService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.MANAGER}')")
     override fun getAddressOfClient(email: String): AddressDTO? {
@@ -26,7 +26,7 @@ class AddressServiceImpl(
 
     @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.MANAGER}')")
     override fun updateAddressOfClient(email: String, newAddress: AddressDTO) {
-        val addr= addressRepository.findByClient(getProfileByEmail(email))
+        val addr = addressRepository.findByClient(getProfileByEmail(email))
             ?: throw AddressNotFoundException("Address not found")
 
         addr.country = newAddress.country

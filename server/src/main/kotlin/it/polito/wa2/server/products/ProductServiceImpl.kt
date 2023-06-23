@@ -10,14 +10,16 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Service @Transactional(readOnly = true) @Observed
+@Service
+@Transactional(readOnly = true)
+@Observed
 class ProductServiceImpl(
     private val productRepository: ProductRepository,
     private val brandRepository: BrandRepository,
     private val categoryRepository: CategoryRepository
-): ProductService {
+) : ProductService {
     override fun getAllProducts(): List<ProductDTO> {
-        return productRepository.findAll().map {it.toDTO()}
+        return productRepository.findAll().map { it.toDTO() }
     }
 
     override fun getProduct(productId: String): ProductDTO {

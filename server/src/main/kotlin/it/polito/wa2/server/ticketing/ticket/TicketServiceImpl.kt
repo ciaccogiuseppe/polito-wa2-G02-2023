@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
-@Service @Transactional @Observed
+@Service
+@Transactional
+@Observed
 class TicketServiceImpl(
     private val ticketRepository: TicketRepository,
     private val profileRepository: ProfileRepository,
@@ -29,7 +31,7 @@ class TicketServiceImpl(
     private val profileService: ProfileService,
     private val itemRepository: ItemRepository,
     private val itemService: ItemService
-): TicketService {
+) : TicketService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun managerGetTicket(ticketId: Long, managerEmail: String): TicketDTO {
@@ -73,7 +75,7 @@ class TicketServiceImpl(
         val expert = if (expertEmail != null) getProfileByEmail(expertEmail, userEmail) else null
         val product = if (productId != null) getProduct(productId) else null
         return if (clientEmail != client.email) listOf()
-            else filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
+        else filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
     }
 
     @Transactional(readOnly = true)
@@ -94,7 +96,7 @@ class TicketServiceImpl(
         val product: Product? = if (productId != null) getProduct(productId) else null
 
         return if (expertEmail != expert.email) listOf()
-            else filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
+        else filterTickets(client, minPriority, maxPriority, product, createdAfter, createdBefore, expert, status)
     }
 
     @Transactional(readOnly = true)
@@ -122,10 +124,10 @@ class TicketServiceImpl(
         val timestamp = Timestamp.valueOf(LocalDateTime.now())
         val item = getItem(ticketDTO.productId, ticketDTO.serialNum, userEmail)
         val client = getProfileByEmail(userEmail, userEmail)
-        if(item.client != client)
+        if (item.client != client)
             throw ForbiddenException("You cannot create a ticket for this item")
         checkWarrantyValidity(item, timestamp)
-        val ticket =  ticketRepository.save(ticketDTO.toNewTicket(item, client, timestamp))
+        val ticket = ticketRepository.save(ticketDTO.toNewTicket(item, client, timestamp))
 
         ticketHistoryRepository.save(
             newTicketHistory(
@@ -209,13 +211,17 @@ class TicketServiceImpl(
             .findAll()
             .filter {
                 (client == null || it.client == client) &&
-                (minPriority == null || it.priority >= minPriority) &&
-                (maxPriority == null || it.priority <= maxPriority) &&
-                (product == null || it.item!!.product == product) &&
-                (createdAfter == null || it.createdTimestamp!!.after(createdAfter) || it.createdTimestamp!!.equals(createdAfter)) &&
-                (createdBefore == null || it.createdTimestamp!!.before(createdBefore) || it.createdTimestamp!!.equals(createdBefore)) &&
-                (expert == null || it.expert == expert) &&
-                (status == null || status.contains(it.status))
+                        (minPriority == null || it.priority >= minPriority) &&
+                        (maxPriority == null || it.priority <= maxPriority) &&
+                        (product == null || it.item!!.product == product) &&
+                        (createdAfter == null || it.createdTimestamp!!.after(createdAfter) || it.createdTimestamp!!.equals(
+                            createdAfter
+                        )) &&
+                        (createdBefore == null || it.createdTimestamp!!.before(createdBefore) || it.createdTimestamp!!.equals(
+                            createdBefore
+                        )) &&
+                        (expert == null || it.expert == expert) &&
+                        (status == null || status.contains(it.status))
             }.map { it.toDTO() }
     }
 
@@ -223,7 +229,7 @@ class TicketServiceImpl(
         val oldState = ticket.status
         val newState = ticketUpdateDTO.newState
 
-        when(user.role) {
+        when (user.role) {
             ProfileRole.MANAGER -> checkNewStateManager(ticketUpdateDTO.newState, ticket)
             ProfileRole.EXPERT -> checkNewStateExpert(ticketUpdateDTO.newState, ticket)
             ProfileRole.CLIENT -> checkNewStateClient(ticketUpdateDTO.newState, ticket)
@@ -250,14 +256,16 @@ class TicketServiceImpl(
                 isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
                 checkWarrantyValidity(ticket.item!!, Timestamp.valueOf(LocalDateTime.now()))
             }
+
             TicketStatus.CLOSED -> {
                 isNextStateValid(newState, hashSetOf(TicketStatus.REOPENED))
                 checkWarrantyValidity(ticket.item!!, Timestamp.valueOf(LocalDateTime.now()))
             }
+
             TicketStatus.IN_PROGRESS -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED))
             TicketStatus.REOPENED -> isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED))
         }
-        if(newState == TicketStatus.REOPENED)
+        if (newState == TicketStatus.REOPENED)
             ticket.expert = null
     }
 
@@ -274,10 +282,14 @@ class TicketServiceImpl(
     private fun checkNewStateManager(newState: TicketStatus, ticket: Ticket) {
         when (ticket.status) {
             TicketStatus.OPEN -> {
-                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                isNextStateValid(
+                    newState,
+                    hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS)
+                )
                 if (newState == TicketStatus.IN_PROGRESS)
                     throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS>: the expert must be assigned")
             }
+
             TicketStatus.RESOLVED -> isNextStateValid(newState, hashSetOf(TicketStatus.CLOSED))
             TicketStatus.CLOSED -> isNextStateValid(newState, hashSetOf())
             TicketStatus.IN_PROGRESS -> {
@@ -286,8 +298,12 @@ class TicketServiceImpl(
                     ticket.expert = null
                 }
             }
+
             TicketStatus.REOPENED -> {
-                isNextStateValid(newState, hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS))
+                isNextStateValid(
+                    newState,
+                    hashSetOf(TicketStatus.RESOLVED, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS)
+                )
                 if (newState == TicketStatus.IN_PROGRESS && ticket.expert == null)
                     throw UnprocessableTicketException("It's not possible to set the status to <IN PROGRESS>: the expert must be assigned")
             }
@@ -321,7 +337,9 @@ class TicketServiceImpl(
     }
 
     private fun checkWarrantyValidity(item: Item, timestamp: Timestamp) {
-        if(item.validFromTimestamp!!.toLocalDateTime().plusMonths(item.durationMonths!!).isBefore(timestamp.toLocalDateTime()))
+        if (item.validFromTimestamp!!.toLocalDateTime().plusMonths(item.durationMonths!!)
+                .isBefore(timestamp.toLocalDateTime())
+        )
             throw ForbiddenException("Warranty has expired for this item")
     }
 }

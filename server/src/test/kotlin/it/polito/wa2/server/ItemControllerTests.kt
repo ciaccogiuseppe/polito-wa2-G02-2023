@@ -21,7 +21,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.*
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -33,10 +34,11 @@ import java.util.*
 
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ItemControllerTests {
     val json = BasicJsonParser()
+
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -52,7 +54,7 @@ class ItemControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -63,7 +65,7 @@ class ItemControllerTests {
 
         @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
         }
@@ -74,25 +76,32 @@ class ItemControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
         }
     }
+
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var productRepository: ProductRepository
+
     @Autowired
-    lateinit var brandRepository:BrandRepository
+    lateinit var brandRepository: BrandRepository
+
     @Autowired
     lateinit var categoryRepository: CategoryRepository
+
     @Autowired
     lateinit var itemRepository: ItemRepository
+
     @Autowired
     lateinit var profileRepository: ProfileRepository
 
@@ -106,10 +115,10 @@ class ItemControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
         productRepository.save(product1)
 
         val itemEntity = ItemDTO(
@@ -157,13 +166,20 @@ class ItemControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
         productRepository.save(product1)
 
-        val item = TestUtils.testItem(product1, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product1,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
@@ -180,11 +196,12 @@ class ItemControllerTests {
         brandRepository.delete(brand)
         profileRepository.delete(customer)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(1, body.size)
 
 
     }
+
     @Test
     fun getItemSuccess() {
 
@@ -198,13 +215,20 @@ class ItemControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
         productRepository.save(product1)
 
-        val item = TestUtils.testItem(product1, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product1,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
 
         val entity = TestUtils.testEntityHeader(null, vendorToken)
@@ -227,6 +251,7 @@ class ItemControllerTests {
 
 
     }
+
     @Test
     fun getAllItems() {
 
@@ -240,13 +265,20 @@ class ItemControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
         productRepository.save(product1)
 
-        val item = TestUtils.testItem(product1, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product1,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
 
         val entity = TestUtils.testEntityHeader(null, clientToken)
@@ -263,11 +295,12 @@ class ItemControllerTests {
         brandRepository.delete(brand)
         profileRepository.delete(customer)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(1, body.size)
 
 
     }
+
     @Test
     fun assignItemSuccess() {
 
@@ -281,14 +314,21 @@ class ItemControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
         productRepository.save(product1)
 
-        val item = TestUtils.testItem(product1, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
-        item.client=null
+        val item = TestUtils.testItem(
+            product1,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
+        item.client = null
         itemRepository.save(item)
 
         val itemEntity = object {

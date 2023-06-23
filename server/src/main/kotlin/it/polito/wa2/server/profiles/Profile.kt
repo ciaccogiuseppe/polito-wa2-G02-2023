@@ -4,22 +4,25 @@ import it.polito.wa2.server.EntityBase
 import it.polito.wa2.server.addresses.Address
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.items.Item
-import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.passwordReset.PasswordReset
+import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import jakarta.persistence.*
 
 @Entity
-@Table(name="profiles")
+@Table(name = "profiles")
 class Profile : EntityBase<Long>() {
 
-    @Column(nullable=false, unique = true)
+    @Column(nullable = false, unique = true)
     var email: String = ""
+
     @Column(nullable = false)
     var name: String = ""
+
     @Column(nullable = false)
     var surname: String = ""
+
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     var role: ProfileRole? = null
@@ -42,13 +45,13 @@ class Profile : EntityBase<Long>() {
     @OneToMany(mappedBy = "currentExpert")
     val historyExpert = mutableSetOf<TicketHistory>()
 
-    @OneToOne(mappedBy="client", cascade = [CascadeType.ALL])
+    @OneToOne(mappedBy = "client", cascade = [CascadeType.ALL])
     var address: Address? = null
 
     @OneToMany(mappedBy = "client")
     val items = mutableSetOf<Item>()
 
-    @OneToMany(mappedBy="profile")
+    @OneToMany(mappedBy = "profile")
     val passwordResets = mutableSetOf<PasswordReset>()
 
     @ManyToMany

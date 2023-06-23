@@ -9,10 +9,10 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
-@CrossOrigin(origins =["http://localhost:3001"])
+@CrossOrigin(origins = ["http://localhost:3001"])
 @RestController
 @Observed
-class BrandController (private val brandService : BrandService) {
+class BrandController(private val brandService: BrandService) {
     @GetMapping("/API/public/brands/")
     fun getAllBrands(): List<BrandDTO> {
         return brandService.getAllBrands()

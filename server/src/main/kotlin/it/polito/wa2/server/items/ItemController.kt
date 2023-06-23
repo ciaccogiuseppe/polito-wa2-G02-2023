@@ -19,8 +19,10 @@ class ItemController(private val itemService: ItemService) {
     }
 
     @GetMapping("/API/private/products/{productId}/items/{serialNum}")
-    fun getItemByProductIdAndSerialNum(@PathVariable("productId") productId: String,
-                                       @PathVariable("serialNum") serialNum: Long): ItemDTO? {
+    fun getItemByProductIdAndSerialNum(
+        @PathVariable("productId") productId: String,
+        @PathVariable("serialNum") serialNum: Long
+    ): ItemDTO? {
         checkProductId(productId)
         checkSerialNum(serialNum)
         return itemService.getItemByProductIdAndSerialNum(productId, serialNum)
@@ -39,8 +41,10 @@ class ItemController(private val itemService: ItemService) {
     }
 
     @PutMapping("/API/client/products/items/register")
-    fun assignClient(principal: Principal,
-                     @RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult): ItemDTO {
+    fun assignClient(
+        principal: Principal,
+        @RequestBody @Valid itemDTO: ItemDTO?, br: BindingResult
+    ): ItemDTO {
         val userEmail = retrieveUserEmail(principal)
         checkInputItem(itemDTO, br)
         return itemService.assignClient(userEmail, itemDTO!!)

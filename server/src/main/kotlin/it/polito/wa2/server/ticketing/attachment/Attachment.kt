@@ -6,17 +6,17 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name="attachments")
-class Attachment :EntityBase<Long>(){
+@Table(name = "attachments")
+class Attachment : EntityBase<Long>() {
 
     @Column(nullable = false)
-    var name : String = ""
+    var name: String = ""
 
-    @Column(columnDefinition="bytea", nullable = false)
+    @Column(columnDefinition = "bytea", nullable = false)
     var attachment: ByteArray = byteArrayOf()
 
     @ManyToOne
-    @JoinColumn(name="message_id")
-    var message : Message? = null
+    @JoinColumn(name = "message_id")
+    var message: Message? = null
 
 }

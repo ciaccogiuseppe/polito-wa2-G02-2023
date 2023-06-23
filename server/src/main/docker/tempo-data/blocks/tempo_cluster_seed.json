@@ -1,1 +1,12 @@
-{"UID":"57594e66-3915-45bf-8924-4213f27b3397","created_at":"2023-05-30T15:13:13.7410654Z","version":{"version":"main-a7d9931","revision":"a7d9931be","branch":"main","buildUser":"","buildDate":"","goVersion":"go1.20.4"}}
+{
+  "UID": "57594e66-3915-45bf-8924-4213f27b3397",
+  "created_at": "2023-05-30T15:13:13.7410654Z",
+  "version": {
+    "version": "main-a7d9931",
+    "revision": "a7d9931be",
+    "branch": "main",
+    "buildUser": "",
+    "buildDate": "",
+    "goVersion": "go1.20.4"
+  }
+}

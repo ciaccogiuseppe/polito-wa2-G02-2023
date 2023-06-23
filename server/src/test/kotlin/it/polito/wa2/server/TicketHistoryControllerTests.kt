@@ -23,8 +23,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.*
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -33,13 +33,13 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.net.URI
 import java.sql.Timestamp
 import java.util.*
-import kotlin.collections.LinkedHashMap
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class TicketHistoryControllerTests {
     val json = BasicJsonParser()
+
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -54,7 +54,7 @@ class TicketHistoryControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -64,7 +64,7 @@ class TicketHistoryControllerTests {
 
         @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
         }
@@ -75,29 +75,38 @@ class TicketHistoryControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
         }
     }
+
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var profileRepository: ProfileRepository
+
     @Autowired
     lateinit var productRepository: ProductRepository
+
     @Autowired
     lateinit var ticketRepository: TicketRepository
+
     @Autowired
     lateinit var ticketHistoryRepository: TicketHistoryRepository
+
     @Autowired
     lateinit var brandRepository: BrandRepository
+
     @Autowired
     lateinit var categoryRepository: CategoryRepository
+
     @Autowired
     lateinit var itemRepository: ItemRepository
 
@@ -175,25 +184,50 @@ class TicketHistoryControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
         val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
-        val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
+        val history1ticket1 = TestUtils.testTicketHistory(
+            ticket1,
+            expert,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer
+        )
         ticketHistoryRepository.save(history1ticket1)
 
         val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket2.getId()}")
@@ -218,7 +252,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 0)
 
@@ -235,33 +269,72 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
         val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
-        val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
-        val history2ticket2 = TestUtils.testTicketHistory(ticket2, expert, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(19), customer)
-        val history3ticket2 = TestUtils.testTicketHistory(ticket2, expert, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(122), customer)
+        val history1ticket1 = TestUtils.testTicketHistory(
+            ticket1,
+            expert,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer
+        )
+        val history2ticket2 = TestUtils.testTicketHistory(
+            ticket2,
+            expert,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(19),
+            customer
+        )
+        val history3ticket2 = TestUtils.testTicketHistory(
+            ticket2,
+            expert,
+            TicketStatus.REOPENED,
+            TicketStatus.RESOLVED,
+            Timestamp(122),
+            customer
+        )
         ticketHistoryRepository.save(history1ticket1)
         ticketHistoryRepository.save(history2ticket2)
         ticketHistoryRepository.save(history3ticket2)
 
 
-        val uri= URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket2.getId()}")
+        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket2.getId()}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -284,7 +357,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 2)
 
@@ -295,7 +368,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[0]["oldState"], history2ticket2.oldState.name)
         Assertions.assertEquals(body[0]["currentExpertEmail"], history2ticket2.currentExpert!!.email)
         Assertions.assertEquals(body[0]["userEmail"], history2ticket2.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2ticket2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[0]["updatedTimestamp"].toString()
+                .startsWith(history2ticket2.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
         Assertions.assertEquals(body[1]["historyId"], history3ticket2.getId())
         Assertions.assertEquals(body[1]["ticketId"], history3ticket2.ticket!!.getId())
@@ -303,7 +379,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["oldState"], history3ticket2.oldState.name)
         Assertions.assertEquals(body[1]["currentExpertEmail"], history3ticket2.currentExpert!!.email)
         Assertions.assertEquals(body[1]["userEmail"], history3ticket2.user!!.email)
-        Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3ticket2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[1]["updatedTimestamp"].toString()
+                .startsWith(history3ticket2.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
 
     }
@@ -318,23 +397,39 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
 
-        val history1ticket1 = TestUtils.testTicketHistory(ticket1, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer)
+        val history1ticket1 = TestUtils.testTicketHistory(
+            ticket1,
+            expert,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer
+        )
         ticketHistoryRepository.save(history1ticket1)
 
 
@@ -416,25 +511,55 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer2)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
-        val history2customer2 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(19), customer2)
-        val history3customer2 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(122), customer2)
+        val history1customer1 = TestUtils.testTicketHistory(
+            ticket,
+            expert,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer1
+        )
+        val history2customer2 = TestUtils.testTicketHistory(
+            ticket,
+            expert,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(19),
+            customer2
+        )
+        val history3customer2 = TestUtils.testTicketHistory(
+            ticket,
+            expert,
+            TicketStatus.REOPENED,
+            TicketStatus.RESOLVED,
+            Timestamp(122),
+            customer2
+        )
         ticketHistoryRepository.save(history1customer1)
         ticketHistoryRepository.save(history2customer2)
         ticketHistoryRepository.save(history3customer2)
@@ -464,7 +589,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         categoryRepository.delete(category)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 2)
         Assertions.assertEquals(body[0]["historyId"], history2customer2.getId())
@@ -473,7 +598,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[0]["oldState"], history2customer2.oldState.name)
         Assertions.assertEquals(body[0]["currentExpertEmail"], history2customer2.currentExpert!!.email)
         Assertions.assertEquals(body[0]["userEmail"], history2customer2.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2customer2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[0]["updatedTimestamp"].toString()
+                .startsWith(history2customer2.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
         Assertions.assertEquals(body[1]["historyId"], history3customer2.getId())
         Assertions.assertEquals(body[1]["ticketId"], history3customer2.ticket!!.getId())
@@ -481,7 +609,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["oldState"], history3customer2.oldState.name)
         Assertions.assertEquals(body[1]["currentExpertEmail"], history3customer2.currentExpert!!.email)
         Assertions.assertEquals(body[1]["userEmail"], history3customer2.user!!.email)
-        Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3customer2.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[1]["updatedTimestamp"].toString()
+                .startsWith(history3customer2.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
 
     }
@@ -496,24 +627,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer1)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
+        val history1customer1 = TestUtils.testTicketHistory(
+            ticket,
+            expert,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer1
+        )
         ticketHistoryRepository.save(history1customer1)
 
         val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?userEmail=not.found@polito.it")
@@ -536,7 +683,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
 
 
     }
@@ -595,25 +741,55 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert2)
         profileRepository.save(expert3)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert3,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1expert2 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
-        val history2expert3 = TestUtils.testTicketHistory(ticket, expert3, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(19), customer1)
-        val history3expert3 = TestUtils.testTicketHistory(ticket, expert3, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(122), customer1)
+        val history1expert2 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer1
+        )
+        val history2expert3 = TestUtils.testTicketHistory(
+            ticket,
+            expert3,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(19),
+            customer1
+        )
+        val history3expert3 = TestUtils.testTicketHistory(
+            ticket,
+            expert3,
+            TicketStatus.REOPENED,
+            TicketStatus.RESOLVED,
+            Timestamp(122),
+            customer1
+        )
         ticketHistoryRepository.save(history1expert2)
         ticketHistoryRepository.save(history2expert3)
         ticketHistoryRepository.save(history3expert3)
@@ -643,7 +819,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         categoryRepository.delete(category)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 2)
         Assertions.assertEquals(body[0]["historyId"], history2expert3.getId())
@@ -652,7 +828,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[0]["oldState"], history2expert3.oldState.name)
         Assertions.assertEquals(body[0]["currentExpertEmail"], history2expert3.currentExpert!!.email)
         Assertions.assertEquals(body[0]["userEmail"], history2expert3.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2expert3.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[0]["updatedTimestamp"].toString()
+                .startsWith(history2expert3.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
         Assertions.assertEquals(body[1]["historyId"], history3expert3.getId())
         Assertions.assertEquals(body[1]["ticketId"], history3expert3.ticket!!.getId())
@@ -660,7 +839,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["oldState"], history3expert3.oldState.name)
         Assertions.assertEquals(body[1]["currentExpertEmail"], history3expert3.currentExpert!!.email)
         Assertions.assertEquals(body[1]["userEmail"], history3expert3.user!!.email)
-        Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3expert3.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[1]["updatedTimestamp"].toString()
+                .startsWith(history3expert3.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
     }
 
@@ -674,26 +856,43 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer1)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1customer1 = TestUtils.testTicketHistory(ticket, expert, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
+        val history1customer1 = TestUtils.testTicketHistory(
+            ticket,
+            expert,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer1
+        )
         ticketHistoryRepository.save(history1customer1)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=not.found@polito.it")
+        val uri =
+            URI("http://localhost:$port/API/manager/ticketing/history/filter?currentExpertEmail=not.found@polito.it")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -713,7 +912,6 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
 
 
     }
@@ -770,30 +968,61 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
-        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
-        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
+        val history1timestamp10 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(10),
+            customer1
+        )
+        val history2timestamp20 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(20),
+            customer1
+        )
+        val history3timestamp30 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.REOPENED,
+            TicketStatus.RESOLVED,
+            Timestamp(30),
+            customer1
+        )
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(20).toLocalDateTime()}")
+        val uri =
+            URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(20).toLocalDateTime()}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -817,7 +1046,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         categoryRepository.delete(category)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 2)
         Assertions.assertEquals(body[0]["historyId"], history2timestamp20.getId())
@@ -826,7 +1055,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[0]["oldState"], history2timestamp20.oldState.name)
         Assertions.assertEquals(body[0]["currentExpertEmail"], history2timestamp20.currentExpert!!.email)
         Assertions.assertEquals(body[0]["userEmail"], history2timestamp20.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history2timestamp20.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[0]["updatedTimestamp"].toString()
+                .startsWith(history2timestamp20.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
         Assertions.assertEquals(body[1]["historyId"], history3timestamp30.getId())
         Assertions.assertEquals(body[1]["ticketId"], history3timestamp30.ticket!!.getId())
@@ -834,7 +1066,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[1]["oldState"], history3timestamp30.oldState.name)
         Assertions.assertEquals(body[1]["currentExpertEmail"], history3timestamp30.currentExpert!!.email)
         Assertions.assertEquals(body[1]["userEmail"], history3timestamp30.user!!.email)
-        Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history3timestamp30.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[1]["updatedTimestamp"].toString()
+                .startsWith(history3timestamp30.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
 
     }
@@ -849,30 +1084,61 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
-        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
-        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
+        val history1timestamp10 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(10),
+            customer1
+        )
+        val history2timestamp20 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(20),
+            customer1
+        )
+        val history3timestamp30 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.REOPENED,
+            TicketStatus.RESOLVED,
+            Timestamp(30),
+            customer1
+        )
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedBefore=${Timestamp(19).toLocalDateTime()}")
+        val uri =
+            URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedBefore=${Timestamp(19).toLocalDateTime()}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -896,7 +1162,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         categoryRepository.delete(category)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 1)
         Assertions.assertEquals(body[0]["historyId"], history1timestamp10.getId())
@@ -905,7 +1171,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
         Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
         Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[0]["updatedTimestamp"].toString()
+                .startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
 
     }
@@ -920,31 +1189,65 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
-        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
-        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
+        val history1timestamp10 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(10),
+            customer1
+        )
+        val history2timestamp20 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(20),
+            customer1
+        )
+        val history3timestamp30 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.REOPENED,
+            TicketStatus.RESOLVED,
+            Timestamp(30),
+            customer1
+        )
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(9).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(9).toLocalDateTime()}&updatedBefore=${
+                Timestamp(10).toLocalDateTime()
+            }"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -969,7 +1272,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         categoryRepository.delete(category)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 1)
         Assertions.assertEquals(body[0]["historyId"], history1timestamp10.getId())
@@ -978,7 +1281,10 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(body[0]["oldState"], history1timestamp10.oldState.name)
         Assertions.assertEquals(body[0]["currentExpertEmail"], history1timestamp10.currentExpert!!.email)
         Assertions.assertEquals(body[0]["userEmail"], history1timestamp10.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[0]["updatedTimestamp"].toString()
+                .startsWith(history1timestamp10.updatedTimestamp!!.toInstant().toString().replace("Z", ""))
+        )
 
     }
 
@@ -992,31 +1298,65 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer1)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
 
         val item = TestUtils.testItem(product, customer1, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
-        val history1timestamp10 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(10), customer1)
-        val history2timestamp20 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(20), customer1)
-        val history3timestamp30 = TestUtils.testTicketHistory(ticket, expert2, TicketStatus.REOPENED, TicketStatus.RESOLVED, Timestamp(30), customer1)
+        val history1timestamp10 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(10),
+            customer1
+        )
+        val history2timestamp20 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(20),
+            customer1
+        )
+        val history3timestamp30 = TestUtils.testTicketHistory(
+            ticket,
+            expert2,
+            TicketStatus.REOPENED,
+            TicketStatus.RESOLVED,
+            Timestamp(30),
+            customer1
+        )
         ticketHistoryRepository.save(history1timestamp10)
         ticketHistoryRepository.save(history2timestamp20)
         ticketHistoryRepository.save(history3timestamp30)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(19).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${
+                Timestamp(19).toLocalDateTime()
+            }"
+        )
 
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
@@ -1042,7 +1382,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
 
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 0)
     }
@@ -1052,7 +1392,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeUnprocessable() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${Timestamp(9).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(11).toLocalDateTime()}&updatedBefore=${
+                Timestamp(9).toLocalDateTime()
+            }"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -1072,7 +1416,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
     fun getTicketHistoryByUpdatedAfterAndUpdatedBeforeEqual() {
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
         profileRepository.save(manager)
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(10).toLocalDateTime()}&updatedBefore=${Timestamp(10).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/history/filter?updatedAfter=${Timestamp(10).toLocalDateTime()}&updatedBefore=${
+                Timestamp(10).toLocalDateTime()
+            }"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -1103,14 +1451,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert3)
         profileRepository.save(expert4)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -1119,16 +1467,69 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer1, TicketStatus.IN_PROGRESS, expert3, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert4, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer1,
+            TicketStatus.IN_PROGRESS,
+            expert3,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert4,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
 
-        val history1ticket1user1expert3timestamp34 = TestUtils.testTicketHistory(ticket1, expert3, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
-        val history2ticket1user2expert3timestamp34 = TestUtils.testTicketHistory(ticket1, expert3, TicketStatus.RESOLVED, TicketStatus.OPEN, Timestamp(34), customer2)
-        val history3ticket2user1expert3timestamp34 = TestUtils.testTicketHistory(ticket2, expert3, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
-        val history4ticket1user1expert4timestamp34 = TestUtils.testTicketHistory(ticket1, expert4, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(34), customer1)
-        val history5ticket1user1expert3timestamp43 = TestUtils.testTicketHistory(ticket1, expert3, TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, Timestamp(43), customer1)
+        val history1ticket1user1expert3timestamp34 = TestUtils.testTicketHistory(
+            ticket1,
+            expert3,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer1
+        )
+        val history2ticket1user2expert3timestamp34 = TestUtils.testTicketHistory(
+            ticket1,
+            expert3,
+            TicketStatus.RESOLVED,
+            TicketStatus.OPEN,
+            Timestamp(34),
+            customer2
+        )
+        val history3ticket2user1expert3timestamp34 = TestUtils.testTicketHistory(
+            ticket2,
+            expert3,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer1
+        )
+        val history4ticket1user1expert4timestamp34 = TestUtils.testTicketHistory(
+            ticket1,
+            expert4,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(34),
+            customer1
+        )
+        val history5ticket1user1expert3timestamp43 = TestUtils.testTicketHistory(
+            ticket1,
+            expert3,
+            TicketStatus.CLOSED,
+            TicketStatus.IN_PROGRESS,
+            Timestamp(43),
+            customer1
+        )
         ticketHistoryRepository.save(history1ticket1user1expert3timestamp34)
         ticketHistoryRepository.save(history2ticket1user2expert3timestamp34)
         ticketHistoryRepository.save(history3ticket2user1expert3timestamp34)
@@ -1136,7 +1537,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         ticketHistoryRepository.save(history5ticket1user1expert3timestamp43)
 
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket1.getId()}&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${Timestamp(33).toLocalDateTime()}&updatedBefore=${Timestamp(44).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/history/filter?ticketId=${ticket1.getId()}&userEmail=${customer1.email}&currentExpertEmail=${expert3.email}&updatedAfter=${
+                Timestamp(33).toLocalDateTime()
+            }&updatedBefore=${Timestamp(44).toLocalDateTime()}"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -1166,24 +1571,38 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         categoryRepository.delete(category)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
 
         Assertions.assertEquals(body.size, 2)
         Assertions.assertEquals(body[0]["historyId"], history1ticket1user1expert3timestamp34.getId())
         Assertions.assertEquals(body[0]["ticketId"], history1ticket1user1expert3timestamp34.ticket!!.getId())
         Assertions.assertEquals(body[0]["newState"], history1ticket1user1expert3timestamp34.newState.name)
         Assertions.assertEquals(body[0]["oldState"], history1ticket1user1expert3timestamp34.oldState.name)
-        Assertions.assertEquals(body[0]["currentExpertEmail"], history1ticket1user1expert3timestamp34.currentExpert!!.email)
+        Assertions.assertEquals(
+            body[0]["currentExpertEmail"],
+            history1ticket1user1expert3timestamp34.currentExpert!!.email
+        )
         Assertions.assertEquals(body[0]["userEmail"], history1ticket1user1expert3timestamp34.user!!.email)
-        Assertions.assertTrue(body[0]["updatedTimestamp"].toString().startsWith(history1ticket1user1expert3timestamp34.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[0]["updatedTimestamp"].toString().startsWith(
+                history1ticket1user1expert3timestamp34.updatedTimestamp!!.toInstant().toString().replace("Z", "")
+            )
+        )
 
         Assertions.assertEquals(body[1]["historyId"], history5ticket1user1expert3timestamp43.getId())
         Assertions.assertEquals(body[1]["ticketId"], history5ticket1user1expert3timestamp43.ticket!!.getId())
         Assertions.assertEquals(body[1]["newState"], history5ticket1user1expert3timestamp43.newState.name)
         Assertions.assertEquals(body[1]["oldState"], history5ticket1user1expert3timestamp43.oldState.name)
-        Assertions.assertEquals(body[1]["currentExpertEmail"], history5ticket1user1expert3timestamp43.currentExpert!!.email)
+        Assertions.assertEquals(
+            body[1]["currentExpertEmail"],
+            history5ticket1user1expert3timestamp43.currentExpert!!.email
+        )
         Assertions.assertEquals(body[1]["userEmail"], history5ticket1user1expert3timestamp43.user!!.email)
-        Assertions.assertTrue(body[1]["updatedTimestamp"].toString().startsWith(history5ticket1user1expert3timestamp43.updatedTimestamp!!.toInstant().toString().replace("Z", "")))
+        Assertions.assertTrue(
+            body[1]["updatedTimestamp"].toString().startsWith(
+                history5ticket1user1expert3timestamp43.updatedTimestamp!!.toInstant().toString().replace("Z", "")
+            )
+        )
 
 
     }

@@ -5,17 +5,17 @@ import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import jakarta.persistence.*
 import java.sql.Timestamp
-import java.util.UUID
+import java.util.*
 
 @Entity
-@Table(name="items")
+@Table(name = "items")
 @IdClass(ItemId::class)
 class Item {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     @Id
-    var product: Product?= null
+    var product: Product? = null
 
     @Id
     @Column(name = "serial_num")
@@ -24,7 +24,7 @@ class Item {
     var uuid: UUID? = null
 
     @Temporal(TemporalType.TIMESTAMP)
-    var validFromTimestamp : Timestamp? = null
+    var validFromTimestamp: Timestamp? = null
 
     var durationMonths: Long? = null
 

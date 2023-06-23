@@ -22,7 +22,7 @@ fun Product.toDTO(): ProductDTO {
     return ProductDTO(productId, name, brand!!.name, category!!.name)
 }
 
-fun ProductDTO.toNewProduct(brand:Brand, category: Category): Product {
+fun ProductDTO.toNewProduct(brand: Brand, category: Category): Product {
     val product = Product()
     product.brand = brand
     product.category = category

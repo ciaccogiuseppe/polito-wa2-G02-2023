@@ -5,7 +5,7 @@ interface KeycloakService {
 
     fun addExpert(userDTO: UserDTO)
 
-    fun resetPassword(email:String)
+    fun resetPassword(email: String)
     fun applyResetPassword(passwordDTO: PasswordDTO)
     fun addVendor(userDTO: UserDTO)
 

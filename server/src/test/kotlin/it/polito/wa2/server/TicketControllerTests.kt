@@ -23,8 +23,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.*
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -36,10 +36,11 @@ import java.util.*
 
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class TicketControllerTests {
     val json = BasicJsonParser()
+
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -54,7 +55,7 @@ class TicketControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -64,7 +65,7 @@ class TicketControllerTests {
 
         @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
         }
@@ -76,31 +77,41 @@ class TicketControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
         }
     }
+
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var profileRepository: ProfileRepository
+
     @Autowired
     lateinit var productRepository: ProductRepository
+
     @Autowired
     lateinit var ticketRepository: TicketRepository
+
     @Autowired
     lateinit var ticketHistoryRepository: TicketHistoryRepository
+
     @Autowired
     lateinit var brandRepository: BrandRepository
+
     @Autowired
     lateinit var categoryRepository: CategoryRepository
+
     @Autowired
-    lateinit var itemRepository:ItemRepository
+    lateinit var itemRepository: ItemRepository
+
     @Test
     //@DirtiesContext
     fun getExistingTicketManager() {
@@ -111,20 +122,29 @@ class TicketControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/manager/ticketing/${ticket.getId()}")
@@ -169,20 +189,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/client/ticketing/${ticket.getId()}")
@@ -227,20 +256,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/expert/ticketing/${ticket.getId()}")
@@ -285,20 +323,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/client/ticketing/${ticket.getId()}")
@@ -334,20 +381,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/expert/ticketing/${ticket.getId()}")
@@ -390,7 +446,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.delete(manager)
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
 
-        
+
     }
 
     @Test
@@ -415,7 +471,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsSingleCustomerFilter(){
+    fun getFilteredTicketsSingleCustomerFilter() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -427,14 +483,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -442,9 +498,36 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         itemRepository.save(item)
         val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item2)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -473,7 +556,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 
@@ -481,7 +564,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsSingleCustomerFilterAuthorizedClient(){
+    fun getFilteredTicketsSingleCustomerFilterAuthorizedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -493,14 +576,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -508,9 +591,36 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         itemRepository.save(item)
         val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item2)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -540,7 +650,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         categoryRepository.delete(category)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 
@@ -548,7 +658,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsSingleCustomerFilterOtherClient(){
+    fun getFilteredTicketsSingleCustomerFilterOtherClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -560,14 +670,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -576,9 +686,36 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -607,7 +744,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 
@@ -615,7 +752,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsMultipleUserFilter(){
+    fun getFilteredTicketsMultipleUserFilter() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -627,14 +764,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -644,14 +781,42 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         itemRepository.save(item)
 
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert2.email}")
+        val uri =
+            URI("http://localhost:$port/API/manager/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert2.email}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -676,7 +841,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(1, body.size)
 
 
@@ -684,7 +849,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsMultipleUserFilterOneClientOnly(){
+    fun getFilteredTicketsMultipleUserFilterOneClientOnly() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -696,14 +861,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -711,14 +876,42 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         itemRepository.save(item)
         val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item2)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/client/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert2.email}")
+        val uri =
+            URI("http://localhost:$port/API/client/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert2.email}")
 
         val entity = TestUtils.testEntityHeader(null, clientToken)
 
@@ -743,7 +936,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(1, body.size)
 
 
@@ -751,7 +944,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsTimeRange(){
+    fun getFilteredTicketsTimeRange() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -763,14 +956,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -778,14 +971,45 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         itemRepository.save(item)
         val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item2)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(3), item2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(3),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/filter?createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${
+                Timestamp(1).toLocalDateTime()
+            }"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -810,7 +1034,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 
@@ -818,7 +1042,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsPriorityRange(){
+    fun getFilteredTicketsPriorityRange() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -830,14 +1054,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -845,9 +1069,36 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         itemRepository.save(item)
         val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item2)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 1, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            1,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -877,7 +1128,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 
@@ -885,7 +1136,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsProduct(){
+    fun getFilteredTicketsProduct() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -897,16 +1148,16 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
-        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand,category)
+        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand, category)
         productRepository.save(product)
         productRepository.save(product2)
 
@@ -919,9 +1170,36 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         val item3 = TestUtils.testItem(product2, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item3)
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item2, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item3, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item3,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -952,7 +1230,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 
@@ -960,7 +1238,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsStatus(){
+    fun getFilteredTicketsStatus() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -972,17 +1250,17 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
-        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand,category)
+        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand, category)
         productRepository.save(product)
         productRepository.save(product2)
 
@@ -994,9 +1272,36 @@ val category = Category()
         val item3 = TestUtils.testItem(product2, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item3)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item2, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item3, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item3,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -1027,14 +1332,15 @@ val category = Category()
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 
     }
+
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsAllFilters(){
+    fun getFilteredTicketsAllFilters() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1046,16 +1352,16 @@ val category = Category()
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-    val category = Category()
-            category.name=ProductCategory.SMARTPHONE
-            categoryRepository.save(category)
-    val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
-        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand,category)
+        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand, category)
         productRepository.save(product)
         productRepository.save(product2)
 
@@ -1066,14 +1372,45 @@ val brand = Brand()
         val item3 = TestUtils.testItem(product2, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item3)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), item2, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), item3, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item3,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert.email}&status=OPEN&productId=0000000000000&minPriority=1&maxPriority=2&createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert.email}&status=OPEN&productId=0000000000000&minPriority=1&maxPriority=2&createdAfter=${
+                Timestamp(0).toLocalDateTime()
+            }&createdBefore=${Timestamp(1).toLocalDateTime()}"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -1099,7 +1436,7 @@ val brand = Brand()
         brandRepository.delete(brand)
         categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(1, body.size)
 
 
@@ -1108,7 +1445,7 @@ val brand = Brand()
 
     @Test
     //@DirtiesContext
-    fun addTicketSuccessfulClient(){
+    fun addTicketSuccessfulClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1117,18 +1454,25 @@ val brand = Brand()
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
-        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
 
         val ticket = TicketDTO(
@@ -1182,10 +1526,9 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
     }
 
 
-
     @Test
     //@DirtiesContext
-    fun addTicketByExpertError(){
+    fun addTicketByExpertError() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1194,14 +1537,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -1244,7 +1587,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun addTicketByManagerError(){
+    fun addTicketByManagerError() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1253,14 +1596,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
@@ -1305,7 +1648,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun addTicketProductNotFound(){
+    fun addTicketProductNotFound() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1314,14 +1657,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
 
 
@@ -1366,7 +1709,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun addTicketProductWrongFormat(){
+    fun addTicketProductWrongFormat() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1375,18 +1718,25 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
-        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
 
         val ticket = TicketDTO(
@@ -1426,7 +1776,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun addTicketWithStatus(){
+    fun addTicketWithStatus() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1435,18 +1785,25 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
-        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
         val ticket = TicketDTO(
             null,
@@ -1499,7 +1856,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun assignTicketSuccessfulManager(){
+    fun assignTicketSuccessfulManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1508,20 +1865,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1561,7 +1927,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun assignTicketForbiddenClient(){
+    fun assignTicketForbiddenClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1570,20 +1936,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1612,7 +1987,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun assignTicketForbiddenExpert(){
+    fun assignTicketForbiddenExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1621,20 +1996,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1663,7 +2047,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun assignReopenedTicketSuccessfulManager(){
+    fun assignReopenedTicketSuccessfulManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1672,20 +2056,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1725,7 +2118,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun assignTicketToCustomer(){
+    fun assignTicketToCustomer() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1734,20 +2127,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1775,7 +2177,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun wrongReassignTicket(){
+    fun wrongReassignTicket() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1784,20 +2186,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1829,7 +2240,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun assignToClosedTicket(){
+    fun assignToClosedTicket() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1838,20 +2249,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1879,7 +2299,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenInProgressToClosedClient(){
+    fun updateTicketForbiddenInProgressToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1888,20 +2308,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1924,12 +2353,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
 
 
-
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulInProgressToClosedManager(){
+    fun updateTicketSuccessfulInProgressToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1938,21 +2366,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1987,7 +2424,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulInProgressToOpenManager(){
+    fun updateTicketSuccessfulInProgressToOpenManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1996,21 +2433,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2045,7 +2491,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenInProgressToOpenClient(){
+    fun updateTicketForbiddenInProgressToOpenClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2054,20 +2500,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2093,7 +2548,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenInProgressToOpenExpert(){
+    fun updateTicketForbiddenInProgressToOpenExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2102,20 +2557,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2142,7 +2606,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenOpenToClosedClient(){
+    fun updateTicketForbiddenOpenToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2151,20 +2615,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2187,12 +2660,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
 
 
-
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToClosedManager(){
+    fun updateTicketSuccessfulOpenToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2201,20 +2673,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2249,7 +2730,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToClosedExpert(){
+    fun updateTicketSuccessfulOpenToClosedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2258,20 +2739,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2305,7 +2795,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenResolvedToClosedClient(){
+    fun updateTicketForbiddenResolvedToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2314,20 +2804,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2354,7 +2853,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulResolvedToClosedManager(){
+    fun updateTicketSuccessfulResolvedToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2363,20 +2862,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2411,7 +2919,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulResolvedToClosedExpert(){
+    fun updateTicketSuccessfulResolvedToClosedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2420,20 +2928,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2468,7 +2985,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenResolvedToClosedOtherClient(){
+    fun updateTicketForbiddenResolvedToClosedOtherClient() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2479,20 +2996,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2520,7 +3046,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenResolvedToClosedOtherExpert(){
+    fun updateTicketForbiddenResolvedToClosedOtherExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -2531,21 +3057,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert2)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2573,7 +3108,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenReopenedToClosedClient(){
+    fun updateTicketForbiddenReopenedToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2582,20 +3117,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2618,12 +3162,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
 
 
-
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulReopenedToClosedExpert(){
+    fun updateTicketSuccessfulReopenedToClosedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2632,19 +3175,28 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2679,7 +3231,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulReopenedToClosedManager(){
+    fun updateTicketSuccessfulReopenedToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2688,20 +3240,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2736,7 +3297,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToResolvedClient(){
+    fun updateTicketSuccessfulOpenToResolvedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2745,21 +3306,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2794,7 +3364,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToResolvedManager(){
+    fun updateTicketSuccessfulOpenToResolvedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2803,20 +3373,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2848,11 +3427,11 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         categoryRepository.delete(category)
     }
-    
+
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenOpenToResolvedExpert(){
+    fun updateTicketForbiddenOpenToResolvedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2861,20 +3440,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2902,7 +3490,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulInProgressToResolved(){
+    fun updateTicketSuccessfulInProgressToResolved() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2911,20 +3499,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2959,7 +3556,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulReopenedToResolved(){
+    fun updateTicketSuccessfulReopenedToResolved() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2968,20 +3565,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3016,7 +3622,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongReopenedToInProgress(){
+    fun updateTicketWrongReopenedToInProgress() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3025,21 +3631,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
-        ticket.expert=null;
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        ticket.expert = null
         ticketRepository.save(ticket)
 
 
@@ -3067,7 +3682,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulClosedToReopen(){
+    fun updateTicketSuccessfulClosedToReopen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3076,20 +3691,36 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
-        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(System.currentTimeMillis()), item, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(System.currentTimeMillis()),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3124,7 +3755,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulResolvedToReopenClient(){
+    fun updateTicketSuccessfulResolvedToReopenClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3133,21 +3764,37 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
-        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(System.currentTimeMillis()))
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3182,7 +3829,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongOpenToReopened(){
+    fun updateTicketWrongOpenToReopened() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3191,20 +3838,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3231,7 +3887,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongClosedToOpen(){
+    fun updateTicketWrongClosedToOpen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3240,20 +3896,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3280,7 +3945,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongClosedToInProgress(){
+    fun updateTicketWrongClosedToInProgress() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3289,21 +3954,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3330,7 +4004,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongClosedToResolved(){
+    fun updateTicketWrongClosedToResolved() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3339,21 +4013,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3380,7 +4063,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongInProgressToReopened(){
+    fun updateTicketWrongInProgressToReopened() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3389,21 +4072,30 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3430,7 +4122,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongReopenedToOpen(){
+    fun updateTicketWrongReopenedToOpen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3439,20 +4131,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3479,7 +4180,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongResolvedToInProgress(){
+    fun updateTicketWrongResolvedToInProgress() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3488,20 +4189,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -3528,7 +4238,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongResolvedToOpen(){
+    fun updateTicketWrongResolvedToOpen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -3537,20 +4247,29 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(

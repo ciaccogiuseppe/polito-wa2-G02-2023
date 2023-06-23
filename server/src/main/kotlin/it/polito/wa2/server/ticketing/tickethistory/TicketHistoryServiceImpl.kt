@@ -14,14 +14,16 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 
-@Service @Transactional @Observed
+@Service
+@Transactional
+@Observed
 class TicketHistoryServiceImpl(
     private val ticketHistoryRepository: TicketHistoryRepository,
     private val ticketService: TicketService,
     private val ticketRepository: TicketRepository,
     private val profileService: ProfileService,
     private val profileRepository: ProfileRepository
-): TicketHistoryService {
+) : TicketHistoryService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
@@ -48,8 +50,12 @@ class TicketHistoryServiceImpl(
             .filter {
                 (ticket == null || it.ticket == ticket) &&
                         (user == null || it.user == user) &&
-                        (updatedAfter == null || it.updatedTimestamp!!.after(updatedAfter) || it.updatedTimestamp!!.equals(updatedAfter)) &&
-                        (updatedBefore == null || it.updatedTimestamp!!.before(updatedBefore) || it.updatedTimestamp!!.equals(updatedBefore)) &&
+                        (updatedAfter == null || it.updatedTimestamp!!.after(updatedAfter) || it.updatedTimestamp!!.equals(
+                            updatedAfter
+                        )) &&
+                        (updatedBefore == null || it.updatedTimestamp!!.before(updatedBefore) || it.updatedTimestamp!!.equals(
+                            updatedBefore
+                        )) &&
                         (currentExpert == null || it.currentExpert == currentExpert)
             }.map { it.toDTO() }
     }

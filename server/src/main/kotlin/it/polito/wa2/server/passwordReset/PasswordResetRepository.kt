@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface PasswordResetRepository: JpaRepository<PasswordReset, UUID>
+interface PasswordResetRepository : JpaRepository<PasswordReset, UUID>

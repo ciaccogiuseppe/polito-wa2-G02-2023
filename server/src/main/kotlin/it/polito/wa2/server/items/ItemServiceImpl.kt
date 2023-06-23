@@ -17,14 +17,16 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.*
 
-@Service @Transactional @Observed
+@Service
+@Transactional
+@Observed
 class ItemServiceImpl(
     private val productRepository: ProductRepository,
     private val productService: ProductService,
     private val profileRepository: ProfileRepository,
     private val profileService: ProfileService,
     private val itemRepository: ItemRepository
-): ItemService {
+) : ItemService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('${WebSecurityConfig.MANAGER}', '${WebSecurityConfig.VENDOR}')")
     override fun getItemByProductId(productId: String): List<ItemDTO> {
@@ -46,7 +48,7 @@ class ItemServiceImpl(
         val product = getProduct(productId)
         val item = itemRepository.findByProductAndSerialNum(product, serialNum)
             ?: throw ItemNotFoundException("Item with productIid '${productId}' and serialNum '${serialNum}' not found")
-        if(item.client != getProfileByEmail(email, email))
+        if (item.client != getProfileByEmail(email, email))
             throw ForbiddenException("You cannot access to this item")
         return item.toDTO()
     }
@@ -60,10 +62,10 @@ class ItemServiceImpl(
     }
 
     override fun addItem(productId: String, itemDTO: ItemDTO): ItemDTO {
-        if(productId != itemDTO.productId)
+        if (productId != itemDTO.productId)
             throw BadRequestItemException("ProductId in path doesn't match the productId in the body")
         val product = getProduct(itemDTO.productId)
-        if(itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum) != null)
+        if (itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum) != null)
             throw DuplicateItemException("Item with productId '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}'already exists")
         val newItem = itemDTO.toNewItem(product)
         val item = itemRepository.save(newItem)
@@ -75,12 +77,12 @@ class ItemServiceImpl(
 
     @PreAuthorize("hasRole('${WebSecurityConfig.VENDOR}')")
     override fun createUUID(itemDTO: ItemDTO): ItemDTO {
-        if(itemDTO.durationMonths == null)
+        if (itemDTO.durationMonths == null)
             throw UnprocessableItemException("Duration cannot be null")
         val product = getProduct(itemDTO.productId)
         val item = itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum)
-            ?:  itemRepository.save(itemDTO.toNewItem(product))
-        if(item.uuid != null)
+            ?: itemRepository.save(itemDTO.toNewItem(product))
+        if (item.uuid != null)
             throw UnprocessableItemException("Item already has an UUID")
         item.uuid = UUID.randomUUID()
         item.validFromTimestamp = Timestamp.valueOf(LocalDateTime.now())
@@ -90,13 +92,13 @@ class ItemServiceImpl(
 
     @PreAuthorize("hasRole('${WebSecurityConfig.CLIENT}')")
     override fun assignClient(userEmail: String, itemDTO: ItemDTO): ItemDTO {
-        if(itemDTO.uuid == null) {
+        if (itemDTO.uuid == null) {
             throw BadRequestItemException("UUID cannot be null")
         }
         val product = getProduct(itemDTO.productId)
         val item = itemRepository.findByProductAndSerialNum(product, itemDTO.serialNum)
             ?: throw ItemNotFoundException("Item with productIid '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}' not found")
-        if(itemDTO.uuid != item.uuid)
+        if (itemDTO.uuid != item.uuid)
             throw ForbiddenException("Impossible to be linked to the product")
         item.client = getProfileByEmail(userEmail, userEmail)
         return itemRepository.save(item).toDTO()

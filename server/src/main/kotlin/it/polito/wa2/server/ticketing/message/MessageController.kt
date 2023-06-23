@@ -11,19 +11,19 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
-@CrossOrigin(origins =["http://localhost:3001"])
+@CrossOrigin(origins = ["http://localhost:3001"])
 @RestController
 @Observed
 class MessageController(private val messageService: MessageService) {
     @GetMapping("/API/chat/{ticketId}")
-    fun getMessage(principal: Principal, @PathVariable ticketId: Long) : List<MessageDTO> {
+    fun getMessage(principal: Principal, @PathVariable ticketId: Long): List<MessageDTO> {
         val userEmail = retrieveUserEmail(principal)
         checkTicketId(ticketId)
         return messageService.getChat(ticketId, userEmail)
     }
 
     @GetMapping("/API/manager/chat/{ticketId}")
-    fun getMessageManager(principal: Principal, @PathVariable ticketId: Long) : List<MessageDTO> {
+    fun getMessageManager(principal: Principal, @PathVariable ticketId: Long): List<MessageDTO> {
         val userEmail = retrieveUserEmail(principal)
         checkTicketId(ticketId)
         return messageService.getChatManager(ticketId, userEmail)
@@ -31,7 +31,12 @@ class MessageController(private val messageService: MessageService) {
 
     @PostMapping("/API/chat/{ticketId}")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addMessage(principal: Principal, @PathVariable ticketId: Long, @RequestBody @Valid messageDTO: MessageDTO?, br: BindingResult) {
+    fun addMessage(
+        principal: Principal,
+        @PathVariable ticketId: Long,
+        @RequestBody @Valid messageDTO: MessageDTO?,
+        br: BindingResult
+    ) {
         val userEmail = retrieveUserEmail(principal)
         checkTicketId(ticketId)
         checkInputMessage(messageDTO, br)
@@ -39,11 +44,12 @@ class MessageController(private val messageService: MessageService) {
     }
 
 
-    private fun checkTicketId(ticketId: Long){
-        if(ticketId <= 0)
+    private fun checkTicketId(ticketId: Long) {
+        if (ticketId <= 0)
             throw UnprocessableTicketException("Wrong ticket id value")
     }
-    private fun checkInputMessage(messageDTO: MessageDTO?, br: BindingResult){
+
+    private fun checkInputMessage(messageDTO: MessageDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableMessageException("Wrong message format")
         if (messageDTO == null)

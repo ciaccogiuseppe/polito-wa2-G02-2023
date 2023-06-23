@@ -4,7 +4,8 @@ import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.addresses.AddressDTO
 import it.polito.wa2.server.keycloak.UserDTO
 import it.polito.wa2.server.keycloak.UserUpdateDTO
-import it.polito.wa2.server.profiles.*
+import it.polito.wa2.server.profiles.ProfileRepository
+import it.polito.wa2.server.profiles.ProfileRole
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -14,12 +15,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.http.*
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -28,8 +24,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.net.URI
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class KeycloakControllerTests {
 
     companion object {
@@ -45,7 +41,7 @@ class KeycloakControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -55,7 +51,7 @@ class KeycloakControllerTests {
 
         @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
         }
@@ -66,22 +62,27 @@ class KeycloakControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
-            registry.add("keycloak.auth-server-url"){keycloak.authServerUrl}
-            registry.add("keycloak.realm"){"SpringBootKeycloak"}
-            registry.add("keycloak.resource"){"springboot-keycloak-client"}
-            registry.add("keycloak.credentials.secret"){keycloak.keycloakAdminClient.realm("SpringBootKeycloak").clients().findByClientId("springboot-keycloak-client")[0].secret}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
+            registry.add("keycloak.auth-server-url") { keycloak.authServerUrl }
+            registry.add("keycloak.realm") { "SpringBootKeycloak" }
+            registry.add("keycloak.resource") { "springboot-keycloak-client" }
+            registry.add("keycloak.credentials.secret") {
+                keycloak.keycloakAdminClient.realm("SpringBootKeycloak").clients()
+                    .findByClientId("springboot-keycloak-client")[0].secret
+            }
         }
     }
 
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var profileRepository: ProfileRepository
 
@@ -111,7 +112,7 @@ class KeycloakControllerTests {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
+        val requestEntity: HttpEntity<UserDTO> = HttpEntity(user, headers)
         val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.CREATED, result.statusCode)
@@ -119,9 +120,9 @@ class KeycloakControllerTests {
         val createdProfile = profileRepository.findByEmail(user.email)
         profileRepository.delete(createdProfile!!)
         Assertions.assertNotNull(createdProfile)
-        Assertions.assertEquals(user.email, createdProfile?.email)
-        Assertions.assertEquals(user.firstName, createdProfile?.name)
-        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+        Assertions.assertEquals(user.email, createdProfile.email)
+        Assertions.assertEquals(user.firstName, createdProfile.name)
+        Assertions.assertEquals(user.lastName, createdProfile.surname)
 
 
         val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
@@ -168,9 +169,9 @@ class KeycloakControllerTests {
 
         Assertions.assertNotNull(createdProfile)
         profileRepository.delete(createdProfile!!)
-        Assertions.assertEquals(user.email, createdProfile?.email)
-        Assertions.assertEquals(user.firstName, createdProfile?.name)
-        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+        Assertions.assertEquals(user.email, createdProfile.email)
+        Assertions.assertEquals(user.firstName, createdProfile.name)
+        Assertions.assertEquals(user.lastName, createdProfile.surname)
 
 
         val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
@@ -208,9 +209,9 @@ class KeycloakControllerTests {
 
         Assertions.assertNotNull(createdProfile)
         profileRepository.delete(createdProfile!!)
-        Assertions.assertEquals(user.email, createdProfile?.email)
-        Assertions.assertEquals(user.firstName, createdProfile?.name)
-        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+        Assertions.assertEquals(user.email, createdProfile.email)
+        Assertions.assertEquals(user.firstName, createdProfile.name)
+        Assertions.assertEquals(user.lastName, createdProfile.surname)
 
 
         val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
@@ -221,6 +222,7 @@ class KeycloakControllerTests {
 
 
     }
+
     @Test
     //@DirtiesContext
     fun putExpert() {
@@ -247,9 +249,9 @@ class KeycloakControllerTests {
 
         Assertions.assertNotNull(createdProfile)
         profileRepository.delete(createdProfile!!)
-        Assertions.assertEquals(user.email, createdProfile?.email)
-        Assertions.assertEquals(user.firstName, createdProfile?.name)
-        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+        Assertions.assertEquals(user.email, createdProfile.email)
+        Assertions.assertEquals(user.firstName, createdProfile.name)
+        Assertions.assertEquals(user.lastName, createdProfile.surname)
 
 
         val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
@@ -266,12 +268,12 @@ class KeycloakControllerTests {
     fun postClientBadRequest() {
         val uri = URI("http://localhost:$port/API/signup")
 
-        val user : UserDTO? = null
+        val user: UserDTO? = null
 
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
+        val requestEntity: HttpEntity<UserDTO> = HttpEntity(user, headers)
         val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
@@ -306,7 +308,7 @@ class KeycloakControllerTests {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val requestEntity : HttpEntity<UserDTO> = HttpEntity(user, headers)
+        val requestEntity: HttpEntity<UserDTO> = HttpEntity(user, headers)
         val result = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String::class.java)
 
         profileRepository.delete(profile)
@@ -340,9 +342,9 @@ class KeycloakControllerTests {
 
         Assertions.assertNotNull(createdProfile)
         profileRepository.delete(createdProfile!!)
-        Assertions.assertEquals(user.email, createdProfile?.email)
-        Assertions.assertEquals(user.firstName, createdProfile?.name)
-        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+        Assertions.assertEquals(user.email, createdProfile.email)
+        Assertions.assertEquals(user.firstName, createdProfile.name)
+        Assertions.assertEquals(user.lastName, createdProfile.surname)
 
 
         val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
@@ -379,9 +381,9 @@ class KeycloakControllerTests {
 
         Assertions.assertNotNull(createdProfile)
         profileRepository.delete(createdProfile!!)
-        Assertions.assertEquals(user.email, createdProfile?.email)
-        Assertions.assertEquals(user.firstName, createdProfile?.name)
-        Assertions.assertEquals(user.lastName, createdProfile?.surname)
+        Assertions.assertEquals(user.email, createdProfile.email)
+        Assertions.assertEquals(user.firstName, createdProfile.name)
+        Assertions.assertEquals(user.lastName, createdProfile.surname)
 
 
         val createdUser = TestUtils.testKeycloakGetUser(keycloak, user.email)
@@ -398,7 +400,7 @@ class KeycloakControllerTests {
     fun postExpertBadRequest() {
         val uri = URI("http://localhost:$port/API/createExpert")
 
-        val user : UserDTO? = null
+        val user: UserDTO? = null
 
         val entity = TestUtils.testEntityHeader(user, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.POST, entity, String::class.java)

@@ -11,8 +11,8 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled=true, securedEnabled = true)
-class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
+class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter) {
     companion object {
         const val MANAGER = "manager"
         const val CLIENT = "client"
@@ -21,7 +21,7 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
     }
 
     @Bean
-    fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain{
+    fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         httpSecurity.authorizeHttpRequests()
             .requestMatchers(HttpMethod.GET, "").permitAll()
             .requestMatchers(HttpMethod.GET, "/*").permitAll()
@@ -42,12 +42,12 @@ class WebSecurityConfig(val jwtAuthConverter: JwtAuthConverter ) {
             .requestMatchers(HttpMethod.POST, "/API/public/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/API/private/**").hasAnyRole(MANAGER, VENDOR)
             .requestMatchers(HttpMethod.POST, "/API/login/**").permitAll()
-            .requestMatchers(HttpMethod.POST,"/API/refreshToken/**").permitAll()
-            .requestMatchers(HttpMethod.POST,"/API/signup/**").permitAll()
-            .requestMatchers(HttpMethod.GET,"/API/resetPassword/**").permitAll()
-            .requestMatchers(HttpMethod.PUT,"/API/resetPassword/**").permitAll()
-            .requestMatchers(HttpMethod.POST,"/API/createExpert").hasRole(MANAGER)
-            .requestMatchers(HttpMethod.POST,"/API/createVendor").hasRole(MANAGER)
+            .requestMatchers(HttpMethod.POST, "/API/refreshToken/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/API/signup/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/API/resetPassword/**").permitAll()
+            .requestMatchers(HttpMethod.PUT, "/API/resetPassword/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/API/createExpert").hasRole(MANAGER)
+            .requestMatchers(HttpMethod.POST, "/API/createVendor").hasRole(MANAGER)
             .requestMatchers(HttpMethod.GET, "/API/attachment/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers(HttpMethod.GET, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)
             .requestMatchers(HttpMethod.POST, "/API/chat/**").hasAnyRole(CLIENT, EXPERT)

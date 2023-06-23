@@ -9,7 +9,7 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
-@CrossOrigin(origins =["http://localhost:3001"])
+@CrossOrigin(origins = ["http://localhost:3001"])
 @RestController
 @Observed
 class ProductController(private val productService: ProductService) {

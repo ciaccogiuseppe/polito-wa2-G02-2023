@@ -8,30 +8,30 @@ import jakarta.persistence.*
 import java.sql.Timestamp
 
 @Entity
-@Table(name="tickets_history")
-class TicketHistory:EntityBase<Long>() {
+@Table(name = "tickets_history")
+class TicketHistory : EntityBase<Long>() {
     @ManyToOne
-    @JoinColumn(name="ticket_id", nullable = false)
-    var ticket : Ticket? = null
+    @JoinColumn(name = "ticket_id", nullable = false)
+    var ticket: Ticket? = null
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    var user : Profile? = null
+    var user: Profile? = null
 
     @ManyToOne
-    var currentExpert : Profile? = null
+    var currentExpert: Profile? = null
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    var updatedTimestamp : Timestamp? = null
+    var updatedTimestamp: Timestamp? = null
 
-    @Enumerated(value=EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    var oldState : TicketStatus = TicketStatus.OPEN
-    @Enumerated(value=EnumType.STRING)
-    @Column(nullable = false)
-    var newState :  TicketStatus =TicketStatus.OPEN
+    var oldState: TicketStatus = TicketStatus.OPEN
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    var newState: TicketStatus = TicketStatus.OPEN
 
 
 }

@@ -4,7 +4,8 @@ import dasniko.testcontainers.keycloak.KeycloakContainer
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.ProductCategory
-import it.polito.wa2.server.profiles.*
+import it.polito.wa2.server.profiles.ProfileRepository
+import it.polito.wa2.server.profiles.ProfileRole
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -23,14 +24,14 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.net.URI
-import java.util.LinkedHashMap
 
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProfileControllerTests {
     val json = BasicJsonParser()
+
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -45,7 +46,7 @@ class ProfileControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -55,7 +56,7 @@ class ProfileControllerTests {
 
         @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
         }
@@ -66,23 +67,28 @@ class ProfileControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
         }
     }
+
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var profileRepository: ProfileRepository
+
     @Autowired
     lateinit var categoryRepository: CategoryRepository
+
     @Test
-        //@DirtiesContext
+    //@DirtiesContext
     fun getSelfProfile() {
         val email = "mario.rossi@polito.it"
         val uri = URI("http://localhost:$port/API/authenticated/profile/")
@@ -113,7 +119,7 @@ class ProfileControllerTests {
     }
 
     @Test
-        //@DirtiesContext
+    //@DirtiesContext
     fun getExistingProfile() {
         val email = "client@polito.it"
         val uri = URI("http://localhost:$port/API/authenticated/profiles/$email")
@@ -143,8 +149,9 @@ class ProfileControllerTests {
 
 
     }
-@Test
-        //@DirtiesContext
+
+    @Test
+    //@DirtiesContext
     fun getNotFoundProfile() {
         val email = "mariorossi@polito.it"
         val email2 = "mario.rossi@polito.it"
@@ -171,13 +178,13 @@ class ProfileControllerTests {
     }
 
     @Test
-        //@DirtiesContext
+    //@DirtiesContext
     fun getExpertsByCategory() {
         val email = "mariorossi@polito.it"
         val email2 = "mario.rossi@polito.it"
         val uri = URI("http://localhost:$port/API/manager/profiles/experts/PC")
 
-        val category1 = Category().apply{ name = ProductCategory.PC }
+        val category1 = Category().apply { name = ProductCategory.PC }
         val category2 = Category().apply { name = ProductCategory.TV }
 
         categoryRepository.save(category1)
@@ -188,9 +195,9 @@ class ProfileControllerTests {
         val expert1 = TestUtils.testProfile("e1@polito.it", "Manager", "Polito", ProfileRole.EXPERT)
         val expert2 = TestUtils.testProfile("e2@polito.it", "Manager", "Polito", ProfileRole.EXPERT)
         val expert3 = TestUtils.testProfile("e3@polito.it", "Manager", "Polito", ProfileRole.EXPERT)
-        expert1.expertCategories=mutableSetOf(category1, category2)
-        expert2.expertCategories=mutableSetOf(category1)
-        expert3.expertCategories=mutableSetOf(category2)
+        expert1.expertCategories = mutableSetOf(category1, category2)
+        expert2.expertCategories = mutableSetOf(category1)
+        expert3.expertCategories = mutableSetOf(category2)
         profileRepository.save(manager)
         profileRepository.save(profile)
         profileRepository.save(expert1)
@@ -214,7 +221,7 @@ class ProfileControllerTests {
         categoryRepository.delete(category2)
         profileRepository.delete(manager)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*, *> }
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(2, body.size)
 
 

@@ -8,17 +8,19 @@ import java.sql.Timestamp
 import java.util.*
 import javax.ws.rs.NotFoundException
 
-@Service @Transactional @Observed
-class PasswordResetServiceImpl (
+@Service
+@Transactional
+@Observed
+class PasswordResetServiceImpl(
     private val passwordResetRepository: PasswordResetRepository,
     private val profileRepository: ProfileRepository
 ) : PasswordResetService {
     override fun checkIsValid(email: String, uuid: UUID): Boolean {
         val record = passwordResetRepository.findById(uuid)
         val curTimestamp = Timestamp(System.currentTimeMillis() - 43200000)
-        if( !record.isPresent ) return false
+        if (!record.isPresent) return false
         else
-            if(record.get().created!!.before(curTimestamp )) {
+            if (record.get().created!!.before(curTimestamp)) {
                 passwordResetRepository.deleteById(uuid)
                 return false
             }
@@ -30,10 +32,9 @@ class PasswordResetServiceImpl (
     }
 
     override fun addPasswordReset(email: String, uuid: UUID) {
-        val user = profileRepository.findByEmail(email)?:
-        throw NotFoundException("User not found")
+        val user = profileRepository.findByEmail(email) ?: throw NotFoundException("User not found")
         val passwordReset = PasswordReset()
-        passwordReset.created=Timestamp(System.currentTimeMillis())
+        passwordReset.created = Timestamp(System.currentTimeMillis())
         passwordReset.profile = user
         passwordReset.uuid = uuid
         passwordResetRepository.save(passwordReset)

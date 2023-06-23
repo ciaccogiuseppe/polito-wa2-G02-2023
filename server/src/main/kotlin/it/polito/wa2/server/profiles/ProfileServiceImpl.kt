@@ -15,25 +15,28 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Service @Transactional @Observed
+@Service
+@Transactional
+@Observed
 class ProfileServiceImpl(
     private val categoryRepository: CategoryRepository,
     private val addressRepository: AddressRepository,
     private val profileRepository: ProfileRepository,
     private val categoryService: CategoryService,
     private val addressService: AddressService
-): ProfileService {
-
+) : ProfileService {
 
 
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
-    @PostAuthorize("" +
-            "(returnObject.email == authentication.name || hasRole('manager')) || " +
-            "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).CLIENT.toString()) && " +
-            "(hasRole('expert'))) || " +
-            "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).EXPERT.toString()) && " +
-            "(hasRole('expert') || hasRole('client')))")
+    @PostAuthorize(
+        "" +
+                "(returnObject.email == authentication.name || hasRole('manager')) || " +
+                "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).CLIENT.toString()) && " +
+                "(hasRole('expert'))) || " +
+                "((returnObject.role == T(it.polito.wa2.server.profiles.ProfileRole).EXPERT.toString()) && " +
+                "(hasRole('expert') || hasRole('client')))"
+    )
     override fun getProfile(email: String, loggedEmail: String): ProfileDTO {
         val profile = getProfilePrivate(email)
         return profile.toDTO()
@@ -58,7 +61,7 @@ class ProfileServiceImpl(
     override fun getExpertByCategory(category: ProductCategory): List<ProfileDTO> {
         return profileRepository
             .findByRole(ProfileRole.EXPERT)
-            .filter{ it.expertCategories.any { cat -> cat.name == category } }
+            .filter { it.expertCategories.any { cat -> cat.name == category } }
             .map { it.toDTO() }
     }
 
@@ -91,7 +94,9 @@ class ProfileServiceImpl(
         profile.name = newProfileDTO.name
         profile.surname = newProfileDTO.surname
         when (profile.role) {
-            ProfileRole.EXPERT -> profile.expertCategories = newProfileDTO.expertCategories!!.map { getCategoryByName(it) }.toMutableSet()
+            ProfileRole.EXPERT -> profile.expertCategories =
+                newProfileDTO.expertCategories!!.map { getCategoryByName(it) }.toMutableSet()
+
             ProfileRole.CLIENT -> {
                 val clientPreviousAddressDTO = addressService.getAddressOfClient(profile.email)
                 if (clientPreviousAddressDTO == null)
@@ -99,6 +104,7 @@ class ProfileServiceImpl(
                 else
                     addressService.updateAddressOfClient(profile.email, newProfileDTO.address!!)
             }
+
             else -> {}
         }
         profileRepository.save(profile)

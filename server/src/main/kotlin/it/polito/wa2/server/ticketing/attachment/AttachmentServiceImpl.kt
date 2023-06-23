@@ -11,21 +11,23 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Service @Transactional @Observed
+@Service
+@Transactional
+@Observed
 class AttachmentServiceImpl(
     private val attachmentRepository: AttachmentRepository, private val profileRepository: ProfileRepository
-): AttachmentService {
+) : AttachmentService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}')")
     override fun getAttachment(attachmentID: Long, userEmail: String): AttachmentDTO {
-        val attachment = attachmentRepository.findByIdOrNull(attachmentID)?:
-            throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
-        val user = profileRepository.findByEmail(userEmail)?:
-            throw ForbiddenException("It's not possible to get an attachment if user is not registered")
+        val attachment = attachmentRepository.findByIdOrNull(attachmentID)
+            ?: throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
+        val user = profileRepository.findByEmail(userEmail)
+            ?: throw ForbiddenException("It's not possible to get an attachment if user is not registered")
         val ticket = attachment.message?.ticket
         val clientOfAttachment = ticket?.client
         val expertOfAttachment = ticket?.expert
-        if(user != clientOfAttachment && user != expertOfAttachment)
+        if (user != clientOfAttachment && user != expertOfAttachment)
             throw ForbiddenException("It's not possible to get an attachment of a message belonging to a ticket in which you are not participating")
         return attachment.toDTO()
     }
@@ -33,8 +35,8 @@ class AttachmentServiceImpl(
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun getAttachmentManager(attachmentID: Long): AttachmentDTO {
-        val attachment = attachmentRepository.findByIdOrNull(attachmentID)?:
-            throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
+        val attachment = attachmentRepository.findByIdOrNull(attachmentID)
+            ?: throw AttachmentNotFoundException("Attachment with id '${attachmentID}' not found")
         return attachment.toDTO()
     }
 

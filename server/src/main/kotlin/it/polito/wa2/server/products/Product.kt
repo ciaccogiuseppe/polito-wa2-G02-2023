@@ -6,11 +6,12 @@ import it.polito.wa2.server.items.Item
 import jakarta.persistence.*
 
 @Entity
-@Table(name="products")
+@Table(name = "products")
 class Product {
     @Id
     @Column(updatable = false, nullable = false)
     var productId: String = ""
+
     @Column(nullable = false)
     var name: String = ""
 

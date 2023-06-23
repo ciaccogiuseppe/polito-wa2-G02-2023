@@ -15,12 +15,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
-@Service @Transactional @Observed
+@Service
+@Transactional
+@Observed
 class KeycloakServiceImpl(
     private val keycloakConfig: KeycloakConfig,
     private val profileService: ProfileService,
     private val passwordResetService: PasswordResetService
-): KeycloakService {
+) : KeycloakService {
     companion object {
         const val CLIENT = "app_client"
         const val EXPERT = "app_expert"
@@ -51,11 +53,10 @@ class KeycloakServiceImpl(
     }
 
     override fun applyResetPassword(passwordDTO: PasswordDTO) {
-        if(passwordResetService.checkIsValid(passwordDTO.email, passwordDTO.token)) {
+        if (passwordResetService.checkIsValid(passwordDTO.email, passwordDTO.token)) {
             keycloakConfig.applyResetPassword(passwordDTO.email, passwordDTO.password)
             passwordResetService.delete(passwordDTO.token)
-        }
-        else
+        } else
             throw BadRequestUserException("Invalid request, ask for a new reset link")
     }
 
@@ -97,7 +98,7 @@ class KeycloakServiceImpl(
         return user
     }
 
-    private fun addUser(user: UserRepresentation){
+    private fun addUser(user: UserRepresentation) {
         keycloakConfig.getRealm().users().create(user)
     }
 }

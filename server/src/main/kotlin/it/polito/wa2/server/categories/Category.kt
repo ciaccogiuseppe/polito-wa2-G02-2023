@@ -6,7 +6,7 @@ import it.polito.wa2.server.profiles.Profile
 import jakarta.persistence.*
 
 @Entity
-@Table(name="categories")
+@Table(name = "categories")
 class Category : EntityBase<Long>() {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)

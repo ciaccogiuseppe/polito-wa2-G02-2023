@@ -6,10 +6,7 @@ import it.polito.wa2.server.brands.BrandRepository
 import it.polito.wa2.server.categories.Category
 import it.polito.wa2.server.categories.CategoryRepository
 import it.polito.wa2.server.categories.ProductCategory
-import it.polito.wa2.server.products.ProductDTO
 import it.polito.wa2.server.products.ProductRepository
-import it.polito.wa2.server.products.toDTO
-import it.polito.wa2.server.profiles.ProfileDTO
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -21,8 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.*
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -32,10 +30,11 @@ import java.net.URI
 
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProductControllerTests {
     val json = BasicJsonParser()
+
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -50,7 +49,7 @@ class ProductControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -60,7 +59,7 @@ class ProductControllerTests {
 
         @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
         }
@@ -71,21 +70,26 @@ class ProductControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
         }
     }
+
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var productRepository: ProductRepository
+
     @Autowired
-    lateinit var brandRepository:BrandRepository
+    lateinit var brandRepository: BrandRepository
+
     @Autowired
     lateinit var categoryRepository: CategoryRepository
 
@@ -102,11 +106,11 @@ class ProductControllerTests {
 
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -123,20 +127,20 @@ class ProductControllerTests {
 
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(body.size, 3)
 
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product2.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product3.productId})
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product1.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product2.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product3.productId })
 
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product1.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product2.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product3.name})
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product1.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product2.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product3.name })
 
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product1.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product2.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product3.brand!!.name})
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product1.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product2.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product3.brand!!.name })
 
         productRepository.delete(product1)
         productRepository.delete(product2)
@@ -146,6 +150,7 @@ class ProductControllerTests {
         categoryRepository.delete(category)
 
     }
+
     @Test
     //@DirtiesContext
     fun getExistingProductsManager() {
@@ -158,11 +163,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -177,20 +182,20 @@ class ProductControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(body.size, 3)
 
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product2.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product3.productId})
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product1.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product2.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product3.productId })
 
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product1.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product2.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product3.name})
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product1.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product2.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product3.name })
 
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product1.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product2.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product3.brand!!.name})
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product1.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product2.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product3.brand!!.name })
 
         productRepository.delete(product1)
         productRepository.delete(product2)
@@ -213,11 +218,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -232,20 +237,20 @@ class ProductControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(body.size, 3)
 
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product2.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product3.productId})
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product1.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product2.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product3.productId })
 
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product1.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product2.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product3.name})
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product1.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product2.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product3.name })
 
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product1.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product2.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product3.brand!!.name})
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product1.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product2.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product3.brand!!.name })
 
         productRepository.delete(product1)
         productRepository.delete(product2)
@@ -266,11 +271,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -285,20 +290,20 @@ class ProductControllerTests {
         )
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(body.size, 3)
 
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product1.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product2.productId})
-        Assertions.assertEquals(true, body.any{a -> a["productId"] == product3.productId})
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product1.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product2.productId })
+        Assertions.assertEquals(true, body.any { a -> a["productId"] == product3.productId })
 
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product1.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product2.name})
-        Assertions.assertEquals(true, body.any{a -> a["name"] == product3.name})
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product1.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product2.name })
+        Assertions.assertEquals(true, body.any { a -> a["name"] == product3.name })
 
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product1.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product2.brand!!.name})
-        Assertions.assertEquals(true, body.any{a -> a["brand"] == product3.brand!!.name})
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product1.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product2.brand!!.name })
+        Assertions.assertEquals(true, body.any { a -> a["brand"] == product3.brand!!.name })
 
         productRepository.delete(product1)
         productRepository.delete(product2)
@@ -321,11 +326,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -365,11 +370,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -409,11 +414,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -452,11 +457,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -495,11 +500,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -533,11 +538,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -571,11 +576,11 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
-        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand,category)
-        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+        val product2 = TestUtils.testProduct("0000000000001", "iPad 7th Generation", brand, category)
+        val product3 = TestUtils.testProduct("0000000000002", "Surface Pro 10 inches", brand, category)
         productRepository.save(product1)
         productRepository.save(product2)
         productRepository.save(product3)
@@ -607,7 +612,7 @@ class ProductControllerTests {
 
         brandRepository.save(brand)
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
         val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
@@ -640,7 +645,7 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
         val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
@@ -673,7 +678,7 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
         val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
         productRepository.save(product1)
@@ -703,7 +708,7 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
         val productEntity = object {
@@ -734,6 +739,7 @@ class ProductControllerTests {
         categoryRepository.delete(category)
         brandRepository.delete(brand)
     }
+
     @Test
     fun postProductNullProduct() {
         val uri = URI("http://localhost:$port/API/manager/products/")
@@ -743,7 +749,7 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
         val productEntity = null
@@ -771,9 +777,8 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-
 
 
         val productEntity = object {
@@ -806,10 +811,8 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-
-
 
 
         val productEntity = object {
@@ -842,7 +845,7 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
         val productEntity = object {
@@ -851,7 +854,6 @@ class ProductControllerTests {
             val brand = "abc"
             val category = category.name.toString()
         }
-
 
 
         val entity = TestUtils.testEntityHeader(productEntity, managerToken)
@@ -878,7 +880,7 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
 
@@ -914,13 +916,12 @@ class ProductControllerTests {
         brandRepository.save(brand)
 
         val category = Category()
-        category.name= ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
 
 
-        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product1 = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
         productRepository.save(product1)
-
 
 
         val productEntity = object {

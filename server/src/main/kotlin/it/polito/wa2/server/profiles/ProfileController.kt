@@ -7,13 +7,13 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
-@CrossOrigin(origins =["http://localhost:3001"])
+@CrossOrigin(origins = ["http://localhost:3001"])
 @RestController
 @Observed
 class ProfileController(private val profileService: ProfileService) {
 
     @GetMapping("/API/authenticated/profile/")
-    fun getProfileInfo(principal: Principal) : ProfileDTO{
+    fun getProfileInfo(principal: Principal): ProfileDTO {
         val userEmail = retrieveUserEmail(principal)
         return profileService.getProfileInfo(userEmail)
     }
@@ -35,7 +35,7 @@ class ProfileController(private val profileService: ProfileService) {
         return token.tokenAttributes["email"] as String
     }
 
-    private fun checkEmail(email: String){
+    private fun checkEmail(email: String) {
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
     }

@@ -5,14 +5,17 @@ import it.polito.wa2.server.profiles.Profile
 import jakarta.persistence.*
 
 @Entity
-@Table(name="addresses")
-class Address: EntityBase<Long>() {
+@Table(name = "addresses")
+class Address : EntityBase<Long>() {
     @Column(nullable = false)
     var country: String? = null
+
     @Column(nullable = false)
     var region: String? = null
+
     @Column(nullable = false)
     var city: String? = null
+
     @Column(nullable = false)
     var address: String? = null
 

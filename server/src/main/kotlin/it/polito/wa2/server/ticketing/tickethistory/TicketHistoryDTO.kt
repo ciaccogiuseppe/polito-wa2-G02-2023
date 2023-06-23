@@ -12,12 +12,16 @@ import java.time.LocalDateTime
 data class TicketHistoryDTO(
     @field:Positive
     val ticketId: Long,
-    @field:NotBlank(message="email is mandatory")
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
+    @field:NotBlank(message = "email is mandatory")
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val userEmail: String,
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val currentExpertEmail: String?,
     val updatedTimestamp: Timestamp?,
     val oldState: TicketStatus,
@@ -27,9 +31,11 @@ data class TicketHistoryDTO(
 )
 
 fun TicketHistory.toDTO(): TicketHistoryDTO {
-    return TicketHistoryDTO(ticket?.getId()!!,
+    return TicketHistoryDTO(
+        ticket?.getId()!!,
         user?.email!!, currentExpert?.email, updatedTimestamp,
-        oldState, newState, this.getId())
+        oldState, newState, this.getId()
+    )
 }
 
 fun newTicketHistory(

@@ -26,8 +26,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.*
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -39,11 +39,220 @@ import java.util.*
 
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MessageControllerTests {
     val json = BasicJsonParser()
-    val imageArray = byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4e.toByte(), 0x47.toByte(), 0x0d.toByte(), 0x0a.toByte(), 0x1a.toByte(), 0x0a.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0d.toByte(), 0x49.toByte(), 0x48.toByte(), 0x44.toByte(), 0x52.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x64.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x64.toByte(), 0x04.toByte(), 0x03.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x82.toByte(), 0xcc.toByte(), 0x88.toByte(), 0x67.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte(), 0x73.toByte(), 0x52.toByte(), 0x47.toByte(), 0x42.toByte(), 0x00.toByte(), 0xae.toByte(), 0xce.toByte(), 0x1c.toByte(), 0xe9.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x04.toByte(), 0x67.toByte(), 0x41.toByte(), 0x4d.toByte(), 0x41.toByte(), 0x00.toByte(), 0x00.toByte(), 0xb1.toByte(), 0x8f.toByte(), 0x0b.toByte(), 0xfc.toByte(), 0x61.toByte(), 0x05.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x06.toByte(), 0x50.toByte(), 0x4c.toByte(), 0x54.toByte(), 0x45.toByte(), 0xff.toByte(), 0xff.toByte(), 0xff.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x55.toByte(), 0xc2.toByte(), 0xd3.toByte(), 0x7e.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x09.toByte(), 0x70.toByte(), 0x48.toByte(), 0x59.toByte(), 0x73.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0e.toByte(), 0xc3.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0e.toByte(), 0xc3.toByte(), 0x01.toByte(), 0xc7.toByte(), 0x6f.toByte(), 0xa8.toByte(), 0x64.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x54.toByte(), 0x49.toByte(), 0x44.toByte(), 0x41.toByte(), 0x54.toByte(), 0x58.toByte(), 0xc3.toByte(), 0xed.toByte(), 0xd3.toByte(), 0x41.toByte(), 0x0e.toByte(), 0x80.toByte(), 0x20.toByte(), 0x0c.toByte(), 0x44.toByte(), 0xd1.toByte(), 0xe9.toByte(), 0x0d.toByte(), 0xf0.toByte(), 0xfe.toByte(), 0x97.toByte(), 0x25.toByte(), 0xda.toByte(), 0xc2.toByte(), 0x42.toByte(), 0x8d.toByte(), 0x61.toByte(), 0x45.toByte(), 0x26.toByte(), 0xe6.toByte(), 0xbf.toByte(), 0x05.toByte(), 0x94.toByte(), 0x36.toByte(), 0xb3.toByte(), 0x02.toByte(), 0x04.toByte(), 0x00.toByte(), 0x00.toByte(), 0x8c.toByte(), 0x1c.toByte(), 0x45.toByte(), 0x51.toByte(), 0x45.toByte(), 0x53.toByte(), 0x96.toByte(), 0x63.toByte(), 0xcf.toByte(), 0x72.toByte(), 0x7f.toByte(), 0xe4.toByte(), 0x4a.toByte(), 0x9d.toByte(), 0x6b.toByte(), 0xcc.toByte(), 0x49.toByte(), 0x9e.toByte(), 0xef.toByte(), 0x5d.toByte(), 0x9b.toByte(), 0x48.toByte(), 0x22.toByte(), 0xf2.toByte(), 0x15.toByte(), 0x79.toByte(), 0xdc.toByte(), 0xbe.toByte(), 0x4b.toByte(), 0xa4.toByte(), 0x2d.toByte(), 0x74.toByte(), 0x89.toByte(), 0xbc.toByte(), 0x0d.toByte(), 0xed.toByte(), 0x7e.toByte(), 0xa5.toByte(), 0xdd.toByte(), 0x1b.toByte(), 0x03.toByte(), 0x00.toByte(), 0xe0.toByte(), 0xef.toByte(), 0xa4.toByte(), 0x0e.toByte(), 0x34.toByte(), 0x24.toByte(), 0x16.toByte(), 0xea.toByte(), 0x92.toByte(), 0x7e.toByte(), 0x66.toByte(), 0x58.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x49.toByte(), 0x45.toByte(), 0x4e.toByte(), 0x44.toByte(), 0xae.toByte(), 0x42.toByte(), 0x60)
+    val imageArray = byteArrayOf(
+        0x89.toByte(),
+        0x50.toByte(),
+        0x4e.toByte(),
+        0x47.toByte(),
+        0x0d.toByte(),
+        0x0a.toByte(),
+        0x1a.toByte(),
+        0x0a.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x0d.toByte(),
+        0x49.toByte(),
+        0x48.toByte(),
+        0x44.toByte(),
+        0x52.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x64.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x64.toByte(),
+        0x04.toByte(),
+        0x03.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x82.toByte(),
+        0xcc.toByte(),
+        0x88.toByte(),
+        0x67.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x01.toByte(),
+        0x73.toByte(),
+        0x52.toByte(),
+        0x47.toByte(),
+        0x42.toByte(),
+        0x00.toByte(),
+        0xae.toByte(),
+        0xce.toByte(),
+        0x1c.toByte(),
+        0xe9.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x04.toByte(),
+        0x67.toByte(),
+        0x41.toByte(),
+        0x4d.toByte(),
+        0x41.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0xb1.toByte(),
+        0x8f.toByte(),
+        0x0b.toByte(),
+        0xfc.toByte(),
+        0x61.toByte(),
+        0x05.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x06.toByte(),
+        0x50.toByte(),
+        0x4c.toByte(),
+        0x54.toByte(),
+        0x45.toByte(),
+        0xff.toByte(),
+        0xff.toByte(),
+        0xff.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x55.toByte(),
+        0xc2.toByte(),
+        0xd3.toByte(),
+        0x7e.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x09.toByte(),
+        0x70.toByte(),
+        0x48.toByte(),
+        0x59.toByte(),
+        0x73.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x0e.toByte(),
+        0xc3.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x0e.toByte(),
+        0xc3.toByte(),
+        0x01.toByte(),
+        0xc7.toByte(),
+        0x6f.toByte(),
+        0xa8.toByte(),
+        0x64.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x54.toByte(),
+        0x49.toByte(),
+        0x44.toByte(),
+        0x41.toByte(),
+        0x54.toByte(),
+        0x58.toByte(),
+        0xc3.toByte(),
+        0xed.toByte(),
+        0xd3.toByte(),
+        0x41.toByte(),
+        0x0e.toByte(),
+        0x80.toByte(),
+        0x20.toByte(),
+        0x0c.toByte(),
+        0x44.toByte(),
+        0xd1.toByte(),
+        0xe9.toByte(),
+        0x0d.toByte(),
+        0xf0.toByte(),
+        0xfe.toByte(),
+        0x97.toByte(),
+        0x25.toByte(),
+        0xda.toByte(),
+        0xc2.toByte(),
+        0x42.toByte(),
+        0x8d.toByte(),
+        0x61.toByte(),
+        0x45.toByte(),
+        0x26.toByte(),
+        0xe6.toByte(),
+        0xbf.toByte(),
+        0x05.toByte(),
+        0x94.toByte(),
+        0x36.toByte(),
+        0xb3.toByte(),
+        0x02.toByte(),
+        0x04.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x8c.toByte(),
+        0x1c.toByte(),
+        0x45.toByte(),
+        0x51.toByte(),
+        0x45.toByte(),
+        0x53.toByte(),
+        0x96.toByte(),
+        0x63.toByte(),
+        0xcf.toByte(),
+        0x72.toByte(),
+        0x7f.toByte(),
+        0xe4.toByte(),
+        0x4a.toByte(),
+        0x9d.toByte(),
+        0x6b.toByte(),
+        0xcc.toByte(),
+        0x49.toByte(),
+        0x9e.toByte(),
+        0xef.toByte(),
+        0x5d.toByte(),
+        0x9b.toByte(),
+        0x48.toByte(),
+        0x22.toByte(),
+        0xf2.toByte(),
+        0x15.toByte(),
+        0x79.toByte(),
+        0xdc.toByte(),
+        0xbe.toByte(),
+        0x4b.toByte(),
+        0xa4.toByte(),
+        0x2d.toByte(),
+        0x74.toByte(),
+        0x89.toByte(),
+        0xbc.toByte(),
+        0x0d.toByte(),
+        0xed.toByte(),
+        0x7e.toByte(),
+        0xa5.toByte(),
+        0xdd.toByte(),
+        0x1b.toByte(),
+        0x03.toByte(),
+        0x00.toByte(),
+        0xe0.toByte(),
+        0xef.toByte(),
+        0xa4.toByte(),
+        0x0e.toByte(),
+        0x34.toByte(),
+        0x24.toByte(),
+        0x16.toByte(),
+        0xea.toByte(),
+        0x92.toByte(),
+        0x7e.toByte(),
+        0x66.toByte(),
+        0x58.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x49.toByte(),
+        0x45.toByte(),
+        0x4e.toByte(),
+        0x44.toByte(),
+        0xae.toByte(),
+        0x42.toByte(),
+        0x60
+    )
 
     companion object {
         @Container
@@ -59,7 +268,7 @@ class MessageControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -69,7 +278,7 @@ class MessageControllerTests {
 
         @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
         }
@@ -80,33 +289,44 @@ class MessageControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
         }
     }
+
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var attachmentRepository: AttachmentRepository
+
     @Autowired
     lateinit var profileRepository: ProfileRepository
+
     @Autowired
     lateinit var ticketRepository: TicketRepository
+
     @Autowired
     lateinit var productRepository: ProductRepository
+
     @Autowired
     lateinit var messageRepository: MessageRepository
+
     @Autowired
-    lateinit var brandRepository:  BrandRepository
+    lateinit var brandRepository: BrandRepository
+
     @Autowired
     lateinit var categoryRepository: CategoryRepository
+
     @Autowired
     lateinit var itemRepository: ItemRepository
+
     @Test
     //@DirtiesContext
     fun getExistingMessagesManager() {
@@ -126,17 +346,35 @@ class MessageControllerTests {
 
         brandRepository.save(brand)
         val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -178,21 +416,21 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(3, body.size)
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message1.text})
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message3.text})
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message1.text })
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message2.text })
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message3.text })
 
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.getId()})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.getId()})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.getId()})
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message1.getId() })
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message2.getId() })
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message3.getId() })
 
 
-        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.getId()})
+        Assertions.assertEquals(true, body.all { a -> a["ticketId"] == ticket.getId() })
 
-        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
-        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
+        Assertions.assertEquals(true, body.any { a -> a["senderEmail"] == customer.email })
+        Assertions.assertEquals(true, body.any { a -> a["senderEmail"] == expert.email })
 
 
     }
@@ -214,17 +452,35 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.save(brand)
         val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -264,21 +520,21 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(3, body.size)
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message1.text})
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message3.text})
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message1.text })
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message2.text })
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message3.text })
 
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.getId()})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.getId()})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.getId()})
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message1.getId() })
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message2.getId() })
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message3.getId() })
 
 
-        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.getId()})
+        Assertions.assertEquals(true, body.all { a -> a["ticketId"] == ticket.getId() })
 
-        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
-        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
+        Assertions.assertEquals(true, body.any { a -> a["senderEmail"] == customer.email })
+        Assertions.assertEquals(true, body.any { a -> a["senderEmail"] == expert.email })
 
 
     }
@@ -301,17 +557,35 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.save(brand)
         val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -371,17 +645,35 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
 
         brandRepository.save(brand)
         val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -421,21 +713,21 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(3, body.size)
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message1.text})
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message2.text})
-        Assertions.assertEquals(true, body.any{a -> a["text"] == message3.text})
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message1.text })
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message2.text })
+        Assertions.assertEquals(true, body.any { a -> a["text"] == message3.text })
 
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message1.getId()})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message2.getId()})
-        Assertions.assertEquals(true, body.any{a -> a["messageId"] == message3.getId()})
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message1.getId() })
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message2.getId() })
+        Assertions.assertEquals(true, body.any { a -> a["messageId"] == message3.getId() })
 
 
-        Assertions.assertEquals(true, body.all{a -> a["ticketId"] == ticket.getId()})
+        Assertions.assertEquals(true, body.all { a -> a["ticketId"] == ticket.getId() })
 
-        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == customer.email})
-        Assertions.assertEquals(true, body.any{a -> a["senderEmail"] == expert.email})
+        Assertions.assertEquals(true, body.any { a -> a["senderEmail"] == customer.email })
+        Assertions.assertEquals(true, body.any { a -> a["senderEmail"] == expert.email })
 
 
     }
@@ -454,22 +746,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -527,22 +837,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -600,22 +928,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -653,7 +999,7 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(0, body.size)
 
     }
@@ -712,22 +1058,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
 
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -773,13 +1137,13 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         brandRepository.delete(brand)
         productRepository.delete(product)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(1, body.size)
 
         Assertions.assertEquals(
             attachment2.getId(),
-            ((body[0]["attachments"]as ArrayList<*>)[0] as LinkedHashMap<*,*>)["attachmentId"]
-            )
+            ((body[0]["attachments"] as ArrayList<*>)[0] as LinkedHashMap<*, *>)["attachmentId"]
+        )
 
 
     }
@@ -796,22 +1160,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -870,21 +1252,39 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -934,22 +1334,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -1009,22 +1427,40 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 
         val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
         itemRepository.save(item)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(1), item, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(1),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
         ticketRepository.save(ticket2)
 
@@ -1074,14 +1510,14 @@ val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,c
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-val brand = Brand()
+        val brand = Brand()
         brand.name = "Apple"
 
         brandRepository.save(brand)
-val category = Category()
-        category.name=ProductCategory.SMARTPHONE
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
         categoryRepository.save(category)
-val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand,category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
 

@@ -21,7 +21,9 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Service @Transactional @Observed
+@Service
+@Transactional
+@Observed
 class MessageServiceImpl(
     private val messageRepository: MessageRepository,
     private val ticketRepository: TicketRepository,
@@ -29,41 +31,42 @@ class MessageServiceImpl(
     private val attachmentRepository: AttachmentRepository,
     private val profileService: ProfileService,
     private val ticketService: TicketService,
-    private val attachmentService: AttachmentService): MessageService {
+    private val attachmentService: AttachmentService
+) : MessageService {
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}')")
     override fun getChat(ticketId: Long, userEmail: String): List<MessageDTO> {
         val user = getProfileByEmail(userEmail, userEmail)
-        val ticket = if(user.role == ProfileRole.CLIENT) getTicketClient(ticketId, userEmail)
-            else getTicketExpert(ticketId, userEmail)
+        val ticket = if (user.role == ProfileRole.CLIENT) getTicketClient(ticketId, userEmail)
+        else getTicketExpert(ticketId, userEmail)
         checkSender(user, ticket)
-        return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
+        return messageRepository.findAllByTicket(ticket).map { it.toDTO() }
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun getChatManager(ticketId: Long, userEmail: String): List<MessageDTO> {
         val ticket = getTicketManager(ticketId, userEmail)
-        return messageRepository.findAllByTicket(ticket).map {it.toDTO()}
+        return messageRepository.findAllByTicket(ticket).map { it.toDTO() }
     }
 
     @PreAuthorize("hasAnyRole('${WebSecurityConfig.CLIENT}', '${WebSecurityConfig.EXPERT}')")
     override fun addMessageSender(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
-        if(ticketId != messageDTO.ticketId)
+        if (ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
         val user = getProfileByEmail(userEmail, userEmail)
-        val ticket = if(user.role == ProfileRole.CLIENT) getTicketClient(ticketId, userEmail)
-            else getTicketExpert(ticketId, userEmail)
+        val ticket = if (user.role == ProfileRole.CLIENT) getTicketClient(ticketId, userEmail)
+        else getTicketExpert(ticketId, userEmail)
         checkSender(user, ticket)
         addMessage(messageDTO, userEmail, ticket)
     }
 
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
     override fun addMessageManager(ticketId: Long, messageDTO: MessageDTO, userEmail: String) {
-        if(ticketId != messageDTO.ticketId)
+        if (ticketId != messageDTO.ticketId)
             throw BadRequestMessageException("The ticket ids are different")
         val ticket = getTicketManager(ticketId, userEmail)
-       addMessage(messageDTO, userEmail, ticket)
+        addMessage(messageDTO, userEmail, ticket)
     }
 
     private fun getTicketManager(ticketId: Long, userEmail: String): Ticket {
@@ -83,11 +86,10 @@ class MessageServiceImpl(
 
     private fun getAttachment(attachmentDTO: AttachmentDTO): Attachment {
         var attachmentId = attachmentDTO.attachmentId
-        if(attachmentId == null)
+        if (attachmentId == null)
             attachmentId = attachmentService.addAttachment(attachmentDTO)
         return attachmentRepository.findByIdOrNull(attachmentId)!!
     }
-
 
 
     private fun getProfileByEmail(email: String, loggedEmail: String): Profile {
@@ -95,10 +97,10 @@ class MessageServiceImpl(
         return profileRepository.findByEmail(profileDTO.email)!!
     }
 
-    private fun addMessage(messageDTO: MessageDTO, userEmail: String, ticket: Ticket){
-        val attachments = messageDTO.attachments.map{getAttachment(it)}.toMutableSet()
+    private fun addMessage(messageDTO: MessageDTO, userEmail: String, ticket: Ticket) {
+        val attachments = messageDTO.attachments.map { getAttachment(it) }.toMutableSet()
         val sender = getProfileByEmail(userEmail, userEmail)
-        if(sender != ticket.client && (ticket.expert != null && ticket.expert != sender))
+        if (sender != ticket.client && (ticket.expert != null && ticket.expert != sender))
             throw UnauthorizedMessageException("Sender is not related to ticket")
         val message = messageDTO.toNewMessage(attachments, sender, ticket)
         messageRepository.save(message)
@@ -109,7 +111,7 @@ class MessageServiceImpl(
     private fun checkSender(user: Profile, ticket: Ticket) {
         val clientOfTicket = ticket.client!!
         val expertOfTicket = ticket.expert!!
-        if(user != clientOfTicket && user != expertOfTicket)
+        if (user != clientOfTicket && user != expertOfTicket)
             throw ForbiddenException("User is not related to ticket")
     }
 }
