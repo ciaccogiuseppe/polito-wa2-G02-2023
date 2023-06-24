@@ -1,4 +1,4 @@
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import React, { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
@@ -14,7 +14,7 @@ function VendorCreatePage(props) {
   const [surname, setSurname] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const loggedIn = props.loggedIn;
   function submit() {
     setErrorMessage("");
@@ -58,7 +58,7 @@ function VendorCreatePage(props) {
       setErrorMessage("Error in form: Passwords do not match");
       return;
     }
-
+    setLoading(true);
     createVendorAPI({
       firstName: name,
       lastName: surname,
@@ -68,8 +68,14 @@ function VendorCreatePage(props) {
       expertCategories: [],
       address: {},
     })
-      .then(() => navigate("/"))
-      .catch((err) => setErrorMessage(err));
+      .then(() => {
+        setLoading(false);
+        navigate("/");
+      })
+      .catch((err) => {
+        setErrorMessage(err);
+        setLoading(false);
+      });
   }
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -176,6 +182,11 @@ function VendorCreatePage(props) {
               onChange={(e) => setPassword2(e.target.value)}
             />
           </Form.Group>
+          {loading && (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
+          )}
           <NavigationButton
             text={"Create vendor"}
             onClick={(e) => {

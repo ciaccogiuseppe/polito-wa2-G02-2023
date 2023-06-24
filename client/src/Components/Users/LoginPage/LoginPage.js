@@ -1,6 +1,6 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
-import { Form } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
@@ -12,19 +12,21 @@ function LoginPage(props) {
   const loggedIn = props.loggedIn;
   const setLoggedIn = props.setLoggedIn;
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function login() {
+    setLoading(true);
     loginAPI({ username: email, password: password })
       .then((response) => {
-        console.log(response);
         setLoggedIn(true);
+        setLoading(false);
         navigate("/");
       })
       .catch((err) => {
-        console.log(err);
+        setLoading(false);
         setErrorMessage(err);
       });
   }
@@ -78,6 +80,11 @@ function LoginPage(props) {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Form.Group>
+          {loading && (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
+          )}
           <NavigationButton
             text={"Login"}
             type={"submit"}

@@ -1,7 +1,7 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getAllProducts } from "../../../API/Products";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { reformatCategory } from "../ProductsPage/ProductsPage";
@@ -14,6 +14,7 @@ function ProductRegisterPage(props) {
   const [errorMessage, setErrorMessage] = useState("");
   const [brands, setBrands] = useState([]);
   const [brand, setBrand] = useState("");
+  const [loading, setLoading] = useState(false);
   const [serialNum, setSerialNum] = useState("");
   const [category, setCategory] = useState("");
   const [products, setProducts] = useState([]);
@@ -27,16 +28,20 @@ function ProductRegisterPage(props) {
   const [war5, setWar5] = useState("");
   useEffect(() => {
     window.scrollTo(0, 0);
-    getAllProducts().then((products) => {
-      setProducts(products);
-      setCategories(
-        products
-          .map((p) => reformatCategory(p.category))
-          .filter((v, i, a) => a.indexOf(v) === i)
-          .sort()
-      );
-      //setBrands(products.map(p => p.brand).filter((v,i,a)=>a.indexOf(v)===i).sort())
-    });
+    getAllProducts()
+      .then((products) => {
+        setProducts(products);
+        setCategories(
+          products
+            .map((p) => reformatCategory(p.category))
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .sort()
+        );
+        //setBrands(products.map(p => p.brand).filter((v,i,a)=>a.indexOf(v)===i).sort())
+      })
+      .catch((err) => {
+        setErrorMessage("Unable to fetch data from server: " + err);
+      });
   }, []);
 
   useEffect(() => {
@@ -70,13 +75,20 @@ function ProductRegisterPage(props) {
 
   const navigate = useNavigate();
   function addProduct() {
+    setLoading(true);
     assignItemAPI({
       productId: product,
       serialNum: serialNum,
       uuid: warranty,
     })
-      .then(() => navigate("/products"))
-      .catch((err) => setErrorMessage(err));
+      .then(() => {
+        setLoading(false);
+        navigate("/products");
+      })
+      .catch((err) => {
+        setLoading(false);
+        setErrorMessage(err);
+      });
   }
 
   useEffect(() => {
@@ -316,7 +328,11 @@ function ProductRegisterPage(props) {
               </div>
             </>
           )}
-
+          {loading && (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
+          )}
           <NavigationButton
             text={"Insert"}
             onClick={(e) => {

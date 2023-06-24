@@ -1,11 +1,12 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import { Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getProfileInfo } from "../../../API/Auth";
 import SuccessMessage from "../../Common/SuccessMessage";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
+import ErrorMessage from "../../Common/ErrorMessage";
 
 function ProfileInfoPage(props) {
   const location = useLocation();
@@ -13,6 +14,7 @@ function ProfileInfoPage(props) {
   const loggedIn = props.loggedIn;
   const [Profile, setProfile] = useState(null);
   const [successMessage, setSuccessMessage] = useState(message || "");
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -22,7 +24,7 @@ function ProfileInfoPage(props) {
       .then((response) => {
         setProfile(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setErrorMessage(err));
   }, []);
 
   useEffect(() => {
@@ -64,10 +66,22 @@ function ProfileInfoPage(props) {
             backgroundColor: "rgba(0,0,0,0.1)",
           }}
         >
-          {loading ? (
+          {errorMessage && (
             <>
-              <Spinner style={{ color: "#A0C1D9" }} />
+              <div style={{ margin: "10px" }}>
+                <ErrorMessage
+                  text={errorMessage}
+                  close={() => {
+                    setErrorMessage("");
+                  }}
+                />{" "}
+              </div>
             </>
+          )}
+          {loading ? (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
           ) : (
             <>
               <div>

@@ -12,7 +12,7 @@ import ChatMessage from "./ChatMessage";
 import { Form, Spinner } from "react-bootstrap";
 import AddButton from "../../Common/AddButton";
 import AttachmentOverlay from "./AttachmentOverlay";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DeleteButton from "../../Common/DeleteButton";
 import SendButton from "../../Common/SendButton";
 import PriorityIndicator from "../TicketCommon/PriorityIndicator";
@@ -342,6 +342,7 @@ function TicketChatPage(props) {
   const [chatErrorMessage, setChatErrorMessage] = useState("");
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingChat, setLoadingChat] = useState(false);
 
   const [newPriority, setNewPriority] = useState("");
   const [newStatus, setNewStatus] = useState("");
@@ -368,11 +369,16 @@ function TicketChatPage(props) {
           })
           .catch((err) => setErrorMessage(err));
 
+        setLoadingChat(true);
         getChatClient(ticketID)
-          .then((response) =>
-            setChat(response.sort((a, b) => a.messageId > b.messageId))
-          )
-          .catch((err) => setChatErrorMessage(err));
+          .then((response) => {
+            setChat(response.sort((a, b) => a.messageId > b.messageId));
+            setLoadingChat(false);
+          })
+          .catch((err) => {
+            setChatErrorMessage(err);
+            setLoadingChat(false);
+          });
       } else if (user.role === "EXPERT") {
         getTicketExpertAPI(ticketID)
           .then((response) => {
@@ -806,7 +812,13 @@ function TicketChatPage(props) {
                   fontSize: 14,
                 }}
               >
-                Expert: {expert.name} {expert.surname}
+                {expert ? (
+                  <>
+                    Expert: {expert.name} {expert.surname}
+                  </>
+                ) : (
+                  <>Expert not assigned</>
+                )}
               </div>
 
               {user.role === "MANAGER" &&
@@ -899,6 +911,11 @@ function TicketChatPage(props) {
               }}
             />
 
+            {loadingChat && (
+              <>
+                <Spinner style={{ color: "#A0C1D9" }} />
+              </>
+            )}
             <div
               style={{
                 backgroundColor: "rgba(255,255,255,0.1)",

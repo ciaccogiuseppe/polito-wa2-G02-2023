@@ -1,7 +1,7 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   addProductAPI,
   getAllBrands,
@@ -22,6 +22,7 @@ function ProductCreatePage(props) {
   const [productId, setProductId] = useState("");
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("");
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [pid1, setPid1] = useState("");
   const [pid2, setPid2] = useState("");
@@ -35,22 +36,35 @@ function ProductCreatePage(props) {
           categories.map((c) => reformatCategory(c.categoryName)).sort()
         );
       })
-      .catch((err) => console.log(err));
-    getAllBrands().then((brands) => {
-      setBrands(brands.map((b) => b.name).sort());
-    });
+      .catch((err) => {
+        setErrorMessage("Unable to fetch data from server: " + err);
+      });
+    getAllBrands()
+      .then((brands) => {
+        setBrands(brands.map((b) => b.name).sort());
+      })
+      .catch((err) => {
+        setErrorMessage("Unable to fetch data from server: " + err);
+      });
   }, []);
 
   const navigate = useNavigate();
   function addProduct() {
+    setLoading(true);
     addProductAPI({
       productId: productId,
       brand: brand,
       category: deformatCategory(category),
       name: name,
     })
-      .then(() => navigate("/products"))
-      .catch((err) => setErrorMessage(err));
+      .then(() => {
+        setLoading(false);
+        navigate("/products");
+      })
+      .catch((err) => {
+        setLoading(false);
+        setErrorMessage(err);
+      });
   }
 
   useEffect(() => {
@@ -207,6 +221,11 @@ function ProductCreatePage(props) {
               }}
             />
           </Form.Group>
+          {loading && (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
+          )}
           {errorMessage && (
             <>
               <div style={{ margin: "10px" }}>

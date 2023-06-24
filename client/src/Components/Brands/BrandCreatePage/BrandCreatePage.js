@@ -1,7 +1,7 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { addBrandAPI } from "../../../API/Products";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { useNavigate } from "react-router-dom";
@@ -10,11 +10,16 @@ function BrandCreatePage(props) {
   const loggedIn = props.loggedIn;
   const [errorMessage, setErrorMessage] = useState("");
   const [brand, setBrand] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   function addProduct() {
+    setLoading(true);
     addBrandAPI({ name: brand })
-      .then(() => navigate("/brands"))
+      .then(() => {
+        setLoading(false);
+        navigate("/brands");
+      })
       .catch((err) => setErrorMessage(err));
   }
 
@@ -75,7 +80,11 @@ function BrandCreatePage(props) {
               </div>
             </>
           )}
-
+          {loading && (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
+          )}
           <NavigationButton
             text={"Insert"}
             type={"submit"}

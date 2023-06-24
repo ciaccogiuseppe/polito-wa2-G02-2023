@@ -1,6 +1,6 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
-import { Form } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { resetPasswordApplyAPI } from "../../../API/Auth";
@@ -14,6 +14,7 @@ function PasswordResetPage(props) {
 
   const loggedIn = props.loggedIn;
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const isExpired = false;
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ function PasswordResetPage(props) {
       setErrorMessage("Passwords do not match");
       return;
     }
+    setLoading(true);
     resetPasswordApplyAPI({
       password: password,
       token: token,
@@ -33,9 +35,10 @@ function PasswordResetPage(props) {
     })
       .then((response) => {
         setSuccessMessage(true);
+        setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        setLoading(false);
         setErrorMessage(err);
       });
   }
@@ -116,6 +119,11 @@ function PasswordResetPage(props) {
                   onChange={(e) => setPassword2(e.target.value)}
                 />
               </Form.Group>
+              {loading && (
+                <>
+                  <Spinner style={{ color: "#A0C1D9" }} />
+                </>
+              )}
               <NavigationButton
                 text={"Reset password"}
                 type={"submit"}

@@ -1,7 +1,7 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   updateClientAPI,
@@ -18,6 +18,7 @@ function ProfileUpdatePage(props) {
   const [Profile, setProfile] = useState({});
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState(Profile.name || "");
   const [lastName, setLastName] = useState(Profile.surname || "");
   const [address, setAddress] = useState(
@@ -35,6 +36,7 @@ function ProfileUpdatePage(props) {
     (Profile.address && Profile.address.city) || ""
   );
   function updateProfile() {
+    setLoading(true);
     if (Profile.role === "CLIENT") {
       updateClientAPI(
         {
@@ -52,13 +54,17 @@ function ProfileUpdatePage(props) {
         },
         Profile.email
       )
-        .then(() =>
+        .then(() => {
+          setLoading(false);
           navigate("/profileinfo", {
             replace: true,
             state: { message: "Profile updated successfully" },
-          })
-        )
-        .catch((err) => setErrorMessage(err));
+          });
+        })
+        .catch((err) => {
+          setLoading(false);
+          setErrorMessage(err);
+        });
     } else if (Profile.role === "EXPERT") {
       updateExpertAPI(
         {
@@ -71,13 +77,17 @@ function ProfileUpdatePage(props) {
         },
         Profile.email
       )
-        .then(() =>
+        .then(() => {
+          setLoading(false);
           navigate("/profileinfo", {
             replace: true,
             state: { message: "Profile updated successfully" },
-          })
-        )
-        .catch((err) => setErrorMessage(err));
+          });
+        })
+        .catch((err) => {
+          setLoading(false);
+          setErrorMessage(err);
+        });
     } else if (Profile.role === "MANAGER") {
       updateManagerAPI(
         {
@@ -90,13 +100,17 @@ function ProfileUpdatePage(props) {
         },
         Profile.email
       )
-        .then(() =>
+        .then(() => {
+          setLoading(false);
           navigate("/profileinfo", {
             replace: true,
             state: { message: "Profile updated successfully" },
-          })
-        )
-        .catch((err) => setErrorMessage(err));
+          });
+        })
+        .catch((err) => {
+          setLoading(false);
+          setErrorMessage(err);
+        });
     }
   }
   useEffect(() => {
@@ -105,7 +119,9 @@ function ProfileUpdatePage(props) {
       .then((response) => {
         setProfile(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setErrorMessage("Unable to fetch data from server: " + err);
+      });
   }, []);
 
   useEffect(() => {
@@ -262,6 +278,11 @@ function ProfileUpdatePage(props) {
           <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />
         )}
 
+        {loading && (
+          <>
+            <Spinner style={{ color: "#A0C1D9" }} />
+          </>
+        )}
         <div style={{ marginTop: "20px" }}>
           <NavigationButton
             text={"Submit"}

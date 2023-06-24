@@ -1,6 +1,6 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
-import { Form } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import { useNavigate } from "react-router-dom";
 import { passwordResetTriggerAPI } from "../../../API/Auth";
@@ -10,17 +10,20 @@ import SuccessMessage from "../../Common/SuccessMessage";
 function PasswordResetTriggerPage(props) {
   const loggedIn = props.loggedIn;
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [successMessage, setSuccessMessage] = useState(false);
 
   function reset() {
+    setLoading(true);
     passwordResetTriggerAPI(email)
       .then((response) => {
         setSuccessMessage(true);
+        setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        setLoading(false);
         setErrorMessage(err);
       });
   }
@@ -69,6 +72,11 @@ function PasswordResetTriggerPage(props) {
               onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
+          {loading && (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
+          )}
           <div style={{ margin: "20px" }}>
             <NavigationButton
               text={"Reset password"}

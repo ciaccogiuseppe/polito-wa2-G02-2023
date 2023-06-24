@@ -1,6 +1,6 @@
-import { Col, Row } from "react-bootstrap";
+import { Col, Row, Spinner } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
 import {
   crossIcon,
@@ -12,6 +12,7 @@ import TicketHistoryTable from "./TicketHistoryTable";
 import { getTicketHistoryAPI } from "../../../API/TicketHistory";
 import InfoMessage from "../../Common/InfoMessage";
 import { useLocation } from "react-router-dom";
+import ErrorMessage from "../../Common/ErrorMessage";
 
 function TicketHistoryPage(props) {
   const [ticketId, setTicketId] = useState("");
@@ -21,6 +22,8 @@ function TicketHistoryPage(props) {
   const [finalDate, setFinalDate] = useState("");
   const [ticketList, setTicketList] = useState([]);
   const [showFilters, setShowFilters] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { state } = useLocation();
 
@@ -36,14 +39,19 @@ function TicketHistoryPage(props) {
     if (ticketId) {
       getTicketHistoryAPI({
         ticketId: ticketId,
-      }).then((tickets) => {
-        setTicketList(tickets.sort((a, b) => a.ticketId > b.ticketId));
-        setShowFilters(false);
-      });
+      })
+        .then((tickets) => {
+          setTicketList(tickets.sort((a, b) => a.ticketId > b.ticketId));
+          setShowFilters(false);
+        })
+        .catch((err) => {
+          setErrorMessage("Unable to fetch data from server: " + err);
+        });
     }
   }, [ticketId]);
 
   function applyFilters() {
+    setLoading(true);
     getTicketHistoryAPI({
       ticketId: "",
       userEmail: userEmail,
@@ -52,10 +60,13 @@ function TicketHistoryPage(props) {
         initialDate && new Date(initialDate).toISOString().replace(/.$/, ""),
       updatedBefore:
         finalDate && new Date(finalDate).toISOString().replace(/.$/, ""),
-    }).then((tickets) => {
-      setTicketList(tickets.sort((a, b) => a.ticketId > b.ticketId));
-      setShowFilters(false);
-    });
+    })
+      .then((tickets) => {
+        setTicketList(tickets.sort((a, b) => a.ticketId > b.ticketId));
+        setShowFilters(false);
+        setLoading(false);
+      })
+      .catch((err) => setErrorMessage(err));
   }
 
   const loggedIn = props.loggedIn;
@@ -267,7 +278,23 @@ function TicketHistoryPage(props) {
             </>
           )}
         </div>
-
+        {loading && (
+          <>
+            <Spinner style={{ color: "#A0C1D9" }} />
+          </>
+        )}
+        {errorMessage && (
+          <>
+            <div style={{ margin: "10px" }}>
+              <ErrorMessage
+                text={errorMessage}
+                close={() => {
+                  setErrorMessage("");
+                }}
+              />{" "}
+            </div>
+          </>
+        )}
         <TicketHistoryTable ticketList={ticketList} />
       </div>
     </>

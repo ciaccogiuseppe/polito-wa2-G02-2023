@@ -1,5 +1,5 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getAllProducts } from "../../../API/Products";
 import NavigationButton from "../../Common/NavigationButton";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,8 @@ import {
   crossIcon,
   filterIcon,
 } from "../../Common/Icons";
-import { Row } from "react-bootstrap";
+import { Row, Spinner } from "react-bootstrap";
+import ErrorMessage from "../../Common/ErrorMessage";
 
 export function reformatCategory(category) {
   switch (category) {
@@ -57,13 +58,22 @@ function ProductsPage(props) {
   const [productsList, setProductsList] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getAllProducts().then((products) => {
-      setProductsList(products);
-      setAllProducts(products);
-    });
+    setLoading(true);
+    getAllProducts()
+      .then((products) => {
+        setProductsList(products);
+        setAllProducts(products);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setErrorMessage("Unable to fetch data from server: " + err);
+      });
   }, []);
 
   useEffect(
@@ -283,7 +293,23 @@ function ProductsPage(props) {
             </>
           )}
         </div>
-
+        {loading && (
+          <>
+            <Spinner style={{ color: "#A0C1D9" }} />
+          </>
+        )}
+        {errorMessage && (
+          <>
+            <div style={{ margin: "10px" }}>
+              <ErrorMessage
+                text={errorMessage}
+                close={() => {
+                  setErrorMessage("");
+                }}
+              />{" "}
+            </div>
+          </>
+        )}
         <ProductsTable products={productsList} />
         <div style={{ position: "fixed", bottom: "24px", right: "24px" }}>
           <AddButton onClick={() => navigate("/newproduct")} />

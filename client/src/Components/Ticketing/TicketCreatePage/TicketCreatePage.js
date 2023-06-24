@@ -1,7 +1,7 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getAllProducts } from "../../../API/Products";
 import { reformatCategory } from "../../Products/ProductsPage/ProductsPage";
 import ErrorMessage from "../../Common/ErrorMessage";
@@ -12,6 +12,7 @@ import { getAllItemsAPI } from "../../../API/Item";
 function TicketCreatePage(props) {
   const loggedIn = props.loggedIn;
   const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [brands, setBrands] = useState([]);
@@ -26,17 +27,21 @@ function TicketCreatePage(props) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getAllProducts().then((prods) => {
-      getAllItemsAPI().then((ps) => {
-        const pd = ps.map((p) => {
-          return {
-            ...p,
-            product: prods.filter((pd) => p.productId === pd.productId)[0],
-          };
+    getAllProducts()
+      .then((prods) => {
+        getAllItemsAPI().then((ps) => {
+          const pd = ps.map((p) => {
+            return {
+              ...p,
+              product: prods.filter((pd) => p.productId === pd.productId)[0],
+            };
+          });
+          setProducts(pd);
         });
-        setProducts(pd);
+      })
+      .catch((err) => {
+        setErrorMessage("Unable to fetch data from server: " + err);
       });
-    });
   }, []);
 
   useEffect(() => {
@@ -98,7 +103,7 @@ function TicketCreatePage(props) {
 
   const navigate = useNavigate();
   function addTicket() {
-    console.log(product);
+    setLoading(true);
     addTicketAPI({
       title: title,
       description: description,
@@ -107,8 +112,12 @@ function TicketCreatePage(props) {
     })
       .then((response) => {
         navigate("/tickets/" + response.data.ticketId);
+        setLoading(false);
       })
-      .catch((err) => setErrorMessage(err));
+      .catch((err) => {
+        setErrorMessage(err);
+        setLoading(false);
+      });
   }
 
   return (
@@ -287,7 +296,11 @@ function TicketCreatePage(props) {
               </div>
             </>
           )}
-
+          {loading && (
+            <div>
+              <Spinner style={{ color: "#A0C1D9" }} />
+            </div>
+          )}
           <NavigationButton
             disabled={
               category === "" ||

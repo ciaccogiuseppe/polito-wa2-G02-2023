@@ -1,4 +1,4 @@
-import { Form, Col, Row } from "react-bootstrap";
+import { Form, Col, Row, Spinner } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
 import React, { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
@@ -25,6 +25,7 @@ function ExpertCreatePage(props) {
   const [surname, setSurname] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [expertCategories, setExpertCategories] = useState([]);
   const updateExpertCategories = (event) => {
@@ -40,6 +41,7 @@ function ExpertCreatePage(props) {
 
   function submit() {
     setErrorMessage("");
+
     let missingFields = "";
     if (name.length === 0) {
       missingFields = missingFields + "first name, ";
@@ -85,7 +87,7 @@ function ExpertCreatePage(props) {
       setErrorMessage("Error in form: No product categories selected");
       return;
     }
-
+    setLoading(true);
     createExpertAPI({
       firstName: name,
       lastName: surname,
@@ -94,8 +96,14 @@ function ExpertCreatePage(props) {
       password: password,
       expertCategories: expertCategories,
     })
-      .then(() => navigate("/"))
-      .catch((err) => setErrorMessage(err));
+      .then(() => {
+        setLoading(false);
+        navigate("/");
+      })
+      .catch((err) => {
+        setLoading(false);
+        setErrorMessage(err);
+      });
   }
 
   useEffect(() => {
@@ -252,6 +260,11 @@ function ExpertCreatePage(props) {
             </Form>
           </Col>
         </Row>
+        {loading && (
+          <>
+            <Spinner style={{ color: "#A0C1D9" }} />
+          </>
+        )}
         <NavigationButton
           text={"Create new expert"}
           onClick={(e) => {

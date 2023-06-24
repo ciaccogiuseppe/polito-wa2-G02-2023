@@ -1,8 +1,8 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { Row } from "react-bootstrap";
+import { Row, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
 import TicketListTable from "./TicketListTable";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   caretDownIcon,
   caretUpIcon,
@@ -20,6 +20,7 @@ import {
   getAllTicketsExpert,
   getAllTicketsManager,
 } from "../../../API/Tickets";
+import ErrorMessage from "../../Common/ErrorMessage";
 
 function StatusSelector(props) {
   const selectedStatus = props.selectedStatus;
@@ -143,6 +144,8 @@ function TicketListPage(props) {
   const [showFilters, setShowFilters] = useState(user.role === "MANAGER");
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(
@@ -152,55 +155,67 @@ function TicketListPage(props) {
       if (user.role === "CLIENT") {
         getAllTicketsClient({
           clientEmail: user.email,
-        }).then((tickets) => {
-          setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
-          const prodsIds = tickets.map((t) => t.productId);
+        })
+          .then((tickets) => {
+            setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
+            const prodsIds = tickets.map((t) => t.productId);
 
-          getAllProducts().then((products) =>
-            setProducts(
-              products
-                .map((p) => {
-                  return { productId: p.productId, name: p.name };
-                })
-                .filter((p) => prodsIds.includes(p.productId))
-                .sort((a, b) =>
-                  a.name.localeCompare(b.name, undefined, { numeric: true })
-                )
-            )
+            getAllProducts().then((products) =>
+              setProducts(
+                products
+                  .map((p) => {
+                    return { productId: p.productId, name: p.name };
+                  })
+                  .filter((p) => prodsIds.includes(p.productId))
+                  .sort((a, b) =>
+                    a.name.localeCompare(b.name, undefined, { numeric: true })
+                  )
+              )
+            );
+          })
+          .catch((err) =>
+            setErrorMessage("Unable to fetch data from server: " + err)
           );
-        });
       } else if (user.role === "EXPERT") {
         getAllTicketsExpert({
           expertEmail: user.email,
-        }).then((tickets) => {
-          setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
-          const prodsIds = tickets.map((t) => t.productId);
+        })
+          .then((tickets) => {
+            setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
+            const prodsIds = tickets.map((t) => t.productId);
 
-          getAllProducts().then((products) =>
+            getAllProducts().then((products) =>
+              setProducts(
+                products
+                  .map((p) => {
+                    return { productId: p.productId, name: p.name };
+                  })
+                  .filter((p) => prodsIds.includes(p.productId))
+                  .sort((a, b) =>
+                    a.name.localeCompare(b.name, undefined, { numeric: true })
+                  )
+              )
+            );
+          })
+          .catch((err) =>
+            setErrorMessage("Unable to fetch data from server: " + err)
+          );
+      } else if (user.role === "MANAGER") {
+        getAllProducts()
+          .then((products) =>
             setProducts(
               products
                 .map((p) => {
                   return { productId: p.productId, name: p.name };
                 })
-                .filter((p) => prodsIds.includes(p.productId))
                 .sort((a, b) =>
                   a.name.localeCompare(b.name, undefined, { numeric: true })
                 )
             )
-          );
-        });
-      } else if (user.role === "MANAGER") {
-        getAllProducts().then((products) =>
-          setProducts(
-            products
-              .map((p) => {
-                return { productId: p.productId, name: p.name };
-              })
-              .sort((a, b) =>
-                a.name.localeCompare(b.name, undefined, { numeric: true })
-              )
           )
-        );
+          .catch((err) =>
+            setErrorMessage("Unable to fetch data from server: " + err)
+          );
       }
     },
     // eslint-disable-next-line
@@ -208,6 +223,7 @@ function TicketListPage(props) {
   );
 
   function applyFilters() {
+    setLoading(true);
     if (user.role === "CLIENT")
       getAllTicketsClient({
         clientEmail: user.email,
@@ -219,11 +235,16 @@ function TicketListPage(props) {
         maxTimestamp:
           finalDate && new Date(finalDate).toISOString().replace(/.$/, ""),
         productId: product,
-      }).then((tickets) => {
-        console.log(tickets);
-        setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
-        setShowFilters(false);
-      });
+      })
+        .then((tickets) => {
+          setLoading(false);
+          setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
+          setShowFilters(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+          setErrorMessage(err);
+        });
     else if (user.role === "EXPERT")
       getAllTicketsExpert({
         expertEmail: user.email,
@@ -235,10 +256,15 @@ function TicketListPage(props) {
         maxTimestamp:
           finalDate && new Date(finalDate).toISOString().replace(/.$/, ""),
         productId: product,
-      }).then((tickets) => {
-        setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
-        setShowFilters(false);
-      });
+      })
+        .then((tickets) => {
+          setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
+          setShowFilters(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+          setErrorMessage(err);
+        });
     else if (user.role === "MANAGER")
       getAllTicketsManager({
         clientEmail: userEmail,
@@ -251,10 +277,15 @@ function TicketListPage(props) {
         maxTimestamp:
           finalDate && new Date(finalDate).toISOString().replace(/.$/, ""),
         productId: product,
-      }).then((tickets) => {
-        setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
-        setShowFilters(false);
-      });
+      })
+        .then((tickets) => {
+          setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
+          setShowFilters(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+          setErrorMessage(err);
+        });
   }
 
   return (
@@ -596,7 +627,23 @@ function TicketListPage(props) {
             </>
           )}
         </div>
-
+        {loading && (
+          <>
+            <Spinner style={{ color: "#A0C1D9" }} />
+          </>
+        )}
+        {errorMessage && (
+          <>
+            <div style={{ margin: "10px" }}>
+              <ErrorMessage
+                text={errorMessage}
+                close={() => {
+                  setErrorMessage("");
+                }}
+              />{" "}
+            </div>
+          </>
+        )}
         <TicketListTable
           ticketList={
             ticketList &&

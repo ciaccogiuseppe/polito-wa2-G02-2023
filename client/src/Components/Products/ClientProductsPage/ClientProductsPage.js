@@ -1,10 +1,12 @@
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
 import { useNavigate } from "react-router-dom";
 import AddButton from "../../Common/AddButton";
 import ClientProductsTable from "./ClientProductsTable";
 import { getAllItemsAPI } from "../../../API/Item";
+import { Spinner } from "react-bootstrap";
+import ErrorMessage from "../../Common/ErrorMessage";
 
 export function reformatCategory(category) {
   switch (category) {
@@ -48,12 +50,21 @@ export function deformatCategory(category) {
 
 function ClientProductsPage(props) {
   const [productsList, setProductsList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getAllItemsAPI().then((products) => {
-      setProductsList(products);
-    });
+    setLoading(true);
+    getAllItemsAPI()
+      .then((products) => {
+        setProductsList(products);
+        setLoading(false);
+      })
+      .catch(() => {
+        setErrorMessage("Error loading products");
+        setLoading(false);
+      });
   }, []);
 
   const loggedIn = props.loggedIn;
@@ -82,6 +93,23 @@ function ClientProductsPage(props) {
           }}
         />
 
+        {loading && (
+          <>
+            <Spinner style={{ color: "#A0C1D9" }} />
+          </>
+        )}
+        {errorMessage && (
+          <>
+            <div style={{ margin: "10px" }}>
+              <ErrorMessage
+                text={errorMessage}
+                close={() => {
+                  setErrorMessage("");
+                }}
+              />{" "}
+            </div>
+          </>
+        )}
         {productsList.length > 0 ? (
           <ClientProductsTable products={productsList} />
         ) : (

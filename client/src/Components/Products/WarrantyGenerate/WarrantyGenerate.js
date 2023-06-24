@@ -1,6 +1,6 @@
-import { Form } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import NavigationButton from "../../Common/NavigationButton";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getAllProducts } from "../../../API/Products";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { reformatCategory } from "../ProductsPage/ProductsPage";
@@ -14,6 +14,7 @@ function WarrantyGenerate(props) {
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("");
   const [useProductId, setUseProductId] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState("");
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
@@ -30,16 +31,20 @@ function WarrantyGenerate(props) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getAllProducts().then((products) => {
-      setProducts(products);
-      setCategories(
-        products
-          .map((p) => reformatCategory(p.category))
-          .filter((v, i, a) => a.indexOf(v) === i)
-          .sort()
+    getAllProducts()
+      .then((products) => {
+        setProducts(products);
+        setCategories(
+          products
+            .map((p) => reformatCategory(p.category))
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .sort()
+        );
+        //setBrands(products.map(p => p.brand).filter((v,i,a)=>a.indexOf(v)===i).sort())
+      })
+      .catch((err) =>
+        setErrorMessage("Unable to fetch data from server: " + err)
       );
-      //setBrands(products.map(p => p.brand).filter((v,i,a)=>a.indexOf(v)===i).sort())
-    });
   }, []);
 
   useEffect(() => {
@@ -72,11 +77,13 @@ function WarrantyGenerate(props) {
   }, [brand, category, products]);
 
   function addItem() {
+    setLoading(true);
     getItemAPI({
       productId: useProductId ? productId : product,
       serialNum: serialNumber,
     })
       .then((response) => {
+        setLoading(false);
         setSelectedProduct(
           products
             .filter((p) => p.productId === response.data.productId)
@@ -97,6 +104,7 @@ function WarrantyGenerate(props) {
           durationMonths: duration,
         })
           .then((response) => {
+            setLoading(false);
             setSelectedProduct(
               products
                 .filter((p) => p.productId === response.data.productId)
@@ -110,7 +118,10 @@ function WarrantyGenerate(props) {
               new Date(response.data.validFromTimestamp).toLocaleDateString()
             );
           })
-          .catch((err) => setErrorMessage(err));
+          .catch((err) => {
+            setLoading(false);
+            setErrorMessage(err);
+          });
       });
   }
 
@@ -389,6 +400,11 @@ function WarrantyGenerate(props) {
               </>
             )}
 
+            {loading && (
+              <>
+                <Spinner style={{ color: "#A0C1D9" }} />
+              </>
+            )}
             <NavigationButton
               type={"submit"}
               text={"Generate"}
