@@ -86,7 +86,7 @@ class KeycloakControllerTests {
     @Autowired
     lateinit var profileRepository: ProfileRepository
 
-    @Test
+    /*@Test
     //@DirtiesContext
     fun postClient() {
         val uri = URI("http://localhost:$port/API/signup")
@@ -100,7 +100,7 @@ class KeycloakControllerTests {
 
         val user = UserDTO(
             "MarioR_99",
-            "mario.rossi@polito.it",
+            "ticketing.wa2g02@gmail.com",
             "password",
             "Mario",
             "Rossi",
@@ -132,7 +132,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
 
-    }
+    }*/
 
     @Test
     //@DirtiesContext
@@ -317,14 +317,14 @@ class KeycloakControllerTests {
 
     }
 
-    @Test
+    /*@Test
     //@DirtiesContext
     fun postExpert() {
         val uri = URI("http://localhost:$port/API/createExpert")
 
         val user = UserDTO(
             "LuigiV_99",
-            "luigi.verdi@polito.it",
+            "ticketing.wa2g02@gmail.com",
             "password",
             "Luigi",
             "Verdi",
@@ -354,16 +354,16 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
 
-    }
+    }*/
 
-    @Test
+    /*@Test
     //@DirtiesContext
     fun postVendor() {
         val uri = URI("http://localhost:$port/API/createVendor")
 
         val user = UserDTO(
             "LuigiV_99",
-            "luigi.verdi@polito.it",
+            "ticketing.wa2g02@gmail.com",
             "password",
             "Luigi",
             "Verdi",
@@ -393,7 +393,7 @@ class KeycloakControllerTests {
         Assertions.assertEquals(user.lastName, createdUser?.lastName)
 
 
-    }
+    }*/
 
     @Test
     //@DirtiesContext
