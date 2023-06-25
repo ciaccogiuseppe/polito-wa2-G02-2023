@@ -77,7 +77,7 @@ function App() {
               if (res.status === 200) {
                 const newAccessToken = res.data.token;
                 localStorage.setItem("token", newAccessToken);
-                localStorage.setItem("refreshToken", res.data.refreshToken);
+                //localStorage.setItem("refreshToken", res.data.refreshToken);
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return axios(originalRequest);
               }
