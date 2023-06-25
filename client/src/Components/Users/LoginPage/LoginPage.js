@@ -8,6 +8,24 @@ import NavigationLink from "../../Common/NavigationLink";
 import { loginAPI } from "../../../API/Auth";
 import ErrorMessage from "../../Common/ErrorMessage";
 
+function ErrorLink(props) {
+  const navigate = useNavigate();
+  const [color, setColor] = useState("#ffe6e6");
+  return (
+    <span
+      style={{ color: color, textDecoration: "underline", cursor: "pointer" }}
+      onClick={(e) => {
+        e.preventDefault();
+        navigate(props.navigateTo);
+      }}
+      onMouseOver={() => setColor("#9f3232")}
+      onMouseLeave={() => setColor("#ffe6e6")}
+    >
+      {props.text}
+    </span>
+  );
+}
+
 function LoginPage(props) {
   const loggedIn = props.loggedIn;
   const setLoggedIn = props.setLoggedIn;
@@ -105,7 +123,22 @@ function LoginPage(props) {
           />
         </div>
 
-        {errorMessage && (
+        {errorMessage && errorMessage === "EMAIL_NOT_ACTIVATED" && (
+          <ErrorMessage
+            withLink={true}
+            close={() => setErrorMessage("")}
+            text={
+              <span>
+                User account is not activated, check your email or{" "}
+                <ErrorLink
+                  text={"generate a new activation link"}
+                  navigateTo={"/askvalidateemail"}
+                />
+              </span>
+            }
+          />
+        )}
+        {errorMessage && errorMessage !== "EMAIL_NOT_ACTIVATED" && (
           <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />
         )}
       </div>

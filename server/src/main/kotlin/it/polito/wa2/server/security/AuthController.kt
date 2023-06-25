@@ -11,7 +11,9 @@ import org.springframework.boot.json.BasicJsonParser
 import org.springframework.http.*
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import java.net.http.HttpClient
 
 
 @CrossOrigin(origins = ["http://localhost:3001"])
@@ -35,8 +37,6 @@ class AuthController(
         val entity = HttpEntity(body, headers)
 
         val tokenUrl = "$authServerUrl/realms/$realm/protocol/openid-connect/token"
-        println(tokenUrl)
-        println(body)
         return sendRequest(entity, tokenUrl)
     }
 
@@ -73,10 +73,18 @@ class AuthController(
             )
             return LoginResponse(tokenResponse.refreshToken, tokenResponse.token, tokenResponse.expiresIn)
 
-        } catch (e: RuntimeException) {
-            println(e)
+        }
+        catch (e : HttpClientErrorException) {
+            if(e.message!!.contains("Account is not fully set up"))
+                throw LoginFailedException("EMAIL_NOT_ACTIVATED")
+            else
+                throw LoginFailedException("Login failed")
+        }
+
+        catch (e: RuntimeException) {
             throw LoginFailedException("Login failed")
         }
+
     }
 
     private fun checkInputParameters(br: BindingResult) {

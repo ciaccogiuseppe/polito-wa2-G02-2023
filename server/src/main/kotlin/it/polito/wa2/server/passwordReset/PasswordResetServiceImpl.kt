@@ -1,6 +1,9 @@
-package it.polito.wa2.server.passwordReset
+package it.polito.wa2.server.emailVerification
 
 import io.micrometer.observation.annotation.Observed
+import it.polito.wa2.server.passwordReset.PasswordReset
+import it.polito.wa2.server.passwordReset.PasswordResetRepository
+import it.polito.wa2.server.passwordReset.PasswordResetService
 import it.polito.wa2.server.profiles.ProfileRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

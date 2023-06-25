@@ -73,6 +73,12 @@ data class PasswordDTO(
 )
 
 
+data class EmailDTO(
+
+    val token: UUID
+)
+
+
 fun UserDTO.toProfileDTO(): ProfileDTO {
     return ProfileDTO(this.email, this.firstName, this.lastName, null, expertCategories, this.address, this.role)
 }

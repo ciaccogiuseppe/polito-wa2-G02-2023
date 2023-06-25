@@ -49,7 +49,8 @@ create table if not exists profiles
     name         varchar(255) not null,
     phone_number varchar(255),
     role         varchar(255) not null,
-    surname      varchar(255) not null
+    surname      varchar(255) not null,
+    valid        bool not null
 );
 
 alter table profiles
@@ -65,6 +66,20 @@ create table if not exists password_reset
 );
 
 alter table password_reset
+    owner to postgres;
+
+create table if not exists email_verification
+(
+    id        bigserial
+        primary key,
+    uuid    uuid,
+    created timestamp,
+    user_id bigint unique
+        constraint email_verification___fk
+            references profiles
+);
+
+alter table email_verification
     owner to postgres;
 
 create table if not exists items
@@ -201,29 +216,29 @@ $$
         id_e2 bigint;
     BEGIN
         select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role)
-        values (id, 'client1@polito.it', 'ClientA', 'PoliTo', 'CLIENT');
+        insert into profiles(id, email, name, surname, role, valid)
+        values (id, 'client1@polito.it', 'ClientA', 'PoliTo', 'CLIENT', true);
         select nextval('addresses_id_seq') into id2;
         insert into addresses(id, address, city, country, region, client_id)
         values (id2, 'Corso Duca degli Abruzzi, 24', 'Turin', 'Italy', 'Piedmont', id);
         select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role)
-        values (id, 'client2@polito.it', 'ClientB', 'PoliTo', 'CLIENT');
+        insert into profiles(id, email, name, surname, role, valid)
+        values (id, 'client2@polito.it', 'ClientB', 'PoliTo', 'CLIENT', true);
         select nextval('addresses_id_seq') into id2;
         insert into addresses(id, address, city, country, region, client_id)
         values (id2, 'Piazza Leonardo da Vinci, 32', 'Milan', 'Italy', 'Lombardy', id);
         select nextval('profiles_id_seq') into id_e1;
-        insert into profiles(id, email, name, surname, role)
-        values (id_e1, 'expert1@polito.it', 'ExpertA', 'PoliTo', 'EXPERT');
+        insert into profiles(id, email, name, surname, role, valid)
+        values (id_e1, 'expert1@polito.it', 'ExpertA', 'PoliTo', 'EXPERT', true);
         select nextval('profiles_id_seq') into id_e2;
-        insert into profiles(id, email, name, surname, role)
-        values (id_e2, 'expert2@polito.it', 'ExpertB', 'PoliTo', 'EXPERT');
+        insert into profiles(id, email, name, surname, role, valid)
+        values (id_e2, 'expert2@polito.it', 'ExpertB', 'PoliTo', 'EXPERT', true);
         select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role)
-        values (id, 'manager@polito.it', 'Manager', 'PoliTo', 'MANAGER');
+        insert into profiles(id, email, name, surname, role, valid)
+        values (id, 'manager@polito.it', 'Manager', 'PoliTo', 'MANAGER', true);
         select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role)
-        values (id, 'vendor@polito.it', 'Vendor', 'PoliTo', 'VENDOR');
+        insert into profiles(id, email, name, surname, role, valid)
+        values (id, 'vendor@polito.it', 'Vendor', 'PoliTo', 'VENDOR', true);
 
 
         insert into brands(name) values ('Apple');

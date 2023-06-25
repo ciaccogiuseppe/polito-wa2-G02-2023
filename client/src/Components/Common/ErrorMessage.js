@@ -5,6 +5,7 @@ function ErrorMessage(props) {
   const text = props.text;
   const [color, setColor] = useState("#ffc5c5");
   const close = props.close;
+  const withLink = props.withLink || false;
   return (
     <div
       style={{
@@ -26,7 +27,7 @@ function ErrorMessage(props) {
       <div
         style={{ display: "inline-block", marginLeft: "32px", width: "200px" }}
       >
-        {typeof text === "string" ? text : "Generic error"}
+        {typeof text === "string" || withLink === true ? text : "Generic error"}
       </div>
       <div
         style={{

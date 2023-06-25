@@ -15,4 +15,7 @@ interface ProfileService {
     fun addProfileWithRole(profileDTO: ProfileDTO, profileRole: ProfileRole)
 
     fun updateProfile(email: String, newProfileDTO: ProfileDTO)
+    fun getIsValid(email: String) : Boolean?
+    fun validateProfile(email: String)
+
 }

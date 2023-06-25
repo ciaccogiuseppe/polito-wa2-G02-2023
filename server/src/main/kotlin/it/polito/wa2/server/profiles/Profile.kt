@@ -3,12 +3,14 @@ package it.polito.wa2.server.profiles
 import it.polito.wa2.server.EntityBase
 import it.polito.wa2.server.addresses.Address
 import it.polito.wa2.server.categories.Category
+import it.polito.wa2.server.emailVerification.EmailVerification
 import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.passwordReset.PasswordReset
 import it.polito.wa2.server.ticketing.message.Message
 import it.polito.wa2.server.ticketing.ticket.Ticket
 import it.polito.wa2.server.ticketing.tickethistory.TicketHistory
 import jakarta.persistence.*
+import jakarta.validation.constraints.Email
 
 @Entity
 @Table(name = "profiles")
@@ -16,6 +18,9 @@ class Profile : EntityBase<Long>() {
 
     @Column(nullable = false, unique = true)
     var email: String = ""
+
+    @Column(nullable = false)
+    var valid: Boolean = false
 
     @Column(nullable = false)
     var name: String = ""
@@ -53,6 +58,9 @@ class Profile : EntityBase<Long>() {
 
     @OneToMany(mappedBy = "profile")
     val passwordResets = mutableSetOf<PasswordReset>()
+
+    @OneToOne(mappedBy = "profile")
+    var emailVerification : EmailVerification? = null
 
     @ManyToMany
     @JoinTable(

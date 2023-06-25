@@ -5,6 +5,7 @@ function SuccessMessage(props) {
   const text = props.text;
   const [color, setColor] = useState("#d0ffc5");
   const close = props.close;
+  const noClose = props.noClose || false;
   return (
     <div
       style={{
@@ -23,32 +24,38 @@ function SuccessMessage(props) {
       }}
     >
       <div
-        style={{ display: "inline-block", marginLeft: "32px", width: "200px" }}
+        style={{
+          display: "inline-block",
+          marginLeft: noClose ? "auto" : "32px",
+          width: "200px",
+        }}
       >
         {text}
       </div>
-      <div
-        style={{
-          marginTop: "auto",
-          marginBottom: "auto",
-          display: "inline-block",
-          float: "right",
-          marginRight: "10px",
-        }}
-      >
-        <a
-          href={"/"}
-          style={{ cursor: "pointer" }}
-          onClick={(e) => {
-            e.preventDefault();
-            close();
+      {!noClose && (
+        <div
+          style={{
+            marginTop: "auto",
+            marginBottom: "auto",
+            display: "inline-block",
+            float: "right",
+            marginRight: "10px",
           }}
-          onMouseOver={() => setColor("#427336")}
-          onMouseLeave={() => setColor("#d0ffc5")}
         >
-          {crossIcon(color, 22)}
-        </a>
-      </div>
+          <a
+            href={"/"}
+            style={{ cursor: "pointer" }}
+            onClick={(e) => {
+              e.preventDefault();
+              close();
+            }}
+            onMouseOver={() => setColor("#427336")}
+            onMouseLeave={() => setColor("#d0ffc5")}
+          >
+            {crossIcon(color, 22)}
+          </a>
+        </div>
+      )}
     </div>
   );
 }

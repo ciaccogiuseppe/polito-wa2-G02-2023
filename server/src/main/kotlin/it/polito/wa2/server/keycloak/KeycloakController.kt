@@ -35,6 +35,18 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         keycloakService.applyResetPassword(passwordDTO!!)
     }
 
+    @GetMapping("/API/validateEmail/{email}")
+    fun askValidateMail(@PathVariable email: String) {
+        checkEmail(email)
+        keycloakService.validateEmail(email)
+    }
+
+    @PutMapping("/API/validateEmail/")
+    fun validateEmail(@Valid @RequestBody emailDTO: EmailDTO?, br: BindingResult) {
+        checkInputEmail(emailDTO, br)
+        keycloakService.applyValidateEmail(emailDTO!!.token)
+    }
+
     @PostMapping("/API/createExpert")
     @ResponseStatus(HttpStatus.CREATED)
     fun addExpert(@Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
@@ -111,6 +123,13 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         if (br.hasErrors())
             throw UnprocessableUserException("Wrong data format")
         if (passwordDTO == null)
+            throw BadRequestUserException("Request must not be NULL")
+    }
+
+    private fun checkInputEmail(emailDTO: EmailDTO?, br: BindingResult) {
+        if (br.hasErrors())
+            throw UnprocessableUserException("Wrong data format")
+        if (emailDTO == null)
             throw BadRequestUserException("Request must not be NULL")
     }
 

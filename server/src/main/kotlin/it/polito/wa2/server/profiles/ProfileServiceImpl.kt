@@ -111,6 +111,17 @@ class ProfileServiceImpl(
         profileRepository.save(profile)
     }
 
+    override fun getIsValid(email: String): Boolean? {
+        return profileRepository.findByEmail(email)?.valid
+    }
+
+    override fun validateProfile(email: String) {
+        val profile = profileRepository.findByEmail(email)
+            ?: throw ProfileNotFoundException("User with email $email not found")
+        profile.valid = true
+        profileRepository.save(profile)
+    }
+
     private fun getCategoryByName(categoryName: ProductCategory): Category {
         val categoryDTO = categoryService.getCategory(categoryName)
         return categoryRepository.findByName(categoryDTO.categoryName)!!

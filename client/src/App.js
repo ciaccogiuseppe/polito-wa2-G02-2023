@@ -31,6 +31,8 @@ import ClientProductsPage from "./Components/Products/ClientProductsPage/ClientP
 import ProductRegisterPage from "./Components/Products/ProductRegisterPage/ProductRegisterPage";
 import PasswordResetPage from "./Components/Users/PasswordResetPage/PasswordResetPage";
 import PasswordResetTriggerPage from "./Components/Users/PasswordResetPage/PasswordResetTriggerPage";
+import MailValidatePage from "./Components/Users/MailValidatePage/MailValidatePage";
+import MailValidateTriggerPage from "./Components/Users/MailValidatePage/MailValidateTriggerPage";
 
 export const api = axios.create({
   baseURL: APIURL,
@@ -184,6 +186,28 @@ function App() {
               path="/passwordreset"
               element={
                 <PasswordResetTriggerPage
+                  user={user}
+                  loggedIn={loggedIn}
+                  setLoggedIn={setLoggedIn}
+                  logout={logout}
+                />
+              }
+            />
+            <Route
+              path="/askvalidateemail"
+              element={
+                <MailValidateTriggerPage
+                  user={user}
+                  loggedIn={loggedIn}
+                  setLoggedIn={setLoggedIn}
+                  logout={logout}
+                />
+              }
+            />
+            <Route
+              path="/validatemail/:id"
+              element={
+                <MailValidatePage
                   user={user}
                   loggedIn={loggedIn}
                   setLoggedIn={setLoggedIn}

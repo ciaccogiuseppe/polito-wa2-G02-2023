@@ -1,11 +1,12 @@
 import { Form, Spinner } from "react-bootstrap";
 import AppNavbar from "../../AppNavbar/AppNavbar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavigationButton from "../../Common/NavigationButton";
 import NavigationLink from "../../Common/NavigationLink";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { signupAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
+import SuccessMessage from "../../Common/SuccessMessage";
 
 function ProfileCreatePage(props) {
   const [email, setEmail] = useState("");
@@ -22,6 +23,8 @@ function ProfileCreatePage(props) {
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const [successMessage, setSuccessMessage] = useState(false);
 
   const loggedIn = props.loggedIn;
   function submit() {
@@ -96,7 +99,7 @@ function ProfileCreatePage(props) {
     })
       .then(() => {
         setLoading(false);
-        navigate("/");
+        setSuccessMessage(true);
       })
       .catch((err) => {
         setLoading(false);
@@ -123,161 +126,192 @@ function ProfileCreatePage(props) {
             marginTop: "2px",
           }}
         />
-        <Form className="form" style={{ marginTop: "30px" }}>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label style={{ color: "#DDDDDD" }}>Personal Info</Form.Label>
-            <div style={{ width: "300px", margin: "auto" }}>
-              <Form.Control
-                value={name}
-                className={"form-control:focus"}
-                style={{
-                  display: "inline-block",
-                  marginRight: "10px",
-                  width: "140px",
-                  alignSelf: "center",
-                  marginTop: "5px",
-                  fontSize: 12,
-                }}
-                type="input"
-                placeholder="First Name"
-                onChange={(e) => setName(e.target.value)}
-              />
-              <Form.Control
-                value={surname}
-                className={"form-control:focus"}
-                style={{
-                  display: "inline-block",
-                  marginLeft: "10px",
-                  width: "140px",
-                  alignSelf: "center",
-                  marginTop: "5px",
-                  fontSize: 12,
-                }}
-                type="input"
-                placeholder="Last Name"
-                onChange={(e) => setSurname(e.target.value)}
-              />
-            </div>
-            <div style={{ marginTop: "15px" }}>
-              <h5 style={{ color: "white" }}>Address</h5>
-              <Form.Control
-                value={country}
-                className={"form-control:focus"}
-                style={{
-                  width: "300px",
-                  alignSelf: "center",
-                  margin: "auto",
-                  fontSize: 12,
-                }}
-                placeholder="Country"
-                onChange={(e) => setCountry(e.target.value)}
-              />
-              <Form.Control
-                value={region}
-                className={"form-control:focus"}
-                style={{
-                  width: "300px",
-                  alignSelf: "center",
-                  margin: "auto",
-                  fontSize: 12,
-                  marginTop: "15px",
-                }}
-                placeholder="Region"
-                onChange={(e) => setRegion(e.target.value)}
-              />
-              <Form.Control
-                value={city}
-                className={"form-control:focus"}
-                style={{
-                  width: "300px",
-                  alignSelf: "center",
-                  margin: "auto",
-                  fontSize: 12,
-                  marginTop: "15px",
-                }}
-                placeholder="City"
-                onChange={(e) => setCity(e.target.value)}
-              />
-              <Form.Control
-                value={address}
-                className={"form-control:focus"}
-                style={{
-                  width: "300px",
-                  alignSelf: "center",
-                  margin: "auto",
-                  fontSize: 12,
-                  marginTop: "15px",
-                }}
-                placeholder="Address"
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </div>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label style={{ color: "#DDDDDD" }}>Email address</Form.Label>
-            <Form.Control
-              value={email}
-              className={"form-control:focus"}
-              style={{
-                width: "300px",
-                alignSelf: "center",
-                margin: "auto",
-                fontSize: 12,
-              }}
-              type="email"
-              placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
-            <Form.Control
-              value={password}
-              style={{
-                width: "300px",
-                alignSelf: "center",
-                margin: "auto",
-                fontSize: 12,
-              }}
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Form.Control
-              value={password2}
-              style={{
-                width: "300px",
-                alignSelf: "center",
-                margin: "auto",
-                marginTop: "10px",
-                fontSize: 12,
-              }}
-              type="password"
-              placeholder="Confirm Password"
-              onChange={(e) => setPassword2(e.target.value)}
-            />
-          </Form.Group>
-          <NavigationButton
-            text={"Sign up"}
-            onClick={(e) => {
-              e.preventDefault();
-              submit();
-            }}
-          />
-        </Form>
-
-        <div style={{ fontSize: "12px", color: "#EEEEEE", marginTop: "5px" }}>
-          <span>Already have an account?</span>{" "}
-          <NavigationLink href={"/login"} text={"Sign in"} />
-        </div>
-        {loading && (
+        {!successMessage && (
           <>
-            <Spinner style={{ color: "#A0C1D9" }} />
+            <Form className="form" style={{ marginTop: "30px" }}>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label style={{ color: "#DDDDDD" }}>
+                  Personal Info
+                </Form.Label>
+                <div style={{ width: "300px", margin: "auto" }}>
+                  <Form.Control
+                    value={name}
+                    className={"form-control:focus"}
+                    style={{
+                      display: "inline-block",
+                      marginRight: "10px",
+                      width: "140px",
+                      alignSelf: "center",
+                      marginTop: "5px",
+                      fontSize: 12,
+                    }}
+                    type="input"
+                    placeholder="First Name"
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                  <Form.Control
+                    value={surname}
+                    className={"form-control:focus"}
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "10px",
+                      width: "140px",
+                      alignSelf: "center",
+                      marginTop: "5px",
+                      fontSize: 12,
+                    }}
+                    type="input"
+                    placeholder="Last Name"
+                    onChange={(e) => setSurname(e.target.value)}
+                  />
+                </div>
+                <div style={{ marginTop: "15px" }}>
+                  <h5 style={{ color: "white" }}>Address</h5>
+                  <Form.Control
+                    value={country}
+                    className={"form-control:focus"}
+                    style={{
+                      width: "300px",
+                      alignSelf: "center",
+                      margin: "auto",
+                      fontSize: 12,
+                    }}
+                    placeholder="Country"
+                    onChange={(e) => setCountry(e.target.value)}
+                  />
+                  <Form.Control
+                    value={region}
+                    className={"form-control:focus"}
+                    style={{
+                      width: "300px",
+                      alignSelf: "center",
+                      margin: "auto",
+                      fontSize: 12,
+                      marginTop: "15px",
+                    }}
+                    placeholder="Region"
+                    onChange={(e) => setRegion(e.target.value)}
+                  />
+                  <Form.Control
+                    value={city}
+                    className={"form-control:focus"}
+                    style={{
+                      width: "300px",
+                      alignSelf: "center",
+                      margin: "auto",
+                      fontSize: 12,
+                      marginTop: "15px",
+                    }}
+                    placeholder="City"
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                  <Form.Control
+                    value={address}
+                    className={"form-control:focus"}
+                    style={{
+                      width: "300px",
+                      alignSelf: "center",
+                      margin: "auto",
+                      fontSize: 12,
+                      marginTop: "15px",
+                    }}
+                    placeholder="Address"
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </div>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label style={{ color: "#DDDDDD" }}>
+                  Email address
+                </Form.Label>
+                <Form.Control
+                  value={email}
+                  className={"form-control:focus"}
+                  style={{
+                    width: "300px",
+                    alignSelf: "center",
+                    margin: "auto",
+                    fontSize: 12,
+                  }}
+                  type="email"
+                  placeholder="Email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
+                <Form.Control
+                  value={password}
+                  style={{
+                    width: "300px",
+                    alignSelf: "center",
+                    margin: "auto",
+                    fontSize: 12,
+                  }}
+                  type="password"
+                  placeholder="Password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Form.Control
+                  value={password2}
+                  style={{
+                    width: "300px",
+                    alignSelf: "center",
+                    margin: "auto",
+                    marginTop: "10px",
+                    fontSize: 12,
+                  }}
+                  type="password"
+                  placeholder="Confirm Password"
+                  onChange={(e) => setPassword2(e.target.value)}
+                />
+              </Form.Group>
+              <NavigationButton
+                text={"Sign up"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  submit();
+                }}
+              />
+            </Form>
+
+            <div
+              style={{ fontSize: "12px", color: "#EEEEEE", marginTop: "5px" }}
+            >
+              <span>Already have an account?</span>{" "}
+              <NavigationLink href={"/login"} text={"Sign in"} />
+            </div>
+            {loading && (
+              <>
+                <Spinner style={{ color: "#A0C1D9" }} />
+              </>
+            )}
+
+            {errorMessage && (
+              <ErrorMessage
+                close={() => setErrorMessage("")}
+                text={errorMessage}
+              />
+            )}
           </>
         )}
 
-        {errorMessage && (
-          <ErrorMessage close={() => setErrorMessage("")} text={errorMessage} />
+        {successMessage && (
+          <>
+            <div style={{margin:"10px"}}>
+            <SuccessMessage
+              text={"Email activation link sent, check your inbox mail"}
+              noClose={true}
+            />
+            </div>
+            <NavigationButton
+              text={"Back to home"}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/");
+              }}
+            />
+          </>
         )}
       </div>
     </>

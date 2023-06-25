@@ -60,6 +60,29 @@ async function resetPasswordApplyAPI(passwordPayload) {
     });
 }
 
+async function validateMailAPI(mailValidatePayload) {
+  return axios
+    .put(APIURL + "/API/validateEmail/", mailValidatePayload)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.log(err);
+      return Promise.reject(err.response.data.detail);
+    });
+}
+async function emailValidateTriggerAPI(email) {
+  return api
+    .get(APIURL + "/API/validateEmail/" + email)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.log(err);
+      return Promise.reject(err.response.data.detail);
+    });
+}
+
 async function createExpertAPI(signupPayload) {
   return api
     .post(APIURL + "/API/createExpert", signupPayload)
@@ -107,4 +130,6 @@ export {
   createVendorAPI,
   resetPasswordApplyAPI,
   passwordResetTriggerAPI,
+  emailValidateTriggerAPI,
+  validateMailAPI,
 };

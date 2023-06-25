@@ -4,16 +4,21 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.BadRequestProfileException
 import it.polito.wa2.server.BadRequestUserException
 import it.polito.wa2.server.ProfileNotFoundException
+import it.polito.wa2.server.UnprocessableUserException
+import it.polito.wa2.server.emailVerification.EmailVerificationService
 import it.polito.wa2.server.passwordReset.PasswordResetService
+import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.security.WebSecurityConfig
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import javax.ws.rs.NotFoundException
 
 @Service
 @Transactional
@@ -21,7 +26,8 @@ import java.util.*
 class KeycloakServiceImpl(
     private val keycloakConfig: KeycloakConfig,
     private val profileService: ProfileService,
-    private val passwordResetService: PasswordResetService
+    private val passwordResetService: PasswordResetService,
+    private val emailVerificationService: EmailVerificationService
 ) : KeycloakService {
     companion object {
         const val CLIENT = "app_client"
@@ -35,6 +41,7 @@ class KeycloakServiceImpl(
         addUser(user)
         keycloakConfig.assignRoles(user.email, listOf(CLIENT))
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.CLIENT)
+        validateEmail(user.email)
     }
 
     @PreAuthorize("hasRole('${WebSecurityConfig.MANAGER}')")
@@ -43,6 +50,7 @@ class KeycloakServiceImpl(
         addUser(user)
         keycloakConfig.assignRoles(user.email, listOf(EXPERT))
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.EXPERT)
+        validateEmail(user.email)
     }
 
     override fun resetPassword(email: String) {
@@ -50,6 +58,30 @@ class KeycloakServiceImpl(
         val uuid = UUID.randomUUID()
         passwordResetService.addPasswordReset(email, uuid)
         keycloakConfig.resetPassword(email, uuid)
+    }
+    override fun validateEmail(email: String) {
+        val isValid = profileService.getIsValid(email)
+            ?:  throw ProfileNotFoundException("User with email $email not found")
+
+        if (!isValid){
+            val uuid = UUID.randomUUID()
+            emailVerificationService.addEmailVerification(email, uuid)
+            keycloakConfig.sendValidateMail(email, uuid)
+        }
+        else {
+            throw UnprocessableUserException("Account has been already validated")
+        }
+    }
+
+    override fun applyValidateEmail( token: UUID) {
+
+        if(emailVerificationService.checkIsValid(token)){
+            val email = emailVerificationService.getEmail(token)
+                ?: throw ProfileNotFoundException("Token is not associated to any account")
+            keycloakConfig.applyValidateUser(email)
+            emailVerificationService.delete(token)
+            profileService.validateProfile(email)
+        }
     }
 
     override fun applyResetPassword(passwordDTO: PasswordDTO) {
@@ -66,6 +98,7 @@ class KeycloakServiceImpl(
         addUser(user)
         keycloakConfig.assignRoles(user.email, listOf(VENDOR))
         profileService.addProfileWithRole(userDTO.toProfileDTO(), ProfileRole.VENDOR)
+        validateEmail(user.email)
     }
 
     @PreAuthorize("isAuthenticated()")
