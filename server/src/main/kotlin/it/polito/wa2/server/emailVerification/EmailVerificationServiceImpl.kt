@@ -1,6 +1,7 @@
 package it.polito.wa2.server.emailVerification
 
 import io.micrometer.observation.annotation.Observed
+import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,7 +38,7 @@ class EmailVerificationServiceImpl(
     }
 
     override fun addEmailVerification(email: String, uuid: UUID) {
-        val user = profileRepository.findByEmail(email)
+        val user = getProfileByEmail(email)
             ?: throw NotFoundException("User not found")
 
         val alreadyExists = emailVerificationRepository.findByProfile(user)
@@ -54,6 +55,10 @@ class EmailVerificationServiceImpl(
             emailVerificationRepository.save(emailVerification)
         }
 
+    }
+
+    private fun getProfileByEmail(email: String): Profile? {
+        return profileRepository.findByEmail(email)
     }
 
 }

@@ -4,6 +4,7 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.server.*
 import it.polito.wa2.server.brands.BrandRepository
 import it.polito.wa2.server.categories.CategoryRepository
+import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.security.WebSecurityConfig
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
@@ -25,6 +26,13 @@ class ProductServiceImpl(
     override fun getProduct(productId: String): ProductDTO {
         return productRepository.findByIdOrNull(productId)?.toDTO()
             ?: throw ProductNotFoundException("Product with id '${productId}' not found")
+    }
+
+    override fun addItem(productId: String, item: Item) {
+        val product = productRepository.findByIdOrNull(productId)
+            ?: throw ProductNotFoundException("Product with id '${productId}' not found")
+        product.items.add(item)
+        productRepository.save(product)
     }
 
     @Transactional(readOnly = false)

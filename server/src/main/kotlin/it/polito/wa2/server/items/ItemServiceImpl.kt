@@ -70,8 +70,7 @@ class ItemServiceImpl(
             throw DuplicateItemException("Item with productId '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}'already exists")
         val newItem = itemDTO.toNewItem(product)
         val item = itemRepository.save(newItem)
-        product.items.add(item)
-        productRepository.save(product)
+        productService.addItem(product.productId, item)
         return item.toDTO()
     }
 
