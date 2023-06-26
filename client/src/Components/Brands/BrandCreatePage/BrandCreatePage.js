@@ -20,7 +20,10 @@ function BrandCreatePage(props) {
         setLoading(false);
         navigate("/brands");
       })
-      .catch((err) => setErrorMessage(err));
+      .catch((err) => {
+          setLoading(false)
+          setErrorMessage(err)
+      });
   }
 
   useEffect(() => {

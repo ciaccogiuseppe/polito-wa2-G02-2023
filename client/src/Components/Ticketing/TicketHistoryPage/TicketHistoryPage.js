@@ -66,7 +66,10 @@ function TicketHistoryPage(props) {
         setShowFilters(false);
         setLoading(false);
       })
-      .catch((err) => setErrorMessage(err));
+      .catch((err) => {
+          setLoading(false)
+          setErrorMessage(err)
+      });
   }
 
   const loggedIn = props.loggedIn;

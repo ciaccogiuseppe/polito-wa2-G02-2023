@@ -274,11 +274,11 @@ function StatusEditList(props) {
       else if (role === "EXPERT") types = ["CLOSED"];
       break;
     case "CLOSED":
-      if (role === "CLIENT" || role === "MANAGER") types = ["REOPENED"];
+      if (role === "CLIENT") types = ["REOPENED"];
       break;
     case "RESOLVED":
       if (role === "EXPERT" || role === "MANAGER")
-        types = ["REOPENED", "CLOSED"];
+        types = ["CLOSED"];
       else if (role === "CLIENT") types = ["REOPENED"];
       break;
     default:
