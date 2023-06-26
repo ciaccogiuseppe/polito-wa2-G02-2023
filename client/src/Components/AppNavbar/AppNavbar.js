@@ -9,7 +9,7 @@ function AppNavbar(props) {
     <>
       <>
         <Navbar
-          className="fixed-top"
+          className="fixed-top no-printme"
           style={{
             backgroundColor: "#FDE0BE",
             padding: 0,
