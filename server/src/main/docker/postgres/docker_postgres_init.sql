@@ -216,14 +216,14 @@ $$
         id_e2 bigint;
     BEGIN
         select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role, valid)
-        values (id, 'client1@polito.it', 'ClientA', 'PoliTo', 'CLIENT', true);
+        insert into profiles(id, email, name, surname, role, valid, phone_number)
+        values (id, 'client1@polito.it', 'ClientA', 'PoliTo', 'CLIENT', true, '+39 333 1234567');
         select nextval('addresses_id_seq') into id2;
         insert into addresses(id, address, city, country, region, client_id)
         values (id2, 'Corso Duca degli Abruzzi, 24', 'Turin', 'Italy', 'Piedmont', id);
         select nextval('profiles_id_seq') into id;
-        insert into profiles(id, email, name, surname, role, valid)
-        values (id, 'client2@polito.it', 'ClientB', 'PoliTo', 'CLIENT', true);
+        insert into profiles(id, email, name, surname, role, valid, phone_number)
+        values (id, 'client2@polito.it', 'ClientB', 'PoliTo', 'CLIENT', true, '+39 333 1122333');
         select nextval('addresses_id_seq') into id2;
         insert into addresses(id, address, city, country, region, client_id)
         values (id2, 'Piazza Leonardo da Vinci, 32', 'Milan', 'Italy', 'Lombardy', id);
@@ -1188,9 +1188,9 @@ Thank you for your prompt attention to this matter, and I look forward to a posi
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
         VALUES ('CLOSED', 'IN_PROGRESS', '2023-06-24 17:50:14.726903', 3, 6, 3); --14
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('REOPEN', 'CLOSED', '2023-06-25 19:33:23.758000', null, 6, 1); --15
+        VALUES ('REOPENED', 'CLOSED', '2023-06-25 19:33:23.758000', null, 6, 1); --15
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('CLOSED', 'REOPEN', '2023-06-25 19:35:23.758000', null, 6, 5); --16
+        VALUES ('CLOSED', 'REOPENED', '2023-06-25 19:35:23.758000', null, 6, 5); --16
 
     END
 $$;

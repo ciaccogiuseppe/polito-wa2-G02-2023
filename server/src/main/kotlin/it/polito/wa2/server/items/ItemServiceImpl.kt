@@ -100,6 +100,8 @@ class ItemServiceImpl(
             ?: throw ItemNotFoundException("Item with productIid '${itemDTO.productId}' and serialNum '${itemDTO.serialNum}' not found")
         if (itemDTO.uuid != item.uuid)
             throw ForbiddenException("Impossible to be linked to the product")
+        if(item.client != null)
+            throw ForbiddenException("The item is already linked to an user")
         item.client = getProfileByEmail(userEmail, userEmail)
         return itemRepository.save(item).toDTO()
     }
