@@ -1,5 +1,6 @@
 package it.polito.wa2.server.keycloak
 
+import it.polito.wa2.server.email.EmailSender
 import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
@@ -25,16 +26,8 @@ class KeycloakConfig(
     @Value("\${keycloak.admin.client}") private val clientId: String,
     @Value("\${keycloak.credentials.username}") private val adminUsername: String,
     @Value("\${keycloak.credentials.password}") private val adminPassword: String,
-    @Value("\${mail.sender.host}") private val host: String,
-    @Value("\${mail.sender.port}") private val port: Int,
-    @Value("\${mail.sender.username}") private val username: String,
-    @Value("\${mail.sender.password}") private val password: String,
-    @Value("\${mail.sender.protocol}") private val protocol: String,
-    @Value("\${mail.sender.debug}") private val debug: String,
-    @Value("\${mail.sender.auth}") private val auth: String,
-    @Value("\${mail.sender.starttls.enable}") private val starttls: String,
     @Value("\${server.url}") private val url: String,
-
+    val emailSender: EmailSender
 
     ) {
     private val keycloak: Keycloak = KeycloakBuilder.builder()
@@ -47,23 +40,7 @@ class KeycloakConfig(
         .build()
 
 
-    private fun configureJavaMailProperties(properties: Properties) {
-        properties["mail.transport.protocol"] = protocol
-        properties["mail.smtp.auth"] = auth
-        properties["mail.smtp.starttls.enable"] = starttls
-        properties["mail.debug"] = debug
-    }
 
-    @Bean
-    fun javaMailSender(): JavaMailSender {
-        val mailSender = JavaMailSenderImpl()
-        mailSender.host = host
-        mailSender.port = port
-        mailSender.username = username
-        mailSender.password = password
-        configureJavaMailProperties(mailSender.javaMailProperties)
-        return mailSender
-    }
 
 
     fun getRealm(): RealmResource {
@@ -86,7 +63,7 @@ class KeycloakConfig(
             "We recently received a request to signup to our Ticketing Service.\n\nTo validate your account, click here: $newUrl\n\n Link will expire in 24 hours"
         message.setTo(email)
 
-        javaMailSender().send(message)
+        emailSender.send(message)
     }
 
     fun resetPassword(email: String, uuid: UUID) {
@@ -99,7 +76,7 @@ class KeycloakConfig(
             "We recently received a request to reset the password for your account associated with Ticketing Service.\n\nTo initiate the password reset process click here: $newUrl"
         message.setTo(email)
 
-        javaMailSender().send(message)
+        emailSender.send(message)
     }
 
     fun applyResetPassword(email: String, password: String) {
@@ -112,9 +89,6 @@ class KeycloakConfig(
 
     fun applyValidateUser(email: String) {
         val id = getRealm().users().search(email).first().id
-        val newCredentials = Credentials.createPasswordCredentials(password)
-        newCredentials.isTemporary = false
-
         val user  = getRealm().users().get(id)
         val userRepr = user.toRepresentation()
         userRepr.requiredActions = mutableListOf()
