@@ -151,6 +151,8 @@ class TicketServiceImpl(
             throw UnprocessableTicketException("A ticket can't be assigned with the actual status")
         if (expert.role != ProfileRole.EXPERT)
             throw UnprocessableTicketException("The assigned profile is not an expert")
+        if(!expert.expertCategories.contains(ticket.item?.product?.category))
+            throw UnprocessableTicketException("The assigned profile is not allowed to work on this category of products")
 
         val user = getProfileByEmail(userEmail, userEmail)
 

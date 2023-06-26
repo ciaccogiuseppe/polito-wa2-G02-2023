@@ -13,12 +13,12 @@ import java.util.*
 class Item {
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false, updatable = false)
     @Id
     var product: Product? = null
 
     @Id
-    @Column(name = "serial_num")
+    @Column(name = "serial_num", nullable = false, updatable = false)
     var serialNum: Long? = null
 
     var uuid: UUID? = null

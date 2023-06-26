@@ -502,6 +502,8 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id)
         VALUES ('0000000000136', 'Sharp Aquos S3', (SELECT brands.id FROM brands WHERE name = 'Sharp'), id);
 
+        insert into category_assigned(expert_id, category_id) values (id_e1, id);
+
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'PC');
 
@@ -1098,7 +1100,7 @@ Despite my efforts to troubleshoot the issue, the audio distortion problem remai
 
 Given the urgency and negative impact on my entertainment experience, I humbly request your expert assistance in promptly resolving this matter. Your prompt attention would be greatly appreciated.
 
-Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null,
+Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3,
                 '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
                              product_id, serial_num)
@@ -1140,6 +1142,55 @@ Considering the urgency and impact of this issue on my entertainment experience,
 
 Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'IN_PROGRESS',
                 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3, '0000000000112', 633020516);
+
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-19 20:04:23.758000', null, 6, 1);  --12
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 10, 1); --23
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 3, 1); --4
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 4, 1); --5
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 7, 1); --17
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 5, 1); --7
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 9, 1); --21
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 8, 1); --18
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:10:49.726903', 3, 8, 5); --19
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:15:49.726903', 3, 9, 5); --22
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:16:43.726903', 3, 10, 5); --24
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-21 19:47:14.726903', null, 1, 1); --1
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-06-21 20:04:23.758173', null, 2, 1); --3
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-22 13:45:49.726903', 3, 4, 5); --6
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-22 13:45:49.726903', 3, 5, 5); --8
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('CLOSED', 'IN_PROGRESS', '2023-06-22 17:46:29.726903', 3, 5, 3); --9
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-23 11:32:49.726903', 3, 1, 5); --2
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('RESOLVED', 'IN_PROGRESS', '2023-06-23 18:50:14.726903', 3, 8, 1); --20
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('REOPENED', 'CLOSED', '2023-06-23 21:15:49.726903', null, 5, 1); --10
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-24 11:33:49.726903', 3, 6, 5); --13
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('RESOLVED', 'REOPENED', '2023-06-24 17:18:21.726903', null, 5, 1); --11
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('CLOSED', 'IN_PROGRESS', '2023-06-24 17:50:14.726903', 3, 6, 3); --14
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('REOPEN', 'CLOSED', '2023-06-25 19:33:23.758000', null, 6, 1); --15
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('CLOSED', 'REOPEN', '2023-06-25 19:35:23.758000', null, 6, 5); --16
 
     END
 $$;
