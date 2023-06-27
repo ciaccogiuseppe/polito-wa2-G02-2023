@@ -1,5 +1,7 @@
 package it.polito.wa2.server.email
 
+import it.polito.wa2.server.UnprocessableMailException
+import it.polito.wa2.server.UnprocessableProfileException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -41,6 +43,11 @@ class EmailSender (
     }
 
     fun send(message: SimpleMailMessage){
-        javaMailSender().send(message)
+        try{
+            javaMailSender().send(message)
+        }
+        catch (e: Exception){
+            throw UnprocessableMailException("Error sending email, address could be wrong")
+        }
     }
 }

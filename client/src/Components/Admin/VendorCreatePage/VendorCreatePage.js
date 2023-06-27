@@ -5,6 +5,7 @@ import NavigationButton from "../../Common/NavigationButton";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { createVendorAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
+import EyeButton from "../../Common/EyeButton";
 
 function VendorCreatePage(props) {
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ function VendorCreatePage(props) {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const loggedIn = props.loggedIn;
   function submit() {
     setErrorMessage("");
@@ -155,19 +157,37 @@ function VendorCreatePage(props) {
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
-            <Form.Control
-              value={password}
+            <div>
+              <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
+            </div>
+            <div style={{ display: "inline-block" }}>
+              <Form.Control
+                value={password}
+                style={{
+                  width: "300px",
+                  alignSelf: "center",
+                  margin: "auto",
+                  fontSize: 12,
+                }}
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div
               style={{
-                width: "300px",
-                alignSelf: "center",
-                margin: "auto",
-                fontSize: 12,
+                display: "inline-block",
+                position: "fixed",
+                verticalAlign: "middle",
+                marginTop: "2px",
+                marginLeft: "10px",
               }}
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            >
+              <EyeButton
+                show={showPassword}
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </div>
             <Form.Control
               value={password2}
               style={{
@@ -177,7 +197,7 @@ function VendorCreatePage(props) {
                 marginTop: "10px",
                 fontSize: 12,
               }}
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Confirm Password"
               onChange={(e) => setPassword2(e.target.value)}
             />

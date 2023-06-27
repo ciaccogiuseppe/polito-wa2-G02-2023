@@ -120,6 +120,8 @@ function ChatMessage(props) {
           display: "inline-block",
           marginLeft: "20px",
           marginTop: "15px",
+          float: "right",
+          marginRight: "25px",
         }}
       >
         {TextNewLine(text)}

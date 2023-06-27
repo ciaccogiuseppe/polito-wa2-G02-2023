@@ -277,8 +277,7 @@ function StatusEditList(props) {
       if (role === "CLIENT") types = ["REOPENED"];
       break;
     case "RESOLVED":
-      if (role === "EXPERT" || role === "MANAGER")
-        types = ["CLOSED"];
+      if (role === "EXPERT" || role === "MANAGER") types = ["CLOSED"];
       else if (role === "CLIENT") types = ["REOPENED"];
       break;
     default:
@@ -1032,6 +1031,15 @@ function TicketChatPage(props) {
             </div>
           </>
         )}
+        <div style={{ marginTop: "20px" }}>
+          <NavigationButton
+            text={"Back"}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(-1);
+            }}
+          />
+        </div>
       </div>
     </>
   );

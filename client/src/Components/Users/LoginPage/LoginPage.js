@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import NavigationLink from "../../Common/NavigationLink";
 import { loginAPI } from "../../../API/Auth";
 import ErrorMessage from "../../Common/ErrorMessage";
+import EyeButton from "../../Common/EyeButton";
 
 function ErrorLink(props) {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ function LoginPage(props) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   function login() {
     setLoading(true);
@@ -89,14 +91,32 @@ function LoginPage(props) {
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
-            <Form.Control
-              value={password}
-              style={{ width: "300px", alignSelf: "center", margin: "auto" }}
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div>
+              <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
+            </div>
+            <div style={{ display: "inline-block" }}>
+              <Form.Control
+                value={password}
+                style={{ width: "300px", alignSelf: "center", margin: "auto" }}
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div
+              style={{
+                display: "inline-block",
+                position: "fixed",
+                verticalAlign: "middle",
+                marginTop: "5px",
+                marginLeft: "10px",
+              }}
+            >
+              <EyeButton
+                show={showPassword}
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </div>
           </Form.Group>
           {loading && (
             <div>

@@ -6,6 +6,7 @@ import NavigationLink from "../../Common/NavigationLink";
 import ErrorMessage from "../../Common/ErrorMessage";
 import { signupAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
+import EyeButton from "../../Common/EyeButton";
 import SuccessMessage from "../../Common/SuccessMessage";
 
 function ProfileCreatePage(props) {
@@ -16,6 +17,7 @@ function ProfileCreatePage(props) {
   const [surname, setSurname] = useState("");
   const [address, setAddress] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
@@ -29,7 +31,6 @@ function ProfileCreatePage(props) {
   const loggedIn = props.loggedIn;
   function submit() {
     setErrorMessage("");
-    setLoading(true);
     let missingFields = "";
     if (name.length === 0) {
       missingFields = missingFields + "first name, ";
@@ -82,7 +83,7 @@ function ProfileCreatePage(props) {
       setErrorMessage("Error in form: Passwords do not match");
       return;
     }
-
+    setLoading(true);
     signupAPI({
       firstName: name,
       lastName: surname,
@@ -239,32 +240,55 @@ function ProfileCreatePage(props) {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
-                <Form.Control
-                  value={password}
+                <div>
+                  <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
+                </div>
+                <div style={{ display: "inline-block" }}>
+                  <Form.Control
+                    value={password}
+                    style={{
+                      width: "300px",
+                      alignSelf: "center",
+                      margin: "auto",
+                      fontSize: 12,
+                    }}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <div
                   style={{
-                    width: "300px",
-                    alignSelf: "center",
-                    margin: "auto",
-                    fontSize: 12,
+                    display: "inline-block",
+                    marginLeft: "10px",
+                    position: "absolute",
                   }}
-                  type="password"
-                  placeholder="Password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Form.Control
-                  value={password2}
-                  style={{
-                    width: "300px",
-                    alignSelf: "center",
-                    margin: "auto",
-                    marginTop: "10px",
-                    fontSize: 12,
-                  }}
-                  type="password"
-                  placeholder="Confirm Password"
-                  onChange={(e) => setPassword2(e.target.value)}
-                />
+                >
+                  <EyeButton
+                    show={showPassword}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                </div>
+
+                <div></div>
+                <div style={{ display: "inline-block" }}>
+                  <Form.Control
+                    value={password2}
+                    style={{
+                      width: "300px",
+                      alignSelf: "center",
+                      margin: "auto",
+                      marginTop: "10px",
+                      fontSize: 12,
+                    }}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Confirm Password"
+                    onChange={(e) => setPassword2(e.target.value)}
+                  />
+                </div>
+                {/*<div style={{display:"inline-block", marginLeft:"10px"}}>
+                  <EyeButton show={showPassword2} onClick={() => setShowPassword2(!showPassword2)}/>
+                </div>*/}
               </Form.Group>
               <NavigationButton
                 text={"Sign up"}
@@ -298,11 +322,11 @@ function ProfileCreatePage(props) {
 
         {successMessage && (
           <>
-            <div style={{margin:"10px"}}>
-            <SuccessMessage
-              text={"Email activation link sent, check your inbox mail"}
-              noClose={true}
-            />
+            <div style={{ margin: "10px" }}>
+              <SuccessMessage
+                text={"Email activation link sent, check your inbox mail"}
+                noClose={true}
+              />
             </div>
             <NavigationButton
               text={"Back to home"}

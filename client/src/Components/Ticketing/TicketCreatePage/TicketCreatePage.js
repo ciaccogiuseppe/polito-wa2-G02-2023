@@ -316,6 +316,15 @@ function TicketCreatePage(props) {
               addTicket();
             }}
           />
+          <div style={{ marginTop: "20px" }}>
+            <NavigationButton
+              text={"Back"}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}
+            />
+          </div>
         </Form>
       </div>
     </>

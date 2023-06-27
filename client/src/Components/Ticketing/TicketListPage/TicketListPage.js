@@ -258,7 +258,7 @@ function TicketListPage(props) {
         productId: product,
       })
         .then((tickets) => {
-            setLoading(false)
+          setLoading(false);
           setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
           setShowFilters(false);
         })
@@ -280,7 +280,7 @@ function TicketListPage(props) {
         productId: product,
       })
         .then((tickets) => {
-            setLoading(false)
+          setLoading(false);
           setTicketList(tickets.sort((a, b) => a.ticketId < b.ticketId));
           setShowFilters(false);
         })

@@ -67,8 +67,8 @@ function TicketHistoryPage(props) {
         setLoading(false);
       })
       .catch((err) => {
-          setLoading(false)
-          setErrorMessage(err)
+        setLoading(false);
+        setErrorMessage(err);
       });
   }
 

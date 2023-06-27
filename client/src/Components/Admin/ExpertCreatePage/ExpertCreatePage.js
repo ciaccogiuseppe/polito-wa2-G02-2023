@@ -7,6 +7,7 @@ import { createExpertAPI } from "../../../API/Auth";
 import { useNavigate } from "react-router-dom";
 import { deformatCategory } from "../../Products/ProductsPage/ProductsPage";
 import "./ExpertCreatePage.css";
+import EyeButton from "../../Common/EyeButton";
 
 const categories = [
   "Smartphone",
@@ -26,6 +27,7 @@ function ExpertCreatePage(props) {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [expertCategories, setExpertCategories] = useState([]);
   const updateExpertCategories = (event) => {
@@ -220,19 +222,37 @@ function ExpertCreatePage(props) {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
-                <Form.Control
-                  value={password}
+                <div>
+                  <Form.Label style={{ color: "#DDDDDD" }}>Password</Form.Label>
+                </div>
+                <div style={{ display: "inline-block" }}>
+                  <Form.Control
+                    value={password}
+                    style={{
+                      fontSize: 12,
+                      width: "300px",
+                      alignSelf: "center",
+                      margin: "auto",
+                    }}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <div
                   style={{
-                    fontSize: 12,
-                    width: "300px",
-                    alignSelf: "center",
-                    margin: "auto",
+                    display: "inline-block",
+                    position: "fixed",
+                    verticalAlign: "middle",
+                    marginTop: "2px",
+                    marginLeft: "10px",
                   }}
-                  type="password"
-                  placeholder="Password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                >
+                  <EyeButton
+                    show={showPassword}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                </div>
                 <Form.Control
                   value={password2}
                   style={{
@@ -242,7 +262,7 @@ function ExpertCreatePage(props) {
                     margin: "auto",
                     marginTop: "10px",
                   }}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Confirm Password"
                   onChange={(e) => setPassword2(e.target.value)}
                 />

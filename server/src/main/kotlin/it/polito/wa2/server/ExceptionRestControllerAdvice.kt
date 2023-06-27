@@ -139,6 +139,9 @@ class ExceptionRestControllerAdvice : ResponseEntityExceptionHandler() {
     @ExceptionHandler(UnprocessableAddressException::class)
     fun handleUnprocessableAddress(e: UnprocessableAddressException) =
         ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.message!!)
+    @ExceptionHandler(UnprocessableMailException::class)
+    fun handleUnprocessableEmail(e: UnprocessableMailException) =
+        ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.message!!)
 }
 
 class ProductNotFoundException(message: String) : RuntimeException(message)
@@ -173,3 +176,4 @@ class DuplicateItemException(message: String) : RuntimeException(message)
 class AddressNotFoundException(message: String) : RuntimeException(message)
 class DuplicateAddressException(message: String) : RuntimeException(message)
 class UnprocessableAddressException(message: String) : RuntimeException(message)
+class UnprocessableMailException(message: String) : RuntimeException(message)

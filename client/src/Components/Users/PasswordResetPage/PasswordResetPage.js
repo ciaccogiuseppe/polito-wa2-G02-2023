@@ -7,6 +7,7 @@ import { resetPasswordApplyAPI } from "../../../API/Auth";
 import ErrorMessage from "../../Common/ErrorMessage";
 
 import SuccessMessage from "../../Common/SuccessMessage";
+import EyeButton from "../../Common/EyeButton";
 
 function PasswordResetPage(props) {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function PasswordResetPage(props) {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [successMessage, setSuccessMessage] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   function reset() {
     if (password !== password2) {
@@ -88,22 +90,40 @@ function PasswordResetPage(props) {
                   placeholder="Email"
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Form.Label style={{ color: "#DDDDDD", marginTop: "10px" }}>
-                  Password
-                </Form.Label>
-                <Form.Control
-                  value={password}
+                <div>
+                  <Form.Label style={{ color: "#DDDDDD", marginTop: "10px" }}>
+                    Password
+                  </Form.Label>
+                </div>
+                <div style={{ display: "inline-block" }}>
+                  <Form.Control
+                    value={password}
+                    style={{
+                      width: "300px",
+                      alignSelf: "center",
+                      fontSize: 12,
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                    }}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <div
                   style={{
-                    width: "300px",
-                    alignSelf: "center",
-                    fontSize: 12,
-                    marginLeft: "auto",
-                    marginRight: "auto",
+                    display: "inline-block",
+                    position: "fixed",
+                    verticalAlign: "middle",
+                    marginTop: "2px",
+                    marginLeft: "10px",
                   }}
-                  type="password"
-                  placeholder="Password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                >
+                  <EyeButton
+                    show={showPassword}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                </div>
                 <Form.Control
                   value={password2}
                   style={{
@@ -114,7 +134,7 @@ function PasswordResetPage(props) {
                     marginLeft: "auto",
                     marginRight: "auto",
                   }}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password confirm"
                   onChange={(e) => setPassword2(e.target.value)}
                 />

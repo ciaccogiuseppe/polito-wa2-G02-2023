@@ -21,8 +21,8 @@ function BrandCreatePage(props) {
         navigate("/brands");
       })
       .catch((err) => {
-          setLoading(false)
-          setErrorMessage(err)
+        setLoading(false);
+        setErrorMessage(err);
       });
   }
 
