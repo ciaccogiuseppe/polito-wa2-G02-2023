@@ -54,7 +54,7 @@ async function getAllTicketsClient(ticketFilters) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
@@ -74,7 +74,7 @@ async function getTicketClientAPI(ticketID) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
@@ -94,7 +94,7 @@ async function getTicketExpertAPI(ticketID) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
@@ -114,7 +114,7 @@ async function getTicketManagerAPI(ticketID) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
@@ -158,7 +158,7 @@ async function getAllTicketsExpert(ticketFilters) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
@@ -202,7 +202,7 @@ async function getAllTicketsManager(ticketFilters) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 

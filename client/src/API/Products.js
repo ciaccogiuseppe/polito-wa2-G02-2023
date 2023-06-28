@@ -18,7 +18,7 @@ async function getAllProducts() {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 
   /*const response = await fetch(url);
@@ -57,7 +57,7 @@ async function getProductByIdAPI(productId) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
@@ -77,7 +77,7 @@ async function getAllCategories() {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
@@ -97,7 +97,7 @@ async function getAllBrands() {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 

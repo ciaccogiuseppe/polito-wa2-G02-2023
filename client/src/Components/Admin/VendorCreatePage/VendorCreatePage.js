@@ -177,10 +177,8 @@ function VendorCreatePage(props) {
             <div
               style={{
                 display: "inline-block",
-                position: "fixed",
-                verticalAlign: "middle",
-                marginTop: "2px",
                 marginLeft: "10px",
+                position: "absolute",
               }}
             >
               <EyeButton

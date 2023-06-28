@@ -1860,6 +1860,11 @@ class TicketControllerTests {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
+
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -1867,11 +1872,8 @@ class TicketControllerTests {
 
         val brand = Brand()
         brand.name = "Apple"
-
         brandRepository.save(brand)
-        val category = Category()
-        category.name = ProductCategory.SMARTPHONE
-        categoryRepository.save(category)
+
         val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
@@ -1931,6 +1933,10 @@ class TicketControllerTests {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -1940,9 +1946,7 @@ class TicketControllerTests {
         brand.name = "Apple"
 
         brandRepository.save(brand)
-        val category = Category()
-        category.name = ProductCategory.SMARTPHONE
-        categoryRepository.save(category)
+
         val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
@@ -1991,6 +1995,10 @@ class TicketControllerTests {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -2000,9 +2008,7 @@ class TicketControllerTests {
         brand.name = "Apple"
 
         brandRepository.save(brand)
-        val category = Category()
-        category.name = ProductCategory.SMARTPHONE
-        categoryRepository.save(category)
+
         val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
@@ -2051,6 +2057,10 @@ class TicketControllerTests {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -2058,11 +2068,8 @@ class TicketControllerTests {
 
         val brand = Brand()
         brand.name = "Apple"
-
         brandRepository.save(brand)
-        val category = Category()
-        category.name = ProductCategory.SMARTPHONE
-        categoryRepository.save(category)
+
         val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
@@ -2122,6 +2129,10 @@ class TicketControllerTests {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -2131,9 +2142,7 @@ class TicketControllerTests {
         brand.name = "Apple"
 
         brandRepository.save(brand)
-        val category = Category()
-        category.name = ProductCategory.SMARTPHONE
-        categoryRepository.save(category)
+
         val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
@@ -2181,6 +2190,10 @@ class TicketControllerTests {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -2190,9 +2203,7 @@ class TicketControllerTests {
         brand.name = "Apple"
 
         brandRepository.save(brand)
-        val category = Category()
-        category.name = ProductCategory.SMARTPHONE
-        categoryRepository.save(category)
+
         val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)
@@ -2244,6 +2255,10 @@ class TicketControllerTests {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
@@ -2253,9 +2268,7 @@ class TicketControllerTests {
         brand.name = "Apple"
 
         brandRepository.save(brand)
-        val category = Category()
-        category.name = ProductCategory.SMARTPHONE
-        categoryRepository.save(category)
+
         val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
 
         productRepository.save(product)

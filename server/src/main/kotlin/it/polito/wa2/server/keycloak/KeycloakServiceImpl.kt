@@ -1,24 +1,19 @@
 package it.polito.wa2.server.keycloak
 
 import io.micrometer.observation.annotation.Observed
-import it.polito.wa2.server.BadRequestProfileException
-import it.polito.wa2.server.BadRequestUserException
-import it.polito.wa2.server.ProfileNotFoundException
-import it.polito.wa2.server.UnprocessableUserException
+import it.polito.wa2.server.*
 import it.polito.wa2.server.emailVerification.EmailVerificationService
 import it.polito.wa2.server.passwordReset.PasswordResetService
-import it.polito.wa2.server.profiles.Profile
+import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
 import it.polito.wa2.server.profiles.ProfileService
 import it.polito.wa2.server.security.WebSecurityConfig
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import javax.ws.rs.NotFoundException
 
 @Service
 @Transactional
@@ -26,6 +21,7 @@ import javax.ws.rs.NotFoundException
 class KeycloakServiceImpl(
     private val keycloakConfig: KeycloakConfig,
     private val profileService: ProfileService,
+    private val profileRepository: ProfileRepository,
     private val passwordResetService: PasswordResetService,
     private val emailVerificationService: EmailVerificationService
 ) : KeycloakService {
@@ -132,6 +128,8 @@ class KeycloakServiceImpl(
     }
 
     private fun addUser(user: UserRepresentation) {
+        if(profileRepository.findByEmail(user.email) != null)
+            throw DuplicateProfileException("Profile with email '${user.email}' already exists")
         keycloakConfig.getRealm().users().create(user)
     }
 }

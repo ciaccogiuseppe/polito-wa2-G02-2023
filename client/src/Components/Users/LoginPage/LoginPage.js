@@ -106,10 +106,8 @@ function LoginPage(props) {
             <div
               style={{
                 display: "inline-block",
-                position: "fixed",
-                verticalAlign: "middle",
-                marginTop: "5px",
                 marginLeft: "10px",
+                position: "absolute",
               }}
             >
               <EyeButton

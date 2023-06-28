@@ -667,6 +667,8 @@ $$
         VALUES ('0000000000224', 'Symantec Ghost Solution Suite',
                 (SELECT brands.id FROM brands WHERE name = 'Symantec'), id);
 
+        insert into category_assigned(expert_id, category_id) values (id_e2, id);
+
         select nextval('categories_id_seq') into id;
         insert into categories(id, name) values (id, 'STORAGE_DEVICE');
 
@@ -848,6 +850,9 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id)
         VALUES ('0000000000284', 'ASUS RT-AC68U AC1900 Wi-Fi Router',
                 (SELECT brands.id FROM brands WHERE name = 'ASUS'), id);
+        INSERT INTO products(product_id, name, brand_id, category_id)
+        VALUES ('0000000000330', 'ASUS RT-AX88U Wi-Fi Router',
+                (SELECT brands.id FROM brands WHERE name = 'ASUS'), id);
 
 -- Webcams
         INSERT INTO products(product_id, name, brand_id, category_id)
@@ -946,8 +951,18 @@ $$
         INSERT INTO products(product_id, name, brand_id, category_id)
         VALUES ('0000000000316', 'Insta360 ONE R Action Camera', (SELECT brands.id FROM brands WHERE name = 'Insta360'),
                 id);
+        insert into category_assigned(expert_id, category_id) values (id_e2, id);
 
 
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id)
+        VALUES (123456789, 12, 'dfac45da-6542-5c5d-11c5-fe53c578987a', '2023-05-01 19:12:05.853000', '0000000000015',
+                2);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id)
+        VALUES (987654321, 12, 'af54f5cd-86bc-11c5-8d6c-5067ed33fc04', '2023-05-02 18:35:05.853000', '0000000000004',
+                2);
+        INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id)
+        VALUES (567890123, 12, '44faa78d-4b79-6137-8d6c-0267edafc045', '2023-05-02 19:26:32.853000', '0000000000330',
+                2);
         INSERT INTO items (serial_num, duration_months, uuid, valid_from_timestamp, product_id, client_id)
         VALUES (203241506, 24, '9fcebd14-fa40-4f11-a11f-84391df346da', '2023-06-21 19:10:54.961201', '0000000000025',
                 1);
@@ -962,15 +977,15 @@ $$
                 1);
 
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-21 19:47:14.726903', e'am reaching out to you regarding an issue I am experiencing with my LG Velvet smartphone\'s touch screen. I am encountering difficulties with the touch functionality and would greatly appreciate your assistance in resolving this problem.
+                             product_id, serial_num) --1
+        VALUES ('2023-06-21 19:47:14.726000', e'I am reaching out to you regarding an issue I am experiencing with my LG Velvet smartphone\'s touch screen. I am encountering difficulties with the touch functionality and would greatly appreciate your assistance in resolving this problem.
 
 Issue Description:
 The touch screen on my LG Velvet smartphone has become unresponsive, making it impossible for me to interact with the device using touch gestures. I have tried various troubleshooting steps but have been unable to restore the touch screen functionality.',
                 2, 'IN_PROGRESS', 'Touch screen not working', 1, 3, '0000000000025', 203241506);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-21 20:04:23.758173', e'I am writing to report an issue that I have encountered with my Sony Bravia X70J television. I am experiencing distorted audio output, which is significantly affecting my viewing experience. I kindly request your assistance in resolving this problem promptly.
+                             product_id, serial_num) --2
+        VALUES ('2023-06-21 20:04:23.758000', e'I am writing to report an issue that I have encountered with my Sony Bravia X70J television. I am experiencing distorted audio output, which is significantly affecting my viewing experience. I kindly request your assistance in resolving this problem promptly.
 
 Issue Description:
 While watching various programs on my Sony Bravia X70J TV, I noticed that the audio output has become distorted and unclear. The sound appears muffled, with a noticeable loss of clarity and depth. This issue persists across all audio sources, including built-in TV apps, external devices connected via HDMI, and broadcast channels.
@@ -983,8 +998,8 @@ In an attempt to resolve the audio distortion problem, I have performed the foll
     Checked external devices: I have disconnected all external devices connected to the TV, such as soundbars or AV receivers, to ensure that they are not causing the audio distortion. However, the issue still persists when using the TV\'s built-in speakers.',
                 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-20 20:04:23.758000', e'I am reaching out to you regarding a pressing concern with my Sony Bravia X70J television. Unfortunately, I have been experiencing consistent audio distortion, severely impacting my viewing enjoyment. I humbly request your prompt assistance in resolving this matter.
+                             product_id, serial_num) --3
+        VALUES ('2023-06-20 20:10:45.456000', e'I am reaching out to you regarding a pressing concern with my Sony Bravia X70J television. Unfortunately, I have been experiencing consistent audio distortion, severely impacting my viewing enjoyment. I humbly request your prompt assistance in resolving this matter.
 
 Issue Description:
 I have noticed persistent audio distortion on my Sony Bravia X70J TV, causing the sound to become muffled and unclear. This problem persists regardless of the audio source, encompassing both built-in TV apps, HDMI-connected external devices, and broadcast channels.
@@ -1003,8 +1018,8 @@ Given the urgency and adverse impact on my viewing experience, I sincerely seek 
 Thank you for your understanding and assistance.', 0, 'OPEN', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null,
                 '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-20 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+                             product_id, serial_num) --4
+        VALUES ('2023-06-20 20:13:47.678000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
 
 Issue Description:
 The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
@@ -1023,8 +1038,8 @@ I urgently seek your expertise and support in resolving this matter. Your prompt
 Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3,
                 '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-20 20:04:23.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
+                             product_id, serial_num) --5
+        VALUES ('2023-06-20 20:20:27.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
 
 Issue Description:
 I have encountered persistent audio distortion on my Sony Bravia X70J TV, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
@@ -1043,7 +1058,7 @@ Given the urgency and negative impact on my entertainment experience, I humbly r
 Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null,
                 '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
+                             product_id, serial_num) --6
         VALUES ('2023-06-19 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
 
 Issue Description:
@@ -1063,8 +1078,8 @@ I urgently seek your expertise and support in resolving this matter. Your prompt
 Thank you for your assistance.', 1, 'CLOSED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112',
                 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-20 20:04:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
+                             product_id, serial_num) --7
+        VALUES ('2023-06-20 20:17:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
 
 Description of the Issue:
 During my regular usage of the Sony Bravia X70J TV, I have noticed a distressing audio distortion that affects the quality of the sound. The audio output exhibits a muffled and unclear nature, depriving me of the clarity and depth I expect from my viewing sessions. This frustrating problem persists across all audio sources, encompassing the TV\'s built-in apps, external devices connected via HDMI, and even the broadcast channels.
@@ -1083,8 +1098,8 @@ Considering the urgency and impact of this issue on my entertainment experience,
 Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'OPEN',
                 'Distorted Audio Output on Sony Bravia X70J TV', 1, null, '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-20 20:04:23.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
+                             product_id, serial_num) --8
+        VALUES ('2023-06-20 20:25:55.758000', e'I am writing to seek immediate assistance regarding an audio distortion issue on my Sony Bravia X70J television. The sound output is consistently distorted, significantly affecting my viewing experience. I kindly request your prompt attention and resolution of this problem.
 
 Issue Description:
 I have encountered persistent audio distortion on my Sony Bravia X70J TV, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
@@ -1103,8 +1118,8 @@ Given the urgency and negative impact on my entertainment experience, I humbly r
 Thank you for your understanding and support.', 2, 'RESOLVED', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3,
                 '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-20 20:04:23.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
+                             product_id, serial_num) --9
+        VALUES ('2023-06-20 20:24:11.758000', e'I am writing to report a critical issue with my Sony Bravia X70J television. The audio output is consistently distorted, negatively impacting my viewing experience. I kindly request your prompt assistance in resolving this problem.
 
 Issue Description:
 The audio output on my Sony Bravia X70J TV is experiencing distortion, resulting in muffled and unclear sound quality. This problem persists across all audio sources, including built-in TV apps, HDMI-connected external devices, and broadcast channels.
@@ -1123,8 +1138,8 @@ I urgently seek your expertise and support in resolving this matter. Your prompt
 Thank you for your assistance.', 1, 'IN_PROGRESS', 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3,
                 '0000000000112', 633020516);
         INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
-                             product_id, serial_num)
-        VALUES ('2023-06-20 20:04:23.758000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
+                             product_id, serial_num) --10
+        VALUES ('2023-06-20 20:06:39.638000', e'I am writing to bring to your attention a pressing matter regarding my Sony Bravia X70J television. Regrettably, I have encountered a persistent issue with distorted audio output that significantly impairs my viewing experience. Therefore, I am reaching out to your esteemed team in the hope of a prompt resolution.
 
 Description of the Issue:
 During my regular usage of the Sony Bravia X70J TV, I have noticed a distressing audio distortion that affects the quality of the sound. The audio output exhibits a muffled and unclear nature, depriving me of the clarity and depth I expect from my viewing sessions. This frustrating problem persists across all audio sources, encompassing the TV\'s built-in apps, external devices connected via HDMI, and even the broadcast channels.
@@ -1140,35 +1155,97 @@ In my sincere efforts to address the audio distortion concern, I have undertaken
 
 Considering the urgency and impact of this issue on my entertainment experience, I kindly implore your expertise and support in resolving this matter at the earliest convenience. Your swift assistance would be greatly appreciated.
 
-Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 0, 'IN_PROGRESS',
+Thank you for your prompt attention to this matter, and I look forward to a positive resolution.', 1, 'IN_PROGRESS',
                 'Distorted Audio Output on Sony Bravia X70J TV', 1, 3, '0000000000112', 633020516);
+        INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
+                             product_id, serial_num)
+        VALUES ('2023-05-05 09:45:20.256000', e'Hello, I am having an issue with my iPhone 12. The battery drains quickly, even with minimal usage. I would like your assistance in resolving this problem.
 
+Issue Description:
+The battery life of my iPhone 12 has significantly decreased. Even after a full charge, the battery percentage drops rapidly, especially when using apps or browsing the internet. This issue has been persistent for the past two weeks, and I have noticed a noticeable decline in battery performance.
+
+Troubleshooting Steps Taken:
+
+	Closed background apps: I have made sure to close all unnecessary apps running in the background, but it hasn\'t improved the battery life.
+
+	Adjusted screen brightness: I have reduced the screen brightness to the lowest possible level, but it didn\'t make a significant difference.
+
+	Disabled push email: I turned off push email and set it to fetch manually to reduce battery consumption, but it didn\'t help.
+
+I would appreciate your help in resolving this battery issue.
+
+Thank you.', 0, 'OPEN', 'Fast Battery Drain on iPhone 12', 2, null, '0000000000015', 123456789);
+        INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
+                             product_id, serial_num)
+        VALUES ('2023-05-10 14:20:55.823000', e'Hi, I am facing an issue with my Samsung Galaxy S21. The phone\'s camera app crashes frequently, making it difficult to take photos or record videos. I request your assistance in resolving this problem.
+
+Issue Description:
+Whenever I launch the camera app on my Samsung Galaxy S21, it crashes after a few seconds. This happens regardless of the camera mode I select, such as photo, video, or portrait. I have tried force stopping the app and clearing its cache, but the issue persists.
+
+Troubleshooting Steps Taken:
+
+	Cleared camera app cache: I cleared the cache of the camera app from the app settings, but it didn\'t fix the issue.
+
+	Restarted the phone: I have restarted my Samsung Galaxy S21 multiple times to see if it resolves the camera app crash, but it didn\'t help.
+
+	Disabled camera enhancements: I turned off the camera enhancements and filters to check if they were causing the crash, but the problem still occurs.
+
+I urgently need your assistance in fixing this camera app crash.
+
+Thank you for your help.', 2, 'IN_PROGRESS', 'Camera App Crash on Samsung Galaxy S21', 2, 3, '0000000000004', 987654321);
+        INSERT INTO tickets (created_timestamp, description, priority, status, title, client_id, expert_id,
+                             product_id, serial_num)
+        VALUES ('2023-05-15 17:30:10.972000', e'Hello, I am experiencing network connectivity issues with my ASUS RT-AX88U router. The Wi-Fi signal is weak and keeps dropping frequently. I request your assistance in resolving this problem.
+
+Issue Description:
+The Wi-Fi signal strength of my ASUS RT-AX88U router is poor, and it frequently disconnects devices connected to it. The issue is not specific to a particular device or location within my house. I have noticed this problem for the past week, and it\'s affecting my ability to work and stream videos.
+
+Troubleshooting Steps Taken:
+
+	Router reboot: I have rebooted the router multiple times to see if it helps improve the Wi-Fi signal, but the issue persists.
+
+	Checked for firmware updates: I accessed the router\'s admin panel and verified that the firmware is up to date.
+
+	Adjusted antenna position: I tried adjusting the position of the router\'s antennas for better signal reception, but it didn\'t make a significant difference.
+
+I kindly request your assistance in resolving this Wi-Fi connectivity issue.
+
+Thank you.', 0, 'OPEN', 'Weak Wi-Fi Signal on ASUS RT-AX88U Router', 2, null, '0000000000330', 567890123);
+
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-05-05 09:45:20.256000', null, 11, 2);
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-05-10 14:20:55.823000', null, 12, 2);
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-05-10 17:33:55.823000', null, 12, 5);
+        INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
+        VALUES ('OPEN', 'OPEN', '2023-05-15 17:30:10.972000', null, 13, 2);
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
         VALUES ('OPEN', 'OPEN', '2023-06-19 20:04:23.758000', null, 6, 1);  --12
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 10, 1); --23
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:06:39.638000', null, 10, 1); --23
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 3, 1); --4
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:10:45.456000', null, 3, 1); --4
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 4, 1); --5
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:13:47.678000', null, 4, 1); --5
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 7, 1); --17
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:17:23.758000', null, 7, 1); --17
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 5, 1); --7
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:20:27.758000', null, 5, 1); --7
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 9, 1); --21
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:24:11.758000', null, 9, 1); --21
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-20 20:04:23.758000', null, 8, 1); --18
+        VALUES ('OPEN', 'OPEN', '2023-06-20 20:25:55.758000', null, 8, 1); --18
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:10:49.726903', 3, 8, 5); --19
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:10:49.726000', 3, 8, 5); --19
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:15:49.726903', 3, 9, 5); --22
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:15:49.726000', 3, 9, 5); --22
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:16:43.726903', 3, 10, 5); --24
+        VALUES ('IN_PROGRESS', 'OPEN', '2023-06-21 10:16:43.726000', 3, 10, 5); --24
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-21 19:47:14.726903', null, 1, 1); --1
+        VALUES ('OPEN', 'OPEN', '2023-06-21 19:47:14.726000', null, 1, 1); --1
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
-        VALUES ('OPEN', 'OPEN', '2023-06-21 20:04:23.758173', null, 2, 1); --3
+        VALUES ('OPEN', 'OPEN', '2023-06-21 20:04:23.758000', null, 2, 1); --3
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)
         VALUES ('IN_PROGRESS', 'OPEN', '2023-06-22 13:45:49.726903', 3, 4, 5); --6
         INSERT INTO tickets_history (new_state, old_state, updated_timestamp, current_expert_id, ticket_id, user_id)

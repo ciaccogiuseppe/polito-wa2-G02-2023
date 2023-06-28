@@ -35,7 +35,7 @@ async function getTicketHistoryAPI(ticketHistoryFilters) {
     })
     .catch((err) => {
       console.log(err);
-      Promise.reject(err.response.data.detail);
+      return Promise.reject(err.response.data.detail);
     });
 }
 
