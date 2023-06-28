@@ -120,7 +120,7 @@ function ChatMessage(props) {
           display: "inline-block",
           marginLeft: "25px",
           marginTop: "15px",
-          float: isExpert?"left":"right",
+          float: isExpert ? "left" : "right",
           marginRight: "25px",
         }}
       >
