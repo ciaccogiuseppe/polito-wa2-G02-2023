@@ -118,9 +118,9 @@ function ChatMessage(props) {
       <div
         style={{
           display: "inline-block",
-          marginLeft: "20px",
+          marginLeft: "25px",
           marginTop: "15px",
-          float: "right",
+          float: isExpert?"left":"right",
           marginRight: "25px",
         }}
       >

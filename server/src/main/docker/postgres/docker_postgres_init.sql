@@ -180,7 +180,7 @@ create table if not exists messages
     id             bigserial
         primary key,
     sent_timestamp timestamp(6) not null,
-    text           varchar(255) not null,
+    text           varchar      not null,
     sender_id      bigint       not null
         constraint fk79kgt6oyju1ma9ly4qmax5933
             references profiles,
