@@ -7,9 +7,9 @@ import jakarta.validation.constraints.Positive
 data class AttachmentDTO(
     @field:Positive
     val attachmentId: Long?,
-    @field:NotEmpty(message="attachment is mandatory")
+    @field:NotEmpty(message = "attachment is mandatory")
     val attachment: ByteArray,
-    @field:NotBlank(message="name is mandatory")
+    @field:NotBlank(message = "name is mandatory")
     val name: String
 ) {
     override fun equals(other: Any?): Boolean {
@@ -20,9 +20,7 @@ data class AttachmentDTO(
 
         if (attachmentId != other.attachmentId) return false
         if (!attachment.contentEquals(other.attachment)) return false
-        if (name != other.name) return false
-
-        return true
+        return name == other.name
     }
 
     override fun hashCode(): Int {
@@ -33,11 +31,11 @@ data class AttachmentDTO(
     }
 }
 
-fun Attachment.toDTO() : AttachmentDTO{
+fun Attachment.toDTO(): AttachmentDTO {
     return AttachmentDTO(this.getId(), attachment, name)
 }
 
-fun AttachmentDTO.toNewAttachment(): Attachment{
+fun AttachmentDTO.toNewAttachment(): Attachment {
     val attachmentObj = Attachment()
     attachmentObj.name = name
     attachmentObj.attachment = attachment

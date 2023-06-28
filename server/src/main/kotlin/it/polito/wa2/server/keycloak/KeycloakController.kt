@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
 @RestController
+@CrossOrigin(origins = ["http://localhost:3001"])
 @Observed
 class KeycloakController(private val keycloakService: KeycloakService) {
     @PostMapping("/API/signup")
@@ -22,6 +23,30 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         keycloakService.addClient(userDTO!!)
     }
 
+    @GetMapping("/API/resetPassword/{email}")
+    fun resetPassword(@PathVariable email: String) {
+        checkEmail(email)
+        keycloakService.resetPassword(email)
+    }
+
+    @PutMapping("/API/resetPassword/")
+    fun applyResetPassword(@Valid @RequestBody passwordDTO: PasswordDTO?, br: BindingResult) {
+        checkInputPassword(passwordDTO, br)
+        keycloakService.applyResetPassword(passwordDTO!!)
+    }
+
+    @GetMapping("/API/validateEmail/{email}")
+    fun askValidateMail(@PathVariable email: String) {
+        checkEmail(email)
+        keycloakService.validateEmail(email)
+    }
+
+    @PutMapping("/API/validateEmail/")
+    fun validateEmail(@Valid @RequestBody emailDTO: EmailDTO?, br: BindingResult) {
+        checkInputEmail(emailDTO, br)
+        keycloakService.applyValidateEmail(emailDTO!!.token)
+    }
+
     @PostMapping("/API/createExpert")
     @ResponseStatus(HttpStatus.CREATED)
     fun addExpert(@Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
@@ -29,49 +54,108 @@ class KeycloakController(private val keycloakService: KeycloakService) {
         keycloakService.addExpert(userDTO!!)
     }
 
+    @PostMapping("/API/createVendor")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addVendor(@Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+        checkInputUser(userDTO, br)
+        keycloakService.addVendor(userDTO!!)
+    }
+
     @PutMapping("/API/client/user/{email}")
-    fun clientUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+    fun clientUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
         val userEmail = retrieveUserEmail(principal)
         checkEmailWithLoggedUser(email, userEmail)
-        checkInputUser(userDTO, br)
+        checkInputUpdateUser(userDTO, br)
         keycloakService.updateUser(email, userDTO!!)
     }
 
     @PutMapping("/API/expert/user/{email}")
-    fun expertUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+    fun expertUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
         val userEmail = retrieveUserEmail(principal)
         checkEmailWithLoggedUser(email, userEmail)
-        checkInputUser(userDTO, br)
+        checkInputUpdateUser(userDTO, br)
+        keycloakService.updateUser(email, userDTO!!)
+    }
+
+    @PutMapping("/API/vendor/user/{email}")
+    fun vendorUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
+        val userEmail = retrieveUserEmail(principal)
+        checkEmailWithLoggedUser(email, userEmail)
+        checkInputUpdateUser(userDTO, br)
         keycloakService.updateUser(email, userDTO!!)
     }
 
     @PutMapping("/API/manager/user/{email}")
-    fun managerUpdateKCUser(principal: Principal, @PathVariable email: String, @Valid @RequestBody userDTO: UserDTO?, br: BindingResult) {
+    fun managerUpdateKCUser(
+        principal: Principal,
+        @PathVariable email: String,
+        @Valid @RequestBody userDTO: UserUpdateDTO?,
+        br: BindingResult
+    ) {
         checkEmail(email)
-        checkInputUser(userDTO, br)
+        checkInputUpdateUser(userDTO, br)
         keycloakService.updateUser(email, userDTO!!)
     }
 
-    private fun checkInputUser(userDTO: UserDTO?, br: BindingResult){
+    private fun checkInputUser(userDTO: UserDTO?, br: BindingResult) {
         if (br.hasErrors())
             throw UnprocessableUserException("Wrong user format")
         if (userDTO == null)
             throw BadRequestUserException("User must not be NULL")
     }
 
-    fun checkEmailWithLoggedUser(email: String, emailLogged: String){
+    private fun checkInputPassword(passwordDTO: PasswordDTO?, br: BindingResult) {
+        if (br.hasErrors())
+            throw UnprocessableUserException("Wrong data format")
+        if (passwordDTO == null)
+            throw BadRequestUserException("Request must not be NULL")
+    }
+
+    private fun checkInputEmail(emailDTO: EmailDTO?, br: BindingResult) {
+        if (br.hasErrors())
+            throw UnprocessableUserException("Wrong data format")
+        if (emailDTO == null)
+            throw BadRequestUserException("Request must not be NULL")
+    }
+
+    private fun checkInputUpdateUser(userDTO: UserUpdateDTO?, br: BindingResult) {
+        if (br.hasErrors())
+            throw UnprocessableUserException("Wrong user format")
+        if (userDTO == null)
+            throw BadRequestUserException("User must not be NULL")
+    }
+
+    private fun checkEmailWithLoggedUser(email: String, emailLogged: String) {
         checkEmail(email)
-        if(email != emailLogged)
+        if (email != emailLogged)
             throw ForbiddenException("You cannot updated profiles that are not yours")
     }
 
-    fun checkEmail(email: String){
+    private fun checkEmail(email: String) {
         if (!email.matches(Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")))
             throw UnprocessableProfileException("Wrong email format")
     }
 
-    fun retrieveUserEmail(principal: Principal): String {
+    private fun retrieveUserEmail(principal: Principal): String {
         val token: JwtAuthenticationToken = principal as JwtAuthenticationToken
         return token.tokenAttributes["email"] as String
     }
+
+
 }
+

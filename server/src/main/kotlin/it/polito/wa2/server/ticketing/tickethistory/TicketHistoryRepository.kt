@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository
 
 
 @Repository
-interface TicketHistoryRepository: JpaRepository<TicketHistory, Long> {
+interface TicketHistoryRepository : JpaRepository<TicketHistory, Long> {
     fun findAllByTicket(ticket: Ticket): List<TicketHistory>
 }

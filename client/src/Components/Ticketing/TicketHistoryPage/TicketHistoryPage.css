@@ -1,0 +1,26 @@
+.tableroundedCorner {
+  border: 1px solid #7a7b7b;
+  border-radius: 1.2em;
+}
+
+.roundedTable {
+  border-collapse: collapse;
+  border-radius: 1.2em;
+  overflow: hidden;
+  width: 100%;
+  margin: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.roundedTable th,
+.roundedTable td {
+  padding: 0.6em;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.roundedTable th {
+}
+
+.roundedTable tr:last-child td {
+  border-bottom: none;
+}

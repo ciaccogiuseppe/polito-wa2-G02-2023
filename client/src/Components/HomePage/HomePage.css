@@ -1,10 +1,22 @@
-.CenteredButton{
-    text-align: center;
-    flex-flow: column;
-    flex: auto;
-    margin: 15px;
+.CenteredButton {
+  text-align: center;
+  flex-flow: column;
+  flex: auto;
+  margin: 15px;
 }
 
-.HomeButton{
-    width: 200px;
+.HomeButton {
+  width: 200px;
+}
+
+.printme {
+  display: none;
+}
+@media print {
+  .no-printme {
+    display: none;
+  }
+  .printme {
+    display: block;
+  }
 }

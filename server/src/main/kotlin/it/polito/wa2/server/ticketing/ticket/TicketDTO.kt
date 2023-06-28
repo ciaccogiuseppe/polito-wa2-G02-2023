@@ -1,14 +1,13 @@
 package it.polito.wa2.server.ticketing.ticket
 
-import it.polito.wa2.server.products.Product
+import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.profiles.Profile
 import jakarta.validation.constraints.*
 import java.sql.Timestamp
-import java.time.LocalDateTime
 
 data class TicketDTO(
     @field:Positive
-    val ticketId : Long?,
+    val ticketId: Long?,
     @field:NotBlank(message = "A title is required")
     val title: String,
     @field:NotBlank
@@ -17,9 +16,18 @@ data class TicketDTO(
     val priority: Int?,
     @field:Size(min = 13, max = 13)
     val productId: String,
-    //@field:Positive
-    val customerEmail: String?,
-    //@field:Positive
+    @field:Positive
+    val serialNum: Long,
+
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
+    val clientEmail: String?,
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val expertEmail: String?,
     val status: TicketStatus?,
     val createdTimestamp: Timestamp?
@@ -27,8 +35,12 @@ data class TicketDTO(
 
 data class TicketAssignDTO(
     @field:Positive
-    val ticketId : Long,
-    //@field:Positive
+    val ticketId: Long,
+    @field:NotBlank(message = "expert email is required")
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val expertEmail: String,
     @field:PositiveOrZero
     val priority: Int
@@ -36,7 +48,7 @@ data class TicketAssignDTO(
 
 data class TicketUpdateDTO(
     @field:Positive
-    val ticketId : Long,
+    val ticketId: Long,
     val newState: TicketStatus
 )
 
@@ -46,8 +58,9 @@ fun Ticket.toDTO(): TicketDTO {
         title,
         description,
         priority,
-        product?.productId!!,
-        customer?.email,
+        item?.product?.productId!!,
+        item?.serialNum!!,
+        client?.email,
         expert?.email,
         status,
         createdTimestamp
@@ -55,18 +68,19 @@ fun Ticket.toDTO(): TicketDTO {
 }
 
 fun TicketDTO.toNewTicket(
-    product: Product,
-    customer: Profile
+    item: Item,
+    client: Profile,
+    timestamp: Timestamp
 ): Ticket {
     val ticket = Ticket()
     ticket.title = title
     ticket.description = description
     ticket.priority = 0
-    ticket.product = product
-    ticket.customer = customer
+    ticket.item = item
+    ticket.client = client
     ticket.expert = null
     ticket.status = TicketStatus.OPEN
-    ticket.createdTimestamp = Timestamp.valueOf(LocalDateTime.now())
+    ticket.createdTimestamp = timestamp
     return ticket
 }
 

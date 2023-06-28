@@ -25,19 +25,22 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
     volumes:
       - ./postgres/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+      - postgres-vol:/var/lib/postgresql/data
     networks:
       - app-network
 
   springboot-app:
     image:
-      'ciaccogiuseppe/polito_wa2_g02_2023:lab5'
+      'ciaccogiuseppe/polito_wa2_g02_2023:final'
     build:
       context: .
     container_name: server
     ports:
-      - "8081:8081"
+      - "8080:8081"
     volumes:
       - ./docker/logback-spring.xml:/data/logback_config/logback.xml
     environment:
@@ -45,6 +48,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_MVC_PROBLEMDETAILS_ENABLED=true
       - KEYCLOAK_AUTH-SERVER-URL=http://keycloak:8080
       - KEYCLOAK_REALM=SpringBootKeycloak
       - KEYCLOAK_RESOURCE=springboot-keycloak-client
@@ -57,6 +61,16 @@ services:
       - LOGGING_CONFIG=/data/logback_config/logback.xml
       - LOKI_HOST=loki
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
+      - MAIL_SENDER_HOST=smtp.gmail.com
+      - MAIL_SENDER_PORT=587
+      - MAIL_SENDER_USERNAME=ticketing.wa2g02@gmail.com
+      - MAIL_SENDER_PASSWORD=tybqmhpuclhcdwre
+      - MAIL_SENDER_PROTOCOL=smtp
+      - MAIL_SENDER_DEBUG=true
+      - MAIL_SENDER_AUTH=true
+      - MAIL_SENDER_STARTTLS_ENABLE=true
+      - SERVER_URL=http://localhost:8080
+
     depends_on:
       - keycloak
       - database
@@ -109,6 +123,7 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-vol:/prometheus
     ports:
       - "9090:9090"
     networks:
@@ -135,3 +150,6 @@ services:
 networks:
   app-network:
 
+volumes:
+  postgres-vol:
+  prometheus-vol:

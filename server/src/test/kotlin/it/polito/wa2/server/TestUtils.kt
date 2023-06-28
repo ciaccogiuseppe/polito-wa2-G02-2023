@@ -1,6 +1,9 @@
 package it.polito.wa2.server
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
+import it.polito.wa2.server.brands.Brand
+import it.polito.wa2.server.categories.Category
+import it.polito.wa2.server.items.Item
 import it.polito.wa2.server.products.Product
 import it.polito.wa2.server.profiles.Profile
 import it.polito.wa2.server.profiles.ProfileRole
@@ -16,10 +19,11 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import java.sql.Timestamp
+import java.util.*
 
 class TestUtils {
     companion object {
-        fun testProfile(email: String, name:String, surname:String, role:ProfileRole) : Profile {
+        fun testProfile(email: String, name: String, surname: String, role: ProfileRole): Profile {
             val profile = Profile()
             profile.email = email
             profile.name = name
@@ -29,19 +33,49 @@ class TestUtils {
             return profile
         }
 
-        fun testProduct(productId: String, name:String, brand:String) : Product {
+        fun testProduct(productId: String, name: String, brand: Brand, category: Category): Product {
+
+
             val product = Product()
             product.productId = productId
             product.name = name
             product.brand = brand
+            product.category = category
 
             return product
         }
 
-        fun testTicket(createdTimestamp:Timestamp, product:Product, customer:Profile, status:TicketStatus, expert:Profile, priority:Int, title:String, description:String) : Ticket{
+        fun testItem(
+            product: Product,
+            client: Profile,
+            uuid: UUID,
+            serialNum: Long,
+            durationMonths: Long,
+            validFromTimestamp: Timestamp
+        ): Item {
+            val item = Item()
+            item.product = product
+            item.client = client
+            item.uuid = uuid
+            item.serialNum = serialNum
+            item.durationMonths = durationMonths
+            item.validFromTimestamp = validFromTimestamp
+            return item
+        }
+
+        fun testTicket(
+            createdTimestamp: Timestamp,
+            item: Item,
+            customer: Profile,
+            status: TicketStatus,
+            expert: Profile,
+            priority: Int,
+            title: String,
+            description: String
+        ): Ticket {
             val ticket = Ticket()
-            ticket.product = product
-            ticket.customer = customer
+            ticket.item = item
+            ticket.client = customer
             ticket.status = status
             ticket.expert = expert
             ticket.priority = priority
@@ -52,7 +86,7 @@ class TestUtils {
             return ticket
         }
 
-        fun testMessage(text:String, sentTimestamp: Timestamp, ticket:Ticket, sender: Profile) : Message{
+        fun testMessage(text: String, sentTimestamp: Timestamp, ticket: Ticket, sender: Profile): Message {
             val message = Message()
             message.text = text
             message.sentTimestamp = sentTimestamp
@@ -62,7 +96,7 @@ class TestUtils {
             return message
         }
 
-        fun testAttachment(name:String, data:ByteArray, message:Message):Attachment{
+        fun testAttachment(name: String, data: ByteArray, message: Message): Attachment {
             val attachment = Attachment()
             attachment.name = name
             attachment.attachment = data
@@ -71,7 +105,14 @@ class TestUtils {
             return attachment
         }
 
-        fun testTicketHistory(ticket:Ticket, expert:Profile, newStatus: TicketStatus, oldStatus: TicketStatus, updatedTimestamp: Timestamp, user:Profile) : TicketHistory{
+        fun testTicketHistory(
+            ticket: Ticket,
+            expert: Profile,
+            newStatus: TicketStatus,
+            oldStatus: TicketStatus,
+            updatedTimestamp: Timestamp,
+            user: Profile
+        ): TicketHistory {
             val ticketHistory = TicketHistory()
             ticketHistory.ticket = ticket
             ticketHistory.currentExpert = expert
@@ -91,7 +132,7 @@ class TestUtils {
             return HttpEntity(body, headers)
         }
 
-        fun testKeycloakSetup(keycloak:KeycloakContainer) {
+        fun testKeycloakSetup(keycloak: KeycloakContainer) {
 
             val realmName = "SpringBootKeycloak"
 
@@ -110,6 +151,11 @@ class TestUtils {
             expert.username = "expert_01"
             expert.isEnabled = true
 
+            val vendor = UserRepresentation()
+            vendor.email = "vendor@polito.it"
+            vendor.username = "vendor_01"
+            vendor.isEnabled = true
+
             val credential = CredentialRepresentation()
             credential.isTemporary = false
             credential.type = CredentialRepresentation.PASSWORD
@@ -118,6 +164,7 @@ class TestUtils {
             keycloak.keycloakAdminClient.realm(realmName).users().create(manager)
             keycloak.keycloakAdminClient.realm(realmName).users().create(client)
             keycloak.keycloakAdminClient.realm(realmName).users().create(expert)
+            keycloak.keycloakAdminClient.realm(realmName).users().create(vendor)
 
 
             val createdManager =
@@ -126,23 +173,33 @@ class TestUtils {
                 keycloak.keycloakAdminClient.realm(realmName).users().search(client.email)[0]
             val createdExpert =
                 keycloak.keycloakAdminClient.realm(realmName).users().search(expert.email)[0]
+            val createdVendor =
+                keycloak.keycloakAdminClient.realm(realmName).users().search(vendor.email)[0]
 
             val roleManager = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_manager")
             val roleClient = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_client")
             val roleExpert = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_expert")
+            val roleVendor = keycloak.keycloakAdminClient.realm(realmName).roles().get("app_vendor")
 
             keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel().add(listOf(roleManager.toRepresentation()))
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdManager.id).roles().realmLevel()
+                .add(listOf(roleManager.toRepresentation()))
 
             keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel().add(listOf(roleClient.toRepresentation()))
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdClient.id).roles().realmLevel()
+                .add(listOf(roleClient.toRepresentation()))
 
             keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).resetPassword(credential)
-            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel().add(listOf(roleExpert.toRepresentation()))
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdExpert.id).roles().realmLevel()
+                .add(listOf(roleExpert.toRepresentation()))
+
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdVendor.id).resetPassword(credential)
+            keycloak.keycloakAdminClient.realm(realmName).users().get(createdVendor.id).roles().realmLevel()
+                .add(listOf(roleVendor.toRepresentation()))
 
         }
 
-        fun testKeycloakGetManagerToken (keycloak: KeycloakContainer) : String {
+        fun testKeycloakGetManagerToken(keycloak: KeycloakContainer): String {
             val realmName = "SpringBootKeycloak"
             val clientId = "springboot-keycloak-client"
             val kcManager = KeycloakBuilder
@@ -157,7 +214,7 @@ class TestUtils {
             return kcManager.tokenManager().accessToken.token
         }
 
-        fun testKeycloakGetClientToken (keycloak: KeycloakContainer) : String {
+        fun testKeycloakGetClientToken(keycloak: KeycloakContainer): String {
             val realmName = "SpringBootKeycloak"
             val clientId = "springboot-keycloak-client"
             val kcClient = KeycloakBuilder
@@ -172,7 +229,7 @@ class TestUtils {
             return kcClient.tokenManager().accessToken.token
         }
 
-        fun testKeycloakGetExpertToken (keycloak: KeycloakContainer) : String {
+        fun testKeycloakGetExpertToken(keycloak: KeycloakContainer): String {
             val realmName = "SpringBootKeycloak"
             val clientId = "springboot-keycloak-client"
             val kcExpert = KeycloakBuilder
@@ -187,7 +244,23 @@ class TestUtils {
             return kcExpert.tokenManager().accessToken.token
         }
 
-        fun testKeycloakGetUser (keycloak: KeycloakContainer, email:String) : UserRepresentation? {
+
+        fun testKeycloakGetVendorToken(keycloak: KeycloakContainer): String {
+            val realmName = "SpringBootKeycloak"
+            val clientId = "springboot-keycloak-client"
+            val kcVendor = KeycloakBuilder
+                .builder()
+                .serverUrl(keycloak.authServerUrl)
+                .realm(realmName)
+                .clientId(clientId)
+                .username("vendor@polito.it")
+                .password("password")
+                .build()
+            kcVendor.tokenManager().grantToken().expiresIn = 50000
+            return kcVendor.tokenManager().accessToken.token
+        }
+
+        fun testKeycloakGetUser(keycloak: KeycloakContainer, email: String): UserRepresentation? {
             val realmName = "SpringBootKeycloak"
             val clientId = "springboot-keycloak-client"
 

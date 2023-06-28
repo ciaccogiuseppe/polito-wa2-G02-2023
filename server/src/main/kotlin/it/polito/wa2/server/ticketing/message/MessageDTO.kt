@@ -13,30 +13,36 @@ import java.time.LocalDateTime
 
 data class MessageDTO(
     @field:Positive
-    val messageId : Long?,
+    val messageId: Long?,
     @field:Positive
     val ticketId: Long,
-    @field:NotBlank(message="email is mandatory")
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
-        message="email must be valid")
+    @field:NotBlank(message = "email is mandatory")
+    @field:Pattern(
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$",
+        message = "email must be valid"
+    )
     val senderEmail: String,
-    @field:NotBlank(message="a message text is mandatory")
+    @field:NotBlank(message = "a message text is mandatory")
     val text: String,
     val sentTimestamp: Timestamp?,
     val attachments: MutableSet<AttachmentDTO>,
 )
 
 fun Message.toDTO(): MessageDTO {
-    return MessageDTO(this.getId(), ticket?.getId()!!, sender?.email!!,
-        text, sentTimestamp, attachments.map{it.toDTO()}.toMutableSet())
+    return MessageDTO(
+        this.getId(), ticket?.getId()!!, sender?.email!!,
+        text, sentTimestamp, attachments.map { it.toDTO() }.toMutableSet()
+    )
 }
 
 fun MessageDTO.toNewMessage(
     attachments: MutableSet<Attachment>,
     sender: Profile,
-    ticket: Ticket): Message {
+    ticket: Ticket
+): Message {
     val message = Message()
     message.attachments = attachments
+    attachments.forEach { it.message = message }
     message.text = text
     message.sender = sender
     message.ticket = ticket

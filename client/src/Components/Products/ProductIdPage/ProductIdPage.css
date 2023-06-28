@@ -1,22 +1,22 @@
-.CenteredButton{
-    text-align: center;
-    align-items: center;
-    flex-flow: column;
-    flex: auto;
-    margin: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.CenteredButton {
+  text-align: center;
+  align-items: center;
+  flex-flow: column;
+  flex: auto;
+  margin: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
 }
 
-.HomeButton{
-    width: 200px;
+.HomeButton {
+  width: 200px;
 }

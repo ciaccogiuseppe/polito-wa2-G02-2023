@@ -2,6 +2,12 @@ package it.polito.wa2.server
 
 
 import dasniko.testcontainers.keycloak.KeycloakContainer
+import it.polito.wa2.server.brands.Brand
+import it.polito.wa2.server.brands.BrandRepository
+import it.polito.wa2.server.categories.Category
+import it.polito.wa2.server.categories.CategoryRepository
+import it.polito.wa2.server.categories.ProductCategory
+import it.polito.wa2.server.items.ItemRepository
 import it.polito.wa2.server.products.ProductRepository
 import it.polito.wa2.server.profiles.ProfileRepository
 import it.polito.wa2.server.profiles.ProfileRole
@@ -17,8 +23,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.*
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -30,10 +36,11 @@ import java.util.*
 
 
 @Testcontainers
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace=AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class TicketControllerTests {
     val json = BasicJsonParser()
+
     companion object {
         @Container
         val postgres = PostgreSQLContainer("postgres:latest")
@@ -48,7 +55,7 @@ class TicketControllerTests {
 
         @JvmStatic
         @BeforeAll
-        fun setup(){
+        fun setup() {
             keycloak.start()
             TestUtils.testKeycloakSetup(keycloak)
             managerToken = TestUtils.testKeycloakGetManagerToken(keycloak)
@@ -56,12 +63,12 @@ class TicketControllerTests {
             expertToken = TestUtils.testKeycloakGetExpertToken(keycloak)
         }
 
-        /*@JvmStatic
+        @JvmStatic
         @AfterAll
-        fun clean(){
+        fun clean() {
             keycloak.stop()
             postgres.close()
-        }*/
+        }
 
 
         @JvmStatic
@@ -70,25 +77,41 @@ class TicketControllerTests {
             registry.add("spring.datasource.url", postgres::getJdbcUrl)
             registry.add("spring.datasource.username", postgres::getUsername)
             registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.jpa.hibernate.ddl-auto") {"create-drop"}
-            registry.add("spring.datasource.hikari.validation-timeout"){"250"}
-            registry.add("spring.datasource.hikari.connection-timeout"){"250"}
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.datasource.hikari.validation-timeout") { "250" }
+            registry.add("spring.datasource.hikari.connection-timeout") { "250" }
             registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri")
-            { keycloak.authServerUrl + "realms/SpringBootKeycloak"}
+            { keycloak.authServerUrl + "realms/SpringBootKeycloak" }
         }
     }
+
     @LocalServerPort
     protected var port: Int = 8080
+
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
     @Autowired
     lateinit var profileRepository: ProfileRepository
+
     @Autowired
     lateinit var productRepository: ProductRepository
+
     @Autowired
     lateinit var ticketRepository: TicketRepository
+
     @Autowired
     lateinit var ticketHistoryRepository: TicketHistoryRepository
+
+    @Autowired
+    lateinit var brandRepository: BrandRepository
+
+    @Autowired
+    lateinit var categoryRepository: CategoryRepository
+
+    @Autowired
+    lateinit var itemRepository: ItemRepository
+
     @Test
     //@DirtiesContext
     fun getExistingTicketManager() {
@@ -99,10 +122,29 @@ class TicketControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/manager/ticketing/${ticket.getId()}")
@@ -115,11 +157,18 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
         Assertions.assertEquals(product.productId, body["productId"])
-        Assertions.assertEquals(customer.email, body["customerEmail"])
+        Assertions.assertEquals(customer.email, body["clientEmail"])
         Assertions.assertEquals(expert.email, body["expertEmail"])
         Assertions.assertNotNull(body["status"])
         Assertions.assertEquals(ticket.status, TicketStatus.valueOf(body["status"]!!.toString()))
@@ -127,11 +176,7 @@ class TicketControllerTests {
         Assertions.assertEquals(ticket.description, body["description"])
         Assertions.assertEquals(ticket.title, body["title"])
 
-        ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
+
     }
 
     @Test
@@ -144,10 +189,29 @@ class TicketControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/client/ticketing/${ticket.getId()}")
@@ -160,11 +224,18 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
         Assertions.assertEquals(product.productId, body["productId"])
-        Assertions.assertEquals(customer.email, body["customerEmail"])
+        Assertions.assertEquals(customer.email, body["clientEmail"])
         Assertions.assertEquals(expert.email, body["expertEmail"])
         Assertions.assertNotNull(body["status"])
         Assertions.assertEquals(ticket.status, TicketStatus.valueOf(body["status"]!!.toString()))
@@ -172,11 +243,7 @@ class TicketControllerTests {
         Assertions.assertEquals(ticket.description, body["description"])
         Assertions.assertEquals(ticket.title, body["title"])
 
-        ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
+
     }
 
     @Test
@@ -189,10 +256,29 @@ class TicketControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/expert/ticketing/${ticket.getId()}")
@@ -205,11 +291,18 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
+        ticketRepository.delete(ticket)
+        itemRepository.delete(item)
+        profileRepository.delete(customer)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
         val body = json.parseMap(result.body)
         Assertions.assertEquals(product.productId, body["productId"])
-        Assertions.assertEquals(customer.email, body["customerEmail"])
+        Assertions.assertEquals(customer.email, body["clientEmail"])
         Assertions.assertEquals(expert.email, body["expertEmail"])
         Assertions.assertNotNull(body["status"])
         Assertions.assertEquals(ticket.status, TicketStatus.valueOf(body["status"]!!.toString()))
@@ -217,11 +310,7 @@ class TicketControllerTests {
         Assertions.assertEquals(ticket.description, body["description"])
         Assertions.assertEquals(ticket.title, body["title"])
 
-        ticketRepository.delete(ticket)
-        profileRepository.delete(customer)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
+
     }
 
     @Test
@@ -234,10 +323,29 @@ class TicketControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/client/ticketing/${ticket.getId()}")
@@ -250,13 +358,17 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
@@ -269,10 +381,29 @@ class TicketControllerTests {
         profileRepository.save(customer)
         profileRepository.save(expert)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val uri = URI("http://localhost:$port/API/expert/ticketing/${ticket.getId()}")
@@ -285,12 +416,16 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
     }
 
     @Test
@@ -308,8 +443,10 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+
     }
 
     @Test
@@ -327,13 +464,14 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
+        profileRepository.delete(manager)
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
-        profileRepository.delete(manager)
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsSingleCustomerFilter(){
+    fun getFilteredTicketsSingleCustomerFilter() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -345,17 +483,56 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?customerEmail=${customer.email}")
+        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?clientEmail=${customer.email}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -365,25 +542,29 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsSingleCustomerFilterAuthorizedClient(){
+    fun getFilteredTicketsSingleCustomerFilterAuthorizedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -395,17 +576,56 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/client/ticketing/filter?customerEmail=${customer.email}")
+        val uri = URI("http://localhost:$port/API/client/ticketing/filter?clientEmail=${customer.email}")
 
         val entity = TestUtils.testEntityHeader(null, clientToken)
 
@@ -415,26 +635,30 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsSingleCustomerFilterOtherClient(){
+    fun getFilteredTicketsSingleCustomerFilterOtherClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -446,17 +670,57 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/client/ticketing/filter?customerEmail=${customer2.email}")
+        val uri = URI("http://localhost:$port/API/client/ticketing/filter?clientEmail=${customer2.email}")
 
         val entity = TestUtils.testEntityHeader(null, clientToken)
 
@@ -466,24 +730,29 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(0, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsMultipleUserFilter(){
+    fun getFilteredTicketsMultipleUserFilter() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -495,17 +764,59 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert2.email}")
+        val uri =
+            URI("http://localhost:$port/API/manager/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert2.email}")
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -515,26 +826,30 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
+        ticketRepository.delete(ticket3)
+        ticketRepository.delete(ticket2)
+        ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
+        profileRepository.delete(customer)
+        profileRepository.delete(customer2)
+        profileRepository.delete(expert)
+        profileRepository.delete(expert2)
+        profileRepository.delete(expert)
+        productRepository.delete(product)
+        profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
         Assertions.assertEquals(1, body.size)
 
-        ticketRepository.delete(ticket3)
-        ticketRepository.delete(ticket2)
-        ticketRepository.delete(ticket1)
-        profileRepository.delete(customer)
-        profileRepository.delete(customer2)
-        profileRepository.delete(expert)
-        profileRepository.delete(expert2)
-        profileRepository.delete(expert)
-        productRepository.delete(product)
-        profileRepository.delete(manager)
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsMultipleUserFilterOneClientOnly(){
+    fun getFilteredTicketsMultipleUserFilterOneClientOnly() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -546,17 +861,57 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/client/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert2.email}")
+        val uri =
+            URI("http://localhost:$port/API/client/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert2.email}")
 
         val entity = TestUtils.testEntityHeader(null, clientToken)
 
@@ -566,14 +921,11 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
@@ -581,11 +933,18 @@ class TicketControllerTests {
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(1, body.size)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsTimeRange(){
+    fun getFilteredTicketsTimeRange() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -597,17 +956,60 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(3), product, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(3),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/filter?createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${
+                Timestamp(1).toLocalDateTime()
+            }"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -617,14 +1019,11 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
@@ -632,11 +1031,18 @@ class TicketControllerTests {
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsPriorityRange(){
+    fun getFilteredTicketsPriorityRange() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -648,12 +1054,51 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 1, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            1,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -668,14 +1113,11 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
@@ -683,11 +1125,18 @@ class TicketControllerTests {
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsProduct(){
+    fun getFilteredTicketsProduct() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -699,14 +1148,58 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
-        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
+        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand, category)
         productRepository.save(product)
         productRepository.save(product2)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product2, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val item2 = TestUtils.testItem(product2, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+
+        val item3 = TestUtils.testItem(product2, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item3)
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item3,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -721,14 +1214,12 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
+        itemRepository.delete(item3)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
@@ -736,11 +1227,18 @@ class TicketControllerTests {
         productRepository.delete(product)
         productRepository.delete(product2)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsStatus(){
+    fun getFilteredTicketsStatus() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -752,14 +1250,58 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
-        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
+        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand, category)
         productRepository.save(product)
         productRepository.save(product2)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product2, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product2, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+        val item3 = TestUtils.testItem(product2, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item3)
+
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item3,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
@@ -774,14 +1316,12 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(2, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
+        itemRepository.delete(item3)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
@@ -789,10 +1329,18 @@ class TicketControllerTests {
         productRepository.delete(product)
         productRepository.delete(product2)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(2, body.size)
+
+
     }
+
     @Test
     //@DirtiesContext
-    fun getFilteredTicketsAllFilters(){
+    fun getFilteredTicketsAllFilters() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client2@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -804,19 +1352,65 @@ class TicketControllerTests {
         profileRepository.save(expert)
         profileRepository.save(expert2)
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
-        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
+        val product2 = TestUtils.testProduct("0000000000001", "PC Omen Intel i5", brand, category)
         productRepository.save(product)
         productRepository.save(product2)
 
-        val ticket1 = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
-        val ticket2 = TestUtils.testTicket(Timestamp(0), product2, customer, TicketStatus.IN_PROGRESS, expert2, 2, "Ticket sample", "Ticket description sample")
-        val ticket3 = TestUtils.testTicket(Timestamp(0), product2, customer2, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val item2 = TestUtils.testItem(product2, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item2)
+        val item3 = TestUtils.testItem(product2, customer2, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item3)
+
+        val ticket1 = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket2 = TestUtils.testTicket(
+            Timestamp(0),
+            item2,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert2,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        val ticket3 = TestUtils.testTicket(
+            Timestamp(0),
+            item3,
+            customer2,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket1)
         ticketRepository.save(ticket2)
         ticketRepository.save(ticket3)
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/filter?customerEmail=${customer.email}&expertEmail=${expert.email}&status=OPEN&productId=0000000000000&minPriority=1&maxPriority=2&createdAfter=${Timestamp(0).toLocalDateTime()}&createdBefore=${Timestamp(1).toLocalDateTime()}")
+        val uri = URI(
+            "http://localhost:$port/API/manager/ticketing/filter?clientEmail=${customer.email}&expertEmail=${expert.email}&status=OPEN&productId=0000000000000&minPriority=1&maxPriority=2&createdAfter=${
+                Timestamp(0).toLocalDateTime()
+            }&createdBefore=${Timestamp(1).toLocalDateTime()}"
+        )
 
         val entity = TestUtils.testEntityHeader(null, managerToken)
 
@@ -826,14 +1420,12 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-        val body = json.parseList(result.body).map{it as LinkedHashMap<*,*>}
-        Assertions.assertEquals(1, body.size)
-
         ticketRepository.delete(ticket3)
         ticketRepository.delete(ticket2)
         ticketRepository.delete(ticket1)
+        itemRepository.delete(item)
+        itemRepository.delete(item2)
+        itemRepository.delete(item3)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
@@ -841,12 +1433,19 @@ class TicketControllerTests {
         productRepository.delete(product)
         productRepository.delete(product2)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
+        val body = json.parseList(result.body).map { it as LinkedHashMap<*, *> }
+        Assertions.assertEquals(1, body.size)
+
+
     }
 
 
     @Test
     //@DirtiesContext
-    fun addTicketSuccessfulClient(){
+    fun addTicketSuccessfulClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -855,8 +1454,26 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
+
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
+        itemRepository.save(item)
 
         val ticket = TicketDTO(
             null,
@@ -864,6 +1481,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
+            item.serialNum!!,
             customer.email,
             expert.email,
             null,
@@ -898,17 +1516,19 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(createdTicket.get())
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(createdTicket.get())
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
-
 
 
     @Test
     //@DirtiesContext
-    fun addTicketByExpertError(){
+    fun addTicketByExpertError() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -917,15 +1537,26 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
         val ticket = TicketDTO(
             null,
             "Ticket title",
             "Ticket description",
             null,
             "0000000000000",
+            item.serialNum!!,
             customer.email,
             expert.email,
             null,
@@ -942,18 +1573,21 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun addTicketByManagerError(){
+    fun addTicketByManagerError() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -962,8 +1596,19 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
+
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
 
         val ticket = TicketDTO(
             null,
@@ -971,6 +1616,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000000",
+            item.serialNum!!,
             customer.email,
             expert.email,
             null,
@@ -987,19 +1633,22 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
 
     @Test
     //@DirtiesContext
-    fun addTicketProductNotFound(){
+    fun addTicketProductNotFound() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1008,15 +1657,28 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
+
+
         productRepository.save(product)
 
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
         val ticket = TicketDTO(
             null,
             "Ticket title",
             "Ticket description",
             null,
             "0000000000001",
+            item.serialNum!!,
             customer.email,
             null,
             null,
@@ -1033,18 +1695,21 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
-
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun addTicketProductWrongFormat(){
+    fun addTicketProductWrongFormat() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1053,8 +1718,26 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
+
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
+        itemRepository.save(item)
 
         val ticket = TicketDTO(
             null,
@@ -1062,6 +1745,7 @@ class TicketControllerTests {
             "Ticket description",
             null,
             "0000000000001abc",
+            item.serialNum!!,
             customer.email,
             null,
             null,
@@ -1078,18 +1762,21 @@ class TicketControllerTests {
             entity,
             String::class.java
         )
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun addTicketWithStatus(){
+    fun addTicketWithStatus() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1098,15 +1785,33 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
+        itemRepository.save(item)
         val ticket = TicketDTO(
             null,
             "Ticket title",
             "Ticket description",
             null,
             "0000000000000",
+            item.serialNum!!,
             customer.email,
             null,
             TicketStatus.IN_PROGRESS,
@@ -1140,27 +1845,51 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(createdTicket.get())
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(createdTicket.get())
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun assignTicketSuccessfulManager(){
+    fun assignTicketSuccessfulManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
+
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1189,27 +1918,51 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun assignTicketForbiddenClient(){
+    fun assignTicketForbiddenClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1223,31 +1976,55 @@ class TicketControllerTests {
         val entity = TestUtils.testEntityHeader(ticketAssign, clientToken)
 
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun assignTicketForbiddenExpert(){
+    fun assignTicketForbiddenExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1261,31 +2038,54 @@ class TicketControllerTests {
         val entity = TestUtils.testEntityHeader(ticketAssign, expertToken)
 
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun assignReopenedTicketSuccessfulManager(){
+    fun assignReopenedTicketSuccessfulManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+        brandRepository.save(brand)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1314,27 +2114,51 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun assignTicketToCustomer(){
+    fun assignTicketToCustomer() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1347,31 +2171,55 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketAssign, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         profileRepository.delete(manager)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun wrongReassignTicket(){
+    fun wrongReassignTicket() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1392,27 +2240,51 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
         profileRepository.delete(manager)
     }
 
     @Test
     //@DirtiesContext
-    fun assignToClosedTicket(){
+    fun assignToClosedTicket() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        expert.expertCategories.add(category)
         profileRepository.save(manager)
         profileRepository.save(customer)
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketAssign = TicketAssignDTO(
@@ -1425,19 +2297,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketAssign, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulInProgressToClosedClient(){
+    fun updateTicketForbiddenInProgressToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1446,10 +2321,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1461,27 +2355,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
-
-        Assertions.assertTrue(updatedTicket.isPresent)
-        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
-
-
-        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
-        ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulInProgressToClosedManager(){
+    fun updateTicketSuccessfulInProgressToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1490,10 +2379,30 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1517,15 +2426,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulInProgressToOpenManager(){
+    fun updateTicketSuccessfulInProgressToOpenManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1534,10 +2446,30 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1561,15 +2493,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenInProgressToOpenClient(){
+    fun updateTicketForbiddenInProgressToOpenClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1578,10 +2513,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1593,18 +2547,21 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenInProgressToOpenExpert(){
+    fun updateTicketForbiddenInProgressToOpenExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1613,10 +2570,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1628,19 +2604,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, expertToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToClosedClient(){
+    fun updateTicketForbiddenOpenToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1649,10 +2628,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1664,27 +2662,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
-
-        Assertions.assertTrue(updatedTicket.isPresent)
-        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
-
-
-        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
-        ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToClosedManager(){
+    fun updateTicketSuccessfulOpenToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1693,10 +2686,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1720,15 +2732,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToClosedExpert(){
+    fun updateTicketSuccessfulOpenToClosedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1737,10 +2752,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1763,15 +2797,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulResolvedToClosedClient(){
+    fun updateTicketForbiddenResolvedToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1780,10 +2817,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1795,27 +2851,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
-
-        Assertions.assertTrue(updatedTicket.isPresent)
-        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
-
-
-        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
-        ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulResolvedToClosedManager(){
+    fun updateTicketSuccessfulResolvedToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1824,10 +2875,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1851,15 +2921,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulResolvedToClosedExpert(){
+    fun updateTicketSuccessfulResolvedToClosedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1868,10 +2941,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1895,15 +2987,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenResolvedToClosedOtherClient(){
+    fun updateTicketForbiddenResolvedToClosedOtherClient() {
         val customer = TestUtils.testProfile("mario.rossi@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val customer2 = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1914,10 +3009,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1929,20 +3043,23 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(customer2)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketForbiddenResolvedToClosedOtherExpert(){
+    fun updateTicketForbiddenResolvedToClosedOtherExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("mario.bianchi@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val expert2 = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
@@ -1953,10 +3070,30 @@ class TicketControllerTests {
         profileRepository.save(expert2)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -1968,20 +3105,23 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, expertToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         profileRepository.delete(expert2)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulReopenedToClosedClient(){
+    fun updateTicketForbiddenReopenedToClosedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -1990,10 +3130,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2005,27 +3164,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
-
-        Assertions.assertTrue(updatedTicket.isPresent)
-        Assertions.assertEquals(TicketStatus.CLOSED, updatedTicket.get().status)
-
-
-        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
-        ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulReopenedToClosedExpert(){
+    fun updateTicketSuccessfulReopenedToClosedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2034,10 +3188,28 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
-        productRepository.save(product)
+        val brand = Brand()
+        brand.name = "Apple"
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
+        productRepository.save(product)
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2061,15 +3233,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulReopenedToClosedManager(){
+    fun updateTicketSuccessfulReopenedToClosedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2078,10 +3253,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2105,15 +3299,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToResolvedClient(){
+    fun updateTicketSuccessfulOpenToResolvedClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2122,10 +3319,30 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2149,15 +3366,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToResolvedManager(){
+    fun updateTicketSuccessfulOpenToResolvedManager() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2166,10 +3386,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2193,15 +3432,19 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
+
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulOpenToResolvedExpert(){
+    fun updateTicketForbiddenOpenToResolvedExpert() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2210,10 +3453,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2226,26 +3488,22 @@ class TicketControllerTests {
         val entity = TestUtils.testEntityHeader(ticketUpdate, expertToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
 
-        Assertions.assertEquals(HttpStatus.OK, result.statusCode)
-
-        val updatedTicket = ticketRepository.findById(ticket.getId()!!)
-
-        Assertions.assertTrue(updatedTicket.isPresent)
-        Assertions.assertEquals(TicketStatus.RESOLVED, updatedTicket.get().status)
-
-
-        val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
-        ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulInProgressToResolved(){
+    fun updateTicketSuccessfulInProgressToResolved() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2254,10 +3512,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2281,15 +3558,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulReopenedToResolved(){
+    fun updateTicketSuccessfulReopenedToResolved() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2298,10 +3578,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2325,15 +3624,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongReopenedToInProgress(){
+    fun updateTicketWrongReopenedToInProgress() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2342,11 +3644,32 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
+        ticket.expert = null
         ticketRepository.save(ticket)
+
 
         val ticketUpdate = TicketUpdateDTO(
             ticket.getId()!!,
@@ -2357,19 +3680,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulClosedToReopen(){
+    fun updateTicketSuccessfulClosedToReopen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2378,10 +3704,36 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(System.currentTimeMillis()),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2389,9 +3741,9 @@ class TicketControllerTests {
             TicketStatus.REOPENED
         )
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/update")
+        val uri = URI("http://localhost:$port/API/client/ticketing/update")
 
-        val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
+        val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
@@ -2405,15 +3757,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketSuccessfulResolvedToReopen(){
+    fun updateTicketSuccessfulResolvedToReopenClient() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2422,10 +3777,37 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(
+            product,
+            customer,
+            UUID.randomUUID(),
+            12341234,
+            12,
+            Timestamp(System.currentTimeMillis())
+        )
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2433,9 +3815,9 @@ class TicketControllerTests {
             TicketStatus.REOPENED
         )
 
-        val uri = URI("http://localhost:$port/API/manager/ticketing/update")
+        val uri = URI("http://localhost:$port/API/client/ticketing/update")
 
-        val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
+        val entity = TestUtils.testEntityHeader(ticketUpdate, clientToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
 
         Assertions.assertEquals(HttpStatus.OK, result.statusCode)
@@ -2449,15 +3831,18 @@ class TicketControllerTests {
         val createdTicketHistory = ticketHistoryRepository.findAllByTicket(ticket)
         ticketHistoryRepository.delete(createdTicketHistory[0])
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongOpenToReopened(){
+    fun updateTicketWrongOpenToReopened() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2466,10 +3851,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.OPEN, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.OPEN,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2481,19 +3885,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongClosedToOpen(){
+    fun updateTicketWrongClosedToOpen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2502,10 +3909,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2517,19 +3943,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongClosedToInProgress(){
+    fun updateTicketWrongClosedToInProgress() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2538,10 +3967,30 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2553,19 +4002,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongClosedToResolved(){
+    fun updateTicketWrongClosedToResolved() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2574,10 +4026,30 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.CLOSED, expert, 2, "Ticket sample", "Ticket description sample")
+
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.CLOSED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2589,19 +4061,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongInProgressToReopened(){
+    fun updateTicketWrongInProgressToReopened() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2610,10 +4085,30 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.IN_PROGRESS, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.IN_PROGRESS,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2625,19 +4120,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongReopenedToOpen(){
+    fun updateTicketWrongReopenedToOpen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2646,10 +4144,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.REOPENED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.REOPENED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2661,19 +4178,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongResolvedToInProgress(){
+    fun updateTicketWrongResolvedToInProgress() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2682,10 +4202,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2697,19 +4236,22 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 
     @Test
     //@DirtiesContext
-    fun updateTicketWrongResolvedToOpen(){
+    fun updateTicketWrongResolvedToOpen() {
         val customer = TestUtils.testProfile("client@polito.it", "Mario", "Rossi", ProfileRole.CLIENT)
         val expert = TestUtils.testProfile("expert@polito.it", "Mario", "Bianchi", ProfileRole.EXPERT)
         val manager = TestUtils.testProfile("manager@polito.it", "Manager", "Polito", ProfileRole.MANAGER)
@@ -2718,10 +4260,29 @@ class TicketControllerTests {
         profileRepository.save(expert)
 
 
-        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", "HP")
+        val brand = Brand()
+        brand.name = "Apple"
+
+        brandRepository.save(brand)
+        val category = Category()
+        category.name = ProductCategory.SMARTPHONE
+        categoryRepository.save(category)
+        val product = TestUtils.testProduct("0000000000000", "PC Omen Intel i7", brand, category)
+
         productRepository.save(product)
 
-        val ticket = TestUtils.testTicket(Timestamp(0), product, customer, TicketStatus.RESOLVED, expert, 2, "Ticket sample", "Ticket description sample")
+        val item = TestUtils.testItem(product, customer, UUID.randomUUID(), 12341234, 12, Timestamp(0))
+        itemRepository.save(item)
+        val ticket = TestUtils.testTicket(
+            Timestamp(0),
+            item,
+            customer,
+            TicketStatus.RESOLVED,
+            expert,
+            2,
+            "Ticket sample",
+            "Ticket description sample"
+        )
         ticketRepository.save(ticket)
 
         val ticketUpdate = TicketUpdateDTO(
@@ -2733,14 +4294,17 @@ class TicketControllerTests {
 
         val entity = TestUtils.testEntityHeader(ticketUpdate, managerToken)
         val result = restTemplate.exchange(uri, HttpMethod.PUT, entity, String::class.java)
-
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
-
         ticketRepository.delete(ticket)
+        itemRepository.delete(item)
         profileRepository.delete(customer)
         profileRepository.delete(expert)
         productRepository.delete(product)
         profileRepository.delete(manager)
+        brandRepository.delete(brand)
+        categoryRepository.delete(category)
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.statusCode)
+
+
     }
 }
 

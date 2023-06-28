@@ -9,7 +9,7 @@ interface TicketService {
     fun expertGetTicket(ticketId: Long, expertEmail: String): TicketDTO
 
     fun clientGetTicketsFiltered(
-        customerEmail: String?,
+        clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,
@@ -21,7 +21,7 @@ interface TicketService {
     ): List<TicketDTO>
 
     fun expertGetTicketsFiltered(
-        customerEmail: String?,
+        clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,
@@ -33,7 +33,7 @@ interface TicketService {
     ): List<TicketDTO>
 
     fun managerGetTicketsFiltered(
-        customerEmail: String?,
+        clientEmail: String?,
         minPriority: Int?,
         maxPriority: Int?,
         productId: String?,

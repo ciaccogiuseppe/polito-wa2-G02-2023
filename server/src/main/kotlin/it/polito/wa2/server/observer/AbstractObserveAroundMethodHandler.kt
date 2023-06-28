@@ -7,7 +7,8 @@ import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component
 
 @Component
-class AbstractObserveAroundMethodHandler: AbstractLogAspect(), ObservationHandler<ObservedAspect.ObservedAspectContext> {
+class AbstractObserveAroundMethodHandler : AbstractLogAspect(),
+    ObservationHandler<ObservedAspect.ObservedAspectContext> {
     override fun onStart(context: ObservedAspect.ObservedAspectContext) {
         super.onStart(context)
         /* we can get much information (including class, arguments...)

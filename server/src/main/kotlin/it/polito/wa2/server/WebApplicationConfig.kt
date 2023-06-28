@@ -18,8 +18,8 @@ class WebApplicationConfig : WebMvcConfigurer {
 
     @Bean
     fun containerCustomizer(): WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
-        return WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
-                factory -> factory?.addErrorPages(ErrorPage(HttpStatus.NOT_FOUND, "/notFound"))
+        return WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> { factory ->
+            factory?.addErrorPages(ErrorPage(HttpStatus.NOT_FOUND, "/notFound"))
         }
     }
 
